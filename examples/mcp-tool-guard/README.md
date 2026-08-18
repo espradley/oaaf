@@ -1,7 +1,9 @@
 # OAAF as an MCP tool guard
 
 A runnable example for MCP server and gateway maintainers. No prior knowledge of
-AAT or AuthZEN required.
+AAT or AuthZEN required. Needs Node.js 20+ and nothing else — no account, no service.
+
+From the repository root (not this directory):
 
 ```bash
 npm install
