@@ -21,6 +21,7 @@ import { verifyAndEvaluate, explain } from '@oaaf/sdk';
 
 const decision = await verifyAndEvaluate({
   tokens, // AAT delegation chain, root first
+  trustAnchors, // public keys trusted as root issuers
   pop, // proof-of-possession JWT
   tool: 'read_file',
   args: { path: '/data/q4.pdf' },
@@ -86,6 +87,13 @@ behaviour is tied to that revision until deliberately upgraded.
 The mapping between AAT and AuthZEN is an OAAF profile, frozen by
 [RFC-0001](../../rfcs/0001-aat-authzen-enforcement-profile.md). It is not a requirement
 of either standard.
+
+## Trust anchors
+
+`trustAnchors` is required. A root token is a claim, not a trust root: without an
+anchor set, anyone can mint a self-signed root and the chain proves nothing about who
+granted the authority. The draft verifies the root against a configured trust anchor,
+and so does this.
 
 ## What this does not do
 

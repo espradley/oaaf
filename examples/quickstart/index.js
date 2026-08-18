@@ -16,9 +16,12 @@ const HOUR = 3600;
 const LEAF_JTI = 'grant-1-delegated';
 
 // 1. An issuer grants an agent read access to two reports.
+//    The issuer key is the trust anchor; the agent key is the holder.
+const issuerKey = await generateHolderKey();
 const agent = await generateHolderKey();
 const rootToken = await mintRootToken({
   issuer: 'https://authority.example',
+  issuerKey,
   holder: agent,
   tools: {
     read_file: {
@@ -61,7 +64,13 @@ async function attempt(path) {
   console.log(`read_file(path="${path}")`);
   console.log('─'.repeat(64));
 
-  const verification = await verifyAuthority({ tokens: chain, pop, tool: 'read_file', args });
+  const verification = await verifyAuthority({
+    tokens: chain,
+    trustAnchors: [issuerKey.publicJwk],
+    pop,
+    tool: 'read_file',
+    args,
+  });
 
   if (!verification.ok) {
     console.log('DENIED — authority did not verify');

@@ -30,6 +30,8 @@ export interface Chain {
   keys: Keypair[];
   leafJti: string;
   maxDepth: number;
+  /** Public keys trusted as root issuers, for `verifyDelegationChain`. */
+  trustAnchors: Record<string, unknown>[];
 }
 
 /** Root-only chain. */
@@ -37,10 +39,12 @@ export async function buildRoot(
   tools: Record<string, ToolConstraints> = EXAMPLE_TOOLS,
   overrides: { issuedAt?: number; expiresAt?: number; maxDepth?: number } = {},
 ): Promise<Chain> {
+  const issuerKey = await generateHolderKey();
   const holder = await generateHolderKey();
   const jti = 'root-1';
   const token = await mintRootToken({
     issuer: ISSUER,
+    issuerKey,
     holder,
     tools,
     issuedAt: overrides.issuedAt ?? NOW,
@@ -48,7 +52,13 @@ export async function buildRoot(
     maxDepth: overrides.maxDepth ?? 3,
     jti,
   });
-  return { tokens: [token], keys: [holder], leafJti: jti, maxDepth: overrides.maxDepth ?? 3 };
+  return {
+    tokens: [token],
+    keys: [holder],
+    leafJti: jti,
+    maxDepth: overrides.maxDepth ?? 3,
+    trustAnchors: [issuerKey.publicJwk],
+  };
 }
 
 /** Append one derived token narrowing the current leaf. */
@@ -86,6 +96,7 @@ export async function extend(
     keys: [...chain.keys, holder],
     leafJti: jti,
     maxDepth: chain.maxDepth,
+    trustAnchors: chain.trustAnchors,
   };
 }
 

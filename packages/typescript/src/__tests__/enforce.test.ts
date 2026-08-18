@@ -14,6 +14,7 @@ describe('proof of possession', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf' });
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf' },
@@ -26,6 +27,7 @@ describe('proof of possession', () => {
     const chain = await buildRoot();
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop: '',
       tool: 'read_file',
       args: {},
@@ -47,6 +49,7 @@ describe('proof of possession', () => {
     });
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf' },
@@ -61,6 +64,7 @@ describe('proof of possession', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf' }, { aat_id: 'other' });
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf' },
@@ -75,6 +79,7 @@ describe('proof of possession', () => {
     const pop = await popFor(chain, 'search_index', {});
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: {},
@@ -89,6 +94,7 @@ describe('proof of possession', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf' });
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q4.pdf' },
@@ -105,6 +111,7 @@ describe('proof of possession', () => {
     const pop = await popFor(chain, 'report', { b: 2, a: 1 });
     const result = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'report',
       args: { a: 1, b: 2 },
@@ -120,6 +127,7 @@ describe('evaluation', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf' });
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf' },
@@ -135,6 +143,7 @@ describe('evaluation', () => {
     const pop = await popFor(chain, 'delete_file', {});
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'delete_file',
       args: {},
@@ -149,6 +158,7 @@ describe('evaluation', () => {
     const pop = await popFor(chain, 'read_file', { path: '/etc/passwd' });
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/etc/passwd' },
@@ -163,6 +173,7 @@ describe('evaluation', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf', encoding: 'utf8' });
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf', encoding: 'utf8' },
@@ -177,6 +188,7 @@ describe('evaluation', () => {
     const pop = await popFor(chain, 'search_index', { query: 'anything' });
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'search_index',
       args: { query: 'anything' },
@@ -193,6 +205,7 @@ describe('evaluation', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q4.pdf' });
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q4.pdf' },
@@ -210,6 +223,7 @@ describe('AuthZEN mapping', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf' });
     const verification = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf' },
@@ -234,6 +248,7 @@ describe('AuthZEN mapping', () => {
     const pop = await popFor(chain, 'delete_file', {});
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'delete_file',
       args: {},
@@ -249,6 +264,7 @@ describe('AuthZEN mapping', () => {
     const chain = await buildRoot();
     const decision = await verifyAndEvaluate({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop: '',
       tool: 'read_file',
       args: {},
@@ -263,6 +279,7 @@ describe('AuthZEN mapping', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q3.pdf' });
     const input = {
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q3.pdf' },
@@ -284,6 +301,7 @@ describe('explanation', () => {
     const pop = await popFor(chain, 'read_file', { path: '/data/q4.pdf' });
     const verification = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'read_file',
       args: { path: '/data/q4.pdf' },
@@ -307,6 +325,7 @@ describe('explanation', () => {
     const pop = await popFor(chain, 'search_index', {});
     const verification = await verifyAuthority({
       tokens: chain.tokens,
+      trustAnchors: chain.trustAnchors,
       pop,
       tool: 'search_index',
       args: {},

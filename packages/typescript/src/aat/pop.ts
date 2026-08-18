@@ -15,6 +15,9 @@ import type { VerifiedDelegationChain } from './verify.js';
 
 const PERMITTED_ALGORITHMS: ReadonlySet<string> = new Set(['EdDSA']);
 
+/** Clock tolerance for a proof of possession, in seconds. */
+export const POP_FRESHNESS_SECONDS = 300;
+
 export type PopResult = { ok: true } | { ok: false; denials: Denial[] };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -44,6 +47,7 @@ export async function verifyProofOfPossession(
   chain: VerifiedDelegationChain,
   tool: string,
   args: ToolArguments,
+  now: number = Math.floor(Date.now() / 1000),
 ): Promise<PopResult> {
   if (typeof pop !== 'string' || pop.length === 0) {
     return {
@@ -126,6 +130,14 @@ export async function verifyProofOfPossession(
       denial('pop_tool_mismatch', 'pop', 'Proof of possession names a different tool.', { tool }),
     );
   }
+  // Step 7g: a proof is bound to one invocation, so an old one must not be
+  // replayable indefinitely.
+  if (Math.abs(payload.iat - now) > POP_FRESHNESS_SECONDS) {
+    denials.push(
+      denial('pop_stale', 'pop', 'Proof of possession is outside the freshness window.'),
+    );
+  }
+
   if (canonicalize(payload.hta) !== canonicalize(args)) {
     denials.push(
       denial(

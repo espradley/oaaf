@@ -33,6 +33,11 @@ export interface VerifiedAuthority {
 export interface VerifyAuthorityInput {
   /** Delegation chain, root first. */
   tokens: readonly string[];
+  /**
+   * Public keys trusted as root issuers. Required: a root token is a claim,
+   * not a trust root.
+   */
+  trustAnchors: readonly Record<string, unknown>[];
   /** Proof-of-possession JWT. Required — see the module note. */
   pop: string;
   tool: string;
@@ -61,13 +66,19 @@ export interface Decision {
 export async function verifyAuthority(input: VerifyAuthorityInput): Promise<VerifyAuthorityResult> {
   const args = input.args ?? {};
 
-  const chainResult = await verifyDelegationChain(
-    input.tokens,
-    input.now === undefined ? {} : { now: input.now },
-  );
+  const chainResult = await verifyDelegationChain(input.tokens, {
+    trustAnchors: input.trustAnchors,
+    ...(input.now === undefined ? {} : { now: input.now }),
+  });
   if (!chainResult.ok) return { ok: false, denials: chainResult.denials };
 
-  const popResult = await verifyProofOfPossession(input.pop, chainResult.chain, input.tool, args);
+  const popResult = await verifyProofOfPossession(
+    input.pop,
+    chainResult.chain,
+    input.tool,
+    args,
+    input.now,
+  );
   if (!popResult.ok) return { ok: false, denials: popResult.denials };
 
   return { ok: true, authority: { chain: chainResult.chain, tool: input.tool, args } };
@@ -99,6 +110,24 @@ export function evaluate(authority: VerifiedAuthority): Decision {
   }
 
   const constrained = Object.keys(constraints).length > 0;
+
+  // Step 6b: under closed-world semantics a constrained argument is required,
+  // not merely permitted. Omitting one would otherwise slip past every
+  // constraint on it.
+  if (constrained) {
+    for (const argument of Object.keys(constraints)) {
+      if (!(argument in args)) {
+        denials.push(
+          denial(
+            'argument_missing',
+            'evaluation',
+            `Argument "${argument}" is constrained by this authority and must be supplied.`,
+            { tool, argument },
+          ),
+        );
+      }
+    }
+  }
 
   for (const [argument, value] of Object.entries(args)) {
     const constraint = constraints[argument];

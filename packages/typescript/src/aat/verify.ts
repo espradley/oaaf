@@ -25,7 +25,12 @@ import { isConstraint, isPermittedPair, subsumes, type Constraint } from './cons
 /** Limits. Deliberately conservative; the draft requires bounds, not these values. */
 export const MAX_CHAIN_LENGTH = 16;
 export const MAX_TOKEN_BYTES = 16 * 1024;
-export const MAX_IAT_SKEW_SECONDS = 60;
+/** §4.4 recommends 30 seconds. */
+export const MAX_IAT_SKEW_SECONDS = 30;
+/** §4.4 recommends 90 days as an upper bound. */
+export const MAX_TOKEN_LIFETIME_SECONDS = 90 * 24 * 3600;
+export const MAX_DELEGATION_DEPTH = 8;
+export const MAX_CONSTRAINT_DEPTH = 8;
 
 /** Algorithms this build accepts. The draft mandates Ed25519 support. */
 const PERMITTED_ALGORITHMS: ReadonlySet<string> = new Set(['EdDSA']);
@@ -63,6 +68,14 @@ export type ChainResult =
   { ok: true; chain: VerifiedDelegationChain } | { ok: false; denials: Denial[] };
 
 export interface VerifyChainOptions {
+  /**
+   * Public keys trusted as root issuers.
+   *
+   * Required. A root token is a claim, not a trust root: without an anchor set
+   * anyone can mint a self-signed root and the chain proves nothing. The draft
+   * verifies the root "against a key in trust_anchors", and so does this.
+   */
+  trustAnchors: readonly Record<string, unknown>[];
   /** Seconds since epoch. Injectable so temporal behaviour is testable. */
   now?: number;
   maxChainLength?: number;
@@ -74,6 +87,44 @@ function fail(...denials: Denial[]): ChainResult {
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * True when a JWK carries private key material.
+ *
+ * A `cnf` claim must convey a public key. A token embedding `d`, `p`, or `q`
+ * has leaked a private key into a credential that is passed around by design.
+ */
+function containsPrivateKeyMaterial(jwk: Record<string, unknown>): boolean {
+  return ['d', 'p', 'q', 'dp', 'dq', 'qi'].some((member) => member in jwk);
+}
+
+function isUri(value: string): boolean {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Nesting depth of a constraint tree, counting the outermost node as 1. */
+function constraintDepth(value: unknown, seen = 0): number {
+  if (seen > MAX_CONSTRAINT_DEPTH + 1) return seen;
+  if (!isPlainObject(value)) return seen;
+  const nested = value['constraints'];
+  if (!Array.isArray(nested)) return seen + 1;
+  return Math.max(...nested.map((child) => constraintDepth(child, seen + 1)), seen + 1);
+}
+
+/** Deepest constraint tree across every tool in a grant map. */
+function exceedsConstraintDepth(tools: Record<string, ToolConstraints>): boolean {
+  for (const constraints of Object.values(tools)) {
+    for (const constraint of Object.values(constraints)) {
+      if (constraintDepth(constraint) > MAX_CONSTRAINT_DEPTH) return true;
+    }
+  }
+  return false;
 }
 
 /** Shape check. Does not trust anything; only decides whether checks can run. */
@@ -177,9 +228,32 @@ function verifyNarrowing(
       continue;
     }
 
-    // An empty parent map authorizes the tool unconstrained, so any child
-    // constraint narrows it.
-    const parentUnconstrained = Object.keys(parentConstraints).length === 0;
+    // §4.5 / step 4p2-4p3: when the parent constrains a tool, closed-world
+    // semantics make the key set the invocation shape. Adding a key produces
+    // invocations the parent would reject as unknown; dropping one produces
+    // invocations omitting a parent-required argument. Either way the derived
+    // invocation set is disjoint from the parent's, not a subset — so the key
+    // sets must match exactly. An open-world parent (empty map) may be
+    // narrowed to any key set.
+    const parentKeys = Object.keys(parentConstraints);
+    const parentUnconstrained = parentKeys.length === 0;
+
+    if (!parentUnconstrained) {
+      const childKeys = Object.keys(childConstraints);
+      const sameKeySet =
+        childKeys.length === parentKeys.length && parentKeys.every((k) => k in childConstraints);
+      if (!sameKeySet) {
+        denials.push(
+          denial(
+            'argument_key_set_mismatch',
+            'chain',
+            `Constraint map for tool "${tool}" must name exactly the same arguments as the parent.`,
+            { tokenIndex, tool },
+          ),
+        );
+        continue;
+      }
+    }
 
     for (const [argument, childConstraint] of Object.entries(childConstraints)) {
       if (!isConstraint(childConstraint)) {
@@ -197,17 +271,9 @@ function verifyNarrowing(
       if (parentUnconstrained) continue;
 
       const parentConstraint = parentConstraints[argument];
-      if (parentConstraint === undefined) {
-        denials.push(
-          denial(
-            'argument_not_delegated',
-            'chain',
-            `Argument "${argument}" of tool "${tool}" was not constrained by the parent, so it cannot be granted here.`,
-            { tokenIndex, tool, argument },
-          ),
-        );
-        continue;
-      }
+      // Unreachable after the key-set check above; retained so a future change
+      // to that check cannot silently skip subsumption.
+      if (parentConstraint === undefined) continue;
 
       if (!isConstraint(parentConstraint)) {
         denials.push(
@@ -258,7 +324,7 @@ function verifyNarrowing(
  */
 export async function verifyDelegationChain(
   tokens: readonly string[],
-  options: VerifyChainOptions = {},
+  options: VerifyChainOptions,
 ): Promise<ChainResult> {
   const now = options.now ?? Math.floor(Date.now() / 1000);
   const maxLength = options.maxChainLength ?? MAX_CHAIN_LENGTH;
@@ -336,14 +402,77 @@ export async function verifyDelegationChain(
     );
   }
 
-  // The root is self-signed under its own holder key: the trust root is the
-  // issuer relationship, which is deployment configuration, not a chain check.
-  const rootVerification = await verifySignature(rootToken, rootPayloadRaw.cnf.jwk);
-  if (!rootVerification.ok) {
-    return fail({ ...rootVerification.denial, tokenIndex: 0 });
+  // Step 3b: the root signature is verified against a configured trust anchor.
+  // Verifying it against its own `cnf.jwk` would accept any self-signed root
+  // and the chain would prove nothing about who granted the authority.
+  if (options.trustAnchors.length === 0) {
+    return fail(
+      denial('untrusted_root', 'chain', 'No trust anchors were configured.', { tokenIndex: 0 }),
+    );
+  }
+
+  let rootVerified = false;
+  let lastAnchorDenial: Denial | null = null;
+  for (const anchor of options.trustAnchors) {
+    const attempt = await verifySignature(rootToken, anchor);
+    if (attempt.ok) {
+      rootVerified = true;
+      break;
+    }
+    lastAnchorDenial = attempt.denial;
+  }
+  if (!rootVerified) {
+    return fail(
+      lastAnchorDenial?.code === 'algorithm_not_permitted'
+        ? { ...lastAnchorDenial, tokenIndex: 0 }
+        : denial(
+            'untrusted_root',
+            'chain',
+            'Root token is not signed by any configured trust anchor.',
+            { tokenIndex: 0 },
+          ),
+    );
   }
 
   const root = rootPayloadRaw;
+
+  if (containsPrivateKeyMaterial(root.cnf.jwk)) {
+    return fail(
+      denial('private_key_material', 'chain', 'Token cnf.jwk contains private key material.', {
+        tokenIndex: 0,
+      }),
+    );
+  }
+  if (root.jti.length === 0) {
+    return fail(
+      denial('token_malformed', 'chain', 'Root jti must be non-empty.', { tokenIndex: 0 }),
+    );
+  }
+  if (!isUri(root.iss)) {
+    return fail(denial('token_malformed', 'chain', 'Root iss must be a URI.', { tokenIndex: 0 }));
+  }
+  if (!Number.isInteger(root.del_max_depth) || root.del_max_depth < 0) {
+    return fail(
+      denial(
+        'delegation_ceiling_invalid',
+        'chain',
+        'Root del_max_depth must be a non-negative integer.',
+        {
+          tokenIndex: 0,
+        },
+      ),
+    );
+  }
+  if (root.del_max_depth > MAX_DELEGATION_DEPTH) {
+    return fail(
+      denial(
+        'delegation_ceiling_invalid',
+        'chain',
+        `Root del_max_depth exceeds the implementation limit of ${MAX_DELEGATION_DEPTH}.`,
+        { tokenIndex: 0 },
+      ),
+    );
+  }
 
   if (root.del_depth !== 0) {
     return fail(
@@ -361,6 +490,21 @@ export async function verifyDelegationChain(
   const rootTemporal = checkTemporal(root, now, 0);
   if (rootTemporal.length > 0) return { ok: false, denials: rootTemporal };
 
+  if (root.exp <= root.iat) {
+    return fail(
+      denial('expiry_not_after_issuance', 'chain', 'Root exp must be after iat.', {
+        tokenIndex: 0,
+      }),
+    );
+  }
+  if (root.exp > root.iat + MAX_TOKEN_LIFETIME_SECONDS) {
+    return fail(
+      denial('lifetime_exceeded', 'chain', 'Root token lifetime exceeds the permitted maximum.', {
+        tokenIndex: 0,
+      }),
+    );
+  }
+
   const rootTools = extractToolGrants(root);
   if (rootTools === null) {
     return fail(
@@ -369,6 +513,19 @@ export async function verifyDelegationChain(
         'chain',
         'Root token must carry exactly one attenuating_agent_token entry with a tools map.',
         { tokenIndex: 0 },
+      ),
+    );
+  }
+
+  if (exceedsConstraintDepth(rootTools)) {
+    return fail(
+      denial(
+        'constraint_too_deep',
+        'chain',
+        'A constraint tree exceeds the permitted nesting depth.',
+        {
+          tokenIndex: 0,
+        },
       ),
     );
   }
@@ -400,6 +557,24 @@ export async function verifyDelegationChain(
       );
     }
     const child = childRaw;
+
+    if (containsPrivateKeyMaterial(child.cnf.jwk)) {
+      return fail(
+        denial('private_key_material', 'chain', 'Token cnf.jwk contains private key material.', {
+          tokenIndex: index,
+        }),
+      );
+    }
+    if (child.jti.length === 0) {
+      return fail(
+        denial('token_malformed', 'chain', 'Token jti must be non-empty.', { tokenIndex: index }),
+      );
+    }
+    if (!Number.isInteger(child.del_depth) || !Number.isInteger(child.del_max_depth)) {
+      return fail(
+        denial('token_malformed', 'chain', 'Depth claims must be integers.', { tokenIndex: index }),
+      );
+    }
 
     if (child.iss !== parent.holder) {
       return fail(
@@ -446,11 +621,34 @@ export async function verifyDelegationChain(
       );
     }
 
-    // AAT -01 requires child.del_depth <= parent.del_max_depth but does not
-    // state that del_max_depth itself must be monotonic. Without that, a
-    // derived token can simply declare a larger ceiling and the root's limit
-    // becomes unenforceable after one hop. Enforced here as a narrowing
-    // invariant; recorded in RFC-0001 as an upstream finding.
+    // Step 4f.
+    if (child.del_depth > MAX_DELEGATION_DEPTH) {
+      return fail(
+        denial(
+          'delegation_depth_exceeded',
+          'chain',
+          `del_depth exceeds the implementation limit of ${MAX_DELEGATION_DEPTH}.`,
+          { tokenIndex: index },
+        ),
+      );
+    }
+
+    // Step 4m.
+    if (child.del_depth > child.del_max_depth) {
+      return fail(
+        denial(
+          'depth_exceeds_own_ceiling',
+          'chain',
+          'del_depth exceeds the token own del_max_depth.',
+          {
+            tokenIndex: index,
+          },
+        ),
+      );
+    }
+
+    // Step 4g: delegation ceilings are monotonic, so a delegate cannot raise
+    // the bound its issuer set.
     if (child.del_max_depth > parent.payload.del_max_depth) {
       return fail(
         denial(
@@ -468,6 +666,13 @@ export async function verifyDelegationChain(
     if (child.exp > parent.payload.exp) {
       return fail(
         denial('expiry_exceeds_parent', 'chain', 'Derived token outlives its parent.', {
+          tokenIndex: index,
+        }),
+      );
+    }
+    if (child.exp <= child.iat) {
+      return fail(
+        denial('expiry_not_after_issuance', 'chain', 'Token exp must be after iat.', {
           tokenIndex: index,
         }),
       );
@@ -492,6 +697,19 @@ export async function verifyDelegationChain(
       );
     }
 
+    if (exceedsConstraintDepth(childTools)) {
+      return fail(
+        denial(
+          'constraint_too_deep',
+          'chain',
+          'A constraint tree exceeds the permitted nesting depth.',
+          {
+            tokenIndex: index,
+          },
+        ),
+      );
+    }
+
     const narrowing = verifyNarrowing(parent.tools, childTools, index);
     if (narrowing.length > 0) return { ok: false, denials: narrowing };
 
@@ -505,6 +723,18 @@ export async function verifyDelegationChain(
   }
 
   const leaf = verified[verified.length - 1] as VerifiedToken;
+
+  // Step 5, defence in depth: a mismatch means the chain was assembled wrongly.
+  if (verified.length !== leaf.payload.del_depth + 1) {
+    return fail(
+      denial(
+        'chain_length_mismatch',
+        'chain',
+        'Chain length does not match the leaf delegation depth.',
+        { tokenIndex: verified.length - 1 },
+      ),
+    );
+  }
 
   return {
     ok: true,

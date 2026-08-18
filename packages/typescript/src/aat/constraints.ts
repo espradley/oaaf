@@ -11,9 +11,9 @@
  * Unrecognized constraint types are rejected rather than ignored. A constraint
  * that cannot be understood cannot be shown to narrow anything.
  *
- * Two ambiguities in -01 are handled here by failing closed; both are recorded
- * in RFC-0001 and should be raised with the draft author. See PERMITTED_PAIRS
- * and `subsumesAny` for the specifics.
+ * Cross-type narrowing is permitted only where §4.5 says so. The rules are
+ * stated there per derived type rather than as a table; `isPermittedPair`
+ * transcribes them.
  */
 
 export type ConstraintType =
@@ -194,36 +194,35 @@ function satisfiesRange(constraint: RangeConstraint, value: unknown): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Permitted (parent type, derived type) pairs, transcribed from AAT -01 §4.5.
- *
- * Deliberately no more permissive than the draft's table. Two consequences are
- * surprising and are believed to be under-specification rather than intent:
- *
- *   - No pair lists `contains` or `subset` as a *parent* type, so a parent
- *     constraint of either kind cannot be restated in a derived token at all.
- *   - `wildcard` may only be narrowed to `exact` or `wildcard` — not to
- *     `one_of` or `range`, which would be the natural narrowings.
- *
- * Both are filed in RFC-0001 for upstream clarification. Until the draft says
- * otherwise, the closed-world rule is explicit and failing closed is never the
- * unsafe direction: a child may always omit the argument or the tool instead.
+ * Cross-type targets a derived `exact` may narrow, per AAT -01 §4.5:
+ * "it subsumes a parent exact if the values are identical; it subsumes a
+ * parent range if the exact value is a number that falls within the parent
+ * range; it subsumes a parent one_of if the exact value is a member of the
+ * parent set; it subsumes a parent wildcard unconditionally."
  */
-const PERMITTED_PAIRS: ReadonlySet<string> = new Set([
-  'exact>exact',
-  'range>exact',
-  'one_of>exact',
-  'wildcard>exact',
-  'range>range',
-  'one_of>one_of',
-  'not_one_of>not_one_of',
-  'wildcard>wildcard',
-  'all>all',
-  'any>any',
-]);
+const EXACT_PARENT_TYPES: ReadonlySet<string> = new Set(['exact', 'range', 'one_of', 'wildcard']);
 
-/** True when the (parent, derived) type pair appears in the draft's table. */
+/**
+ * True when the (parent, derived) type pair is permitted by §4.5.
+ *
+ * The section states the rules per derived type rather than as a table:
+ *
+ *   - "Any other constraint type subsumes a parent wildcard" — a wildcard
+ *     parent may be narrowed to any type at all.
+ *   - "A derived wildcard is valid only if the parent is also wildcard."
+ *   - A derived `exact` may narrow `exact`, `range`, `one_of`, or `wildcard`.
+ *   - Every other type narrows only its own type.
+ *   - A derived `not_one_of` against a parent `one_of` is explicitly refused:
+ *     it accepts values outside the parent's set and cannot be shown to
+ *     subsume it without domain knowledge.
+ *
+ * Anything not permitted above MUST be rejected.
+ */
 export function isPermittedPair(parent: ConstraintType, derived: ConstraintType): boolean {
-  return PERMITTED_PAIRS.has(`${parent}>${derived}`);
+  if (parent === 'wildcard') return true;
+  if (derived === 'wildcard') return false;
+  if (derived === 'exact') return EXACT_PARENT_TYPES.has(parent);
+  return parent === derived;
 }
 
 /**
@@ -236,40 +235,56 @@ export function subsumes(parent: Constraint, derived: Constraint): boolean {
   if (!isConstraint(parent) || !isConstraint(derived)) return false;
   if (!isPermittedPair(parent.constraint_type, derived.constraint_type)) return false;
 
-  switch (parent.constraint_type) {
-    case 'exact':
-      return derived.constraint_type === 'exact' && jsonEqual(parent.value, derived.value);
+  // A wildcard parent is narrowed by anything.
+  if (parent.constraint_type === 'wildcard') return true;
 
-    case 'wildcard':
-      // Only 'exact' and 'wildcard' reach here; both are narrowings of wildcard.
-      return true;
+  switch (derived.constraint_type) {
+    case 'exact':
+      return exactSubsumedBy(parent, derived.value);
+
+    case 'range':
+      return parent.constraint_type === 'range' && rangeSubsumes(parent, derived);
 
     case 'one_of':
-      if (derived.constraint_type === 'exact') return includesValue(parent.values, derived.value);
-      if (derived.constraint_type === 'one_of') return isSubsetOf(derived.values, parent.values);
-      return false;
+      return parent.constraint_type === 'one_of' && isSubsetOf(derived.values, parent.values);
 
     case 'not_one_of':
       // Narrowing means excluding at least as much.
       return (
-        derived.constraint_type === 'not_one_of' && isSubsetOf(parent.excluded, derived.excluded)
+        parent.constraint_type === 'not_one_of' && isSubsetOf(parent.excluded, derived.excluded)
       );
 
-    case 'range':
-      if (derived.constraint_type === 'exact') return satisfiesRange(parent, derived.value);
-      if (derived.constraint_type === 'range') return rangeSubsumes(parent, derived);
+    case 'contains':
+      // Requiring more elements is a restriction.
+      return parent.constraint_type === 'contains' && isSubsetOf(parent.required, derived.required);
+
+    case 'subset':
+      // Shrinking the allowed set is a restriction.
+      return parent.constraint_type === 'subset' && isSubsetOf(derived.allowed, parent.allowed);
+
+    case 'wildcard':
+      // Unreachable: only a wildcard parent permits a wildcard derived, and
+      // that case returned above.
       return false;
 
     case 'all':
-      return derived.constraint_type === 'all' && subsumesAll(parent, derived);
+      return parent.constraint_type === 'all' && subsumesAll(parent, derived);
 
     case 'any':
-      return derived.constraint_type === 'any' && subsumesAny(parent, derived);
+      return parent.constraint_type === 'any' && subsumesAny(parent, derived);
+  }
+}
 
-    case 'contains':
-    case 'subset':
-      // No permitted pair names these as a parent type; unreachable via the
-      // pair check above, and rejected here too rather than falling through.
+/** Whether a derived `exact` value narrows the given parent constraint. */
+function exactSubsumedBy(parent: Constraint, value: unknown): boolean {
+  switch (parent.constraint_type) {
+    case 'exact':
+      return jsonEqual(parent.value, value);
+    case 'range':
+      return satisfiesRange(parent, value);
+    case 'one_of':
+      return includesValue(parent.values, value);
+    default:
       return false;
   }
 }
@@ -299,27 +314,43 @@ function rangeSubsumes(parent: RangeConstraint, derived: RangeConstraint): boole
 }
 
 /**
- * Conjunction. The parent permits the intersection of its clauses, so every
- * parent clause must still be enforced by some derived clause. Extra derived
- * clauses only narrow further and are allowed.
+ * Conjunction. Every parent clause must survive in the derived constraint, and
+ * §4.5 requires a **distinct** derived clause per parent clause — one derived
+ * clause must not satisfy two parent clauses. A greedy match can dead-end, so
+ * this backtracks, following the matching algorithm in the draft.
+ *
+ * Extra derived clauses are permitted; they only narrow further.
  */
 function subsumesAll(parent: AllConstraint, derived: AllConstraint): boolean {
-  return parent.constraints.every((parentClause) =>
-    derived.constraints.some((derivedClause) => subsumes(parentClause, derivedClause)),
-  );
+  const used = new Set<number>();
+
+  const match = (index: number): boolean => {
+    const parentClause = parent.constraints[index];
+    if (parentClause === undefined) return true;
+    for (const [i, derivedClause] of derived.constraints.entries()) {
+      if (used.has(i)) continue;
+      if (!subsumes(parentClause, derivedClause)) continue;
+      used.add(i);
+      if (match(index + 1)) return true;
+      used.delete(i);
+    }
+    return false;
+  };
+
+  return match(0);
 }
 
 /**
  * Disjunction. The parent permits the union of its clauses, so narrowing holds
  * when every *derived* clause falls inside some parent clause.
  *
- * Descriptions of -01 §4.5 are not consistent about this direction. The
- * opposite reading — every parent clause subsumed by some derived clause —
- * would permit a derived token to add alternatives the parent never granted,
- * which is widening. The narrowing-preserving direction is implemented here and
- * the discrepancy is recorded in RFC-0001.
+ * §4.5: "for each clause_d in derived.any.constraints, there MUST exist a
+ * clause_p in parent.any.constraints such that clause_d ⊑ clause_p." Removing
+ * clauses narrows; adding them widens and is refused.
  */
 function subsumesAny(parent: AnyConstraint, derived: AnyConstraint): boolean {
+  // "The derived any MUST contain at least one clause."
+  if (derived.constraints.length === 0) return false;
   return derived.constraints.every((derivedClause) =>
     parent.constraints.some((parentClause) => subsumes(parentClause, derivedClause)),
   );

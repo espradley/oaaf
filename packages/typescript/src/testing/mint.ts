@@ -39,6 +39,12 @@ async function sign(payload: object, privateKey: CryptoKey, alg = 'EdDSA'): Prom
 
 export interface MintRootInput {
   issuer: string;
+  /**
+   * Key that signs the root token — the trust anchor. Distinct from `holder`:
+   * the issuer attests the grant, the holder exercises it.
+   */
+  issuerKey: Keypair;
+  /** Key the grant is issued to. Becomes `cnf.jwk`. */
   holder: Keypair;
   tools: Record<string, ToolConstraints>;
   issuedAt: number;
@@ -62,7 +68,7 @@ export async function mintRootToken(input: MintRootInput): Promise<string> {
     del_max_depth: input.maxDepth ?? 3,
     authorization_details: [{ type: AAT_AUTHORIZATION_DETAIL_TYPE, tools: input.tools }],
   };
-  return sign(payload, input.signWith ?? input.holder.privateKey, input.alg);
+  return sign(payload, input.signWith ?? input.issuerKey.privateKey, input.alg);
 }
 
 /** base64url-nopad SHA-256 of a token's JWS signing input. */

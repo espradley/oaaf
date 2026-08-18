@@ -107,42 +107,62 @@ describe('satisfies', () => {
 });
 
 describe('permitted subsumption pairs', () => {
-  // Transcribed from AAT -01 section 4.5. The matrix is closed-world.
-  const permitted: Array<[string, string]> = [
-    ['exact', 'exact'],
-    ['range', 'exact'],
-    ['one_of', 'exact'],
-    ['wildcard', 'exact'],
-    ['range', 'range'],
-    ['one_of', 'one_of'],
-    ['not_one_of', 'not_one_of'],
-    ['wildcard', 'wildcard'],
-    ['all', 'all'],
-    ['any', 'any'],
-  ];
+  // AAT -01 section 4.5 states the rules per derived type:
+  //   "Any other constraint type subsumes a parent wildcard"
+  //   "A derived wildcard is valid only if the parent is also wildcard"
+  //   a derived exact may narrow exact, range, one_of, or wildcard
+  //   every other type narrows only its own type
+  const ALL_TYPES = [
+    'exact',
+    'range',
+    'one_of',
+    'not_one_of',
+    'contains',
+    'subset',
+    'wildcard',
+    'all',
+    'any',
+  ] as const;
 
-  it('permits exactly the pairs the draft lists', () => {
-    for (const [parent, derived] of permitted) {
-      expect(isPermittedPair(parent as never, derived as never), `${parent}>${derived}`).toBe(true);
+  it('permits a wildcard parent to be narrowed to any type', () => {
+    for (const derived of ALL_TYPES) {
+      expect(isPermittedPair('wildcard', derived), `wildcard>${derived}`).toBe(true);
     }
   });
 
-  it('rejects pairs outside the table, including not_one_of to one_of', () => {
+  it('permits same-type narrowing for every type', () => {
+    for (const type of ALL_TYPES) {
+      expect(isPermittedPair(type, type), `${type}>${type}`).toBe(true);
+    }
+  });
+
+  it('permits a derived exact to narrow exact, range, one_of, and wildcard', () => {
+    for (const parent of ['exact', 'range', 'one_of', 'wildcard'] as const) {
+      expect(isPermittedPair(parent, 'exact'), `${parent}>exact`).toBe(true);
+    }
+  });
+
+  it('permits a derived wildcard only under a wildcard parent', () => {
+    for (const parent of ALL_TYPES) {
+      expect(isPermittedPair(parent, 'wildcard'), `${parent}>wildcard`).toBe(parent === 'wildcard');
+    }
+  });
+
+  it('rejects every other cross-type pair', () => {
     const rejected: Array<[string, string]> = [
+      // Explicitly called out by the draft: a not_one_of accepts values
+      // outside the parent set and cannot be shown to subsume it.
+      ['one_of', 'not_one_of'],
       ['not_one_of', 'one_of'],
       ['exact', 'one_of'],
-      ['exact', 'wildcard'],
-      ['one_of', 'wildcard'],
+      ['exact', 'range'],
       ['one_of', 'range'],
       ['range', 'one_of'],
       ['all', 'any'],
       ['any', 'all'],
-      // Recorded in RFC-0001 as suspected under-specification. Implemented as
-      // written: closed-world, so these are refused.
-      ['wildcard', 'one_of'],
-      ['wildcard', 'range'],
-      ['contains', 'contains'],
-      ['subset', 'subset'],
+      ['contains', 'subset'],
+      ['subset', 'contains'],
+      ['contains', 'exact'],
     ];
     for (const [parent, derived] of rejected) {
       expect(isPermittedPair(parent as never, derived as never), `${parent}>${derived}`).toBe(
@@ -288,6 +308,81 @@ describe('subsumption', () => {
     };
     expect(subsumes(parent, narrower)).toBe(true);
     expect(subsumes(parent, widened)).toBe(false);
+  });
+
+  it('narrows contains by requiring more elements', () => {
+    expect(
+      subsumes(
+        { constraint_type: 'contains', required: ['id'] },
+        { constraint_type: 'contains', required: ['id', 'name'] },
+      ),
+    ).toBe(true);
+    expect(
+      subsumes(
+        { constraint_type: 'contains', required: ['id', 'name'] },
+        { constraint_type: 'contains', required: ['id'] },
+      ),
+    ).toBe(false);
+  });
+
+  it('narrows subset by shrinking the allowed set', () => {
+    expect(
+      subsumes(
+        { constraint_type: 'subset', allowed: ['r', 'w', 'x'] },
+        { constraint_type: 'subset', allowed: ['r'] },
+      ),
+    ).toBe(true);
+    expect(
+      subsumes(
+        { constraint_type: 'subset', allowed: ['r'] },
+        { constraint_type: 'subset', allowed: ['r', 'w'] },
+      ),
+    ).toBe(false);
+  });
+
+  it('lets a wildcard parent be narrowed to any constraint', () => {
+    for (const derived of [
+      { constraint_type: 'one_of', values: ['a'] },
+      { constraint_type: 'range', min: 0, max: 1 },
+      { constraint_type: 'not_one_of', excluded: ['x'] },
+      { constraint_type: 'subset', allowed: ['r'] },
+    ] as Constraint[]) {
+      expect(subsumes({ constraint_type: 'wildcard' }, derived), derived.constraint_type).toBe(
+        true,
+      );
+    }
+  });
+
+  it('requires a distinct derived clause per parent clause in all', () => {
+    // One derived clause must not satisfy two parent clauses.
+    const parent: Constraint = {
+      constraint_type: 'all',
+      constraints: [
+        { constraint_type: 'one_of', values: ['a', 'b'] },
+        { constraint_type: 'one_of', values: ['a', 'c'] },
+      ],
+    };
+    const single: Constraint = {
+      constraint_type: 'all',
+      constraints: [{ constraint_type: 'exact', value: 'a' }],
+    };
+    const distinct: Constraint = {
+      constraint_type: 'all',
+      constraints: [
+        { constraint_type: 'exact', value: 'a' },
+        { constraint_type: 'exact', value: 'a' },
+      ],
+    };
+    expect(subsumes(parent, single)).toBe(false);
+    expect(subsumes(parent, distinct)).toBe(true);
+  });
+
+  it('requires a derived any to carry at least one clause', () => {
+    const parent: Constraint = {
+      constraint_type: 'any',
+      constraints: [{ constraint_type: 'exact', value: 'a' }],
+    };
+    expect(subsumes(parent, { constraint_type: 'any', constraints: [] })).toBe(false);
   });
 
   it('rejects unknown constraint types on either side', () => {

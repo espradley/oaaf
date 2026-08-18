@@ -116,14 +116,12 @@ no new wire format.
 - A reason code on every denial, and a human-readable explanation
 - Runnable quickstart: `npm run demo`
 
-Three under-specifications in AAT -01 surfaced while implementing, one of them
-exploitable: a derived token could raise `del_max_depth` and escape the root's
-delegation ceiling. All three are handled by failing closed and are recorded in RFC-0001
-for upstream reporting.
+A follow-up conformance review against the draft's full normative text corrected
+several gaps in the first implementation, including verifying the root against a
+configured trust anchor rather than against itself.
 
-**Ecosystem evidence created:** a package that does something real; a quickstart that
-runs with no account or service; and substantive feedback to send to a draft author —
-the first genuine upstream contact this project has had to offer.
+**Ecosystem evidence created:** a package that does something real, and a quickstart
+that runs with no account or service.
 
 ## O3 — MCP and A2A bindings
 

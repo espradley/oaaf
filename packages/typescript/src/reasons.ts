@@ -26,6 +26,8 @@ export const REASON_CODES = [
   // Cryptography
   'invalid_signature',
   'algorithm_not_permitted',
+  'untrusted_root',
+  'private_key_material',
   'issuer_thumbprint_mismatch',
   'par_hash_mismatch',
   'holder_key_invalid',
@@ -35,11 +37,16 @@ export const REASON_CODES = [
   'not_yet_valid',
   'expiry_exceeds_parent',
   'issued_before_parent',
+  'expiry_not_after_issuance',
+  'lifetime_exceeded',
 
   // Delegation
   'delegation_depth_invalid',
   'delegation_depth_exceeded',
   'delegation_ceiling_raised',
+  'delegation_ceiling_invalid',
+  'depth_exceeds_own_ceiling',
+  'chain_length_mismatch',
   'root_depth_invalid',
 
   // Narrowing
@@ -47,11 +54,13 @@ export const REASON_CODES = [
   'constraint_expansion',
   'constraint_type_unrecognized',
   'constraint_type_not_permitted',
-  'argument_not_delegated',
+  'argument_key_set_mismatch',
+  'constraint_too_deep',
 
   // Leaf and request
   'tool_not_authorized',
   'argument_not_permitted',
+  'argument_missing',
   'argument_constraint_violated',
 
   // Proof of possession
@@ -61,6 +70,7 @@ export const REASON_CODES = [
   'pop_token_mismatch',
   'pop_tool_mismatch',
   'pop_binding_mismatch',
+  'pop_stale',
 ] as const;
 
 export type ReasonCode = (typeof REASON_CODES)[number];

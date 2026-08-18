@@ -139,41 +139,34 @@ than accumulating.
 Reason codes are stable identifiers. Adding one is a minor change; renaming or removing
 one is breaking.
 
-## Ambiguities in AAT -01
+## Conformance notes
 
-Three under-specified areas were found while implementing this profile. In each, OAAF
-fails closed and documents the choice rather than inventing permissive behaviour. All
-three should be raised with the draft author; the second is security-relevant.
+AAT -01 specifies its verification algorithm in full, including several checks that are
+easy to miss on a first reading and that an implementation must not skip:
 
-**1. Direction of the `any` subsumption rule.** For a disjunction, narrowing holds when
-every _derived_ clause is subsumed by some _parent_ clause; the reverse direction would
-permit widening. Available descriptions of §4.5 are not consistent on which direction is
-intended. OAAF implements the narrowing-preserving direction: **every derived clause MUST
-be subsumed by at least one parent clause.**
+- **The root is verified against a configured trust anchor**, not against its own
+  `cnf.jwk`. A root token is a claim, not a trust root; verifying it against itself
+  would accept any self-signed root and the chain would prove nothing about who granted
+  the authority.
+- **`del_max_depth` is monotonic** (invariant I2, step 4g). A delegate cannot raise the
+  ceiling its issuer set, so a root's depth bound continues to bind for the whole chain.
+- **Closed-world key sets must match exactly** (step 4p2). When a parent constrains a
+  tool, a derived token must name the same argument keys — adding one produces
+  invocations the parent would reject as unknown, and dropping one produces invocations
+  omitting a parent-required argument. Neither is a subset of the parent's invocation
+  set.
+- **A constrained argument is required, not merely permitted** (step 6b). An omitted
+  argument would otherwise slip past every constraint on it.
+- **`cnf.jwk` must not carry private key material.** A confirmation claim conveys a
+  public key, and an AAT is designed to be passed around.
+- **`all` subsumption requires a distinct derived clause per parent clause**, with
+  backtracking; a single derived clause must not satisfy two parent clauses.
+- **A wildcard parent may be narrowed to any constraint type**, while a derived
+  `wildcard` is valid only under a `wildcard` parent.
 
-**2. `del_max_depth` is not required to be monotonic.** The draft requires
-`child.del_depth <= parent.del_max_depth` but states no constraint on
-`child.del_max_depth` itself. A derived token can therefore declare a larger ceiling
-than its parent, and the root's delegation limit stops binding after a single hop —
-a chain rooted at `del_max_depth: 1` can be extended indefinitely.
-
-This appears to be an oversight rather than a design choice: a depth ceiling that any
-delegate may raise provides no bound at all. OAAF enforces
-`child.del_max_depth <= parent.del_max_depth` as a narrowing invariant and denies with
-`delegation_ceiling_raised`. This is the finding most worth raising upstream, because
-it is exploitable rather than merely unclear.
-
-**3. Constraint types with no permitted subsumption pair.** The permitted pair table
-lists no entry whose parent type is `contains` or `subset`, and permits `wildcard` only
-to `exact` or `wildcard`. Read against the closed-world rule — any pair not explicitly
-permitted MUST be rejected — a parent constraint of `contains` or `subset` cannot be
-restated in a derived token at all, and a `wildcard` parent cannot be narrowed to
-`one_of` or `range`. That is very likely not the intent.
-
-OAAF implements the table as written, because the closed-world rule is explicit and
-failing closed is never the unsafe choice. A child may still omit the affected argument
-or tool entirely, which remains a valid narrowing. The restriction is recorded in code
-next to the matrix so it is visible to anyone who hits it.
+OAAF implements each of these. They are recorded here because an implementation that
+omits any one of them will appear to work against well-formed inputs while failing to
+enforce the invariant the draft relies on.
 
 ## Security considerations
 
@@ -215,7 +208,6 @@ competing wire format that
 - Semantic resource binding (R2), pending MCP metadata.
 - Whether `context` should carry the full verified chain summary or only its shape. O2
   carries a summary; a richer form may be wanted once evidence receipts land.
-- Upstream resolution of the two ambiguities above.
 
 ## Prior art
 
