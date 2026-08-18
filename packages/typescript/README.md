@@ -5,10 +5,9 @@ TypeScript SDK for the [Open Agent Authority Framework](https://github.com/espra
 Verify a delegated authority chain, decide whether a requested tool call is permitted,
 and explain the answer.
 
-> **Status: early (pre-v1, `0.x`).** Not yet published to npm — the artifact is
-> certified publish-ready under the name `@oaaf/sdk`; the `@oaaf` scope is a pending
-> ownership step. OAAF profiles Internet-Drafts that may change — see [Standards](#standards)
-> and the [versioning policy](../../docs/versioning-and-compatibility.md).
+> **Status: early (pre-v1, `0.x`).** Published on npm as `@oaaf/sdk`. OAAF profiles
+> Internet-Drafts that may change — see [Standards](#standards) and the
+> [versioning policy](../../docs/versioning-and-compatibility.md).
 
 ## Install
 
@@ -16,18 +15,8 @@ and explain the answer.
 npm install @oaaf/sdk
 ```
 
-> **Not yet on npm.** The `@oaaf` scope is a pending ownership step
-> ([docs/releasing.md](../../docs/releasing.md)); the command above will work once the first
-> publish happens. Until then, install the certified packed artifact directly — either from a
-> git reference:
->
-> ```bash
-> npm install github:espradley/oaaf#main --workspace @oaaf/sdk
-> ```
->
-> or by packing it yourself from a clone (`npm run build && npm pack -w @oaaf/sdk`, then
-> `npm install /path/to/oaaf-sdk-0.1.0.tgz`). The packed artifact an outsider installs is
-> certified on every change by `npm run check:package`.
+Requires Node.js 20+. ESM-only. The published artifact is re-certified on every change by
+`npm run check:package` (pack → install into a throwaway project → use via public paths).
 
 ## Runtime and module format
 

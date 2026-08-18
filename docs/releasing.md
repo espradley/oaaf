@@ -1,16 +1,9 @@
 # Releasing `@oaaf/sdk`
 
-Publishing is a deliberate, owner-performed action, not an automated one. This runbook
-makes it a short mechanical checklist so that "the SDK is on npm" becomes a one-sitting task
-the moment the `@oaaf` scope is owned.
-
-## Prerequisite: own the `@oaaf` npm scope
-
-The single blocker to a first publish. The package is `@oaaf/sdk` with
-`publishConfig.access = "public"`; publishing requires an npm account that owns the `@oaaf`
-organization/scope. This is a human ownership step (it needs npm credentials) and is tracked
-in the [pre-launch checklist](pre-launch-checklist.md). Until it is done, the SDK is
-installable only from a packed tarball or a git reference (see the SDK README).
+`@oaaf/sdk` is published on npm and `oaaf` on PyPI. Publishing a new version is a deliberate,
+owner-performed action, not an automated one. This runbook keeps it a short mechanical
+checklist. (Moving publishing to Trusted Publishing / OIDC from CI is tracked separately as
+REL-1 on the [roadmap](../ROADMAP.md).)
 
 ## Pre-publish gate (already enforced in CI)
 

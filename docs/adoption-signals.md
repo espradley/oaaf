@@ -23,16 +23,16 @@ opt-in — never a default, and never silent.
 
 All of these are external, public, and require no cooperation from the SDK:
 
-| Signal                            | Where it is observed                                                                                                       | What it indicates                          |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Repository traffic                | GitHub → Insights → Traffic (views, unique clones)                                                                         | discovery and hands-on trials              |
-| Stars / forks / watchers          | GitHub repo                                                                                                                | interest and intent to track               |
-| Issues opened                     | GitHub Issues, esp. `interoperability` / `adopter` labels                                                                  | real integration friction and declared use |
-| Pull requests                     | GitHub PRs                                                                                                                 | contribution                               |
-| npm downloads _(once published)_  | npmjs.com package page / npm registry API                                                                                  | installs of the SDK                        |
-| npm dependents _(once published)_ | npmjs "Dependents" / ecosystem search                                                                                      | packages built on OAAF                     |
-| Reverse dependencies in code      | GitHub code search for `@oaaf/sdk`                                                                                         | integrations in public repos               |
-| Voluntary self-identification     | [adopter issue template](https://github.com/espradley/oaaf/issues/new?template=adopter.md) → [ADOPTERS.md](../ADOPTERS.md) | named, verified adopters                   |
+| Signal                        | Where it is observed                                                                                                       | What it indicates                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Repository traffic            | GitHub → Insights → Traffic (views, unique clones)                                                                         | discovery and hands-on trials              |
+| Stars / forks / watchers      | GitHub repo                                                                                                                | interest and intent to track               |
+| Issues opened                 | GitHub Issues, esp. `interoperability` / `adopter` labels                                                                  | real integration friction and declared use |
+| Pull requests                 | GitHub PRs                                                                                                                 | contribution                               |
+| npm downloads                 | npmjs.com package page / npm registry API                                                                                  | installs of the SDK                        |
+| npm dependents                | npmjs "Dependents" / ecosystem search                                                                                      | packages built on OAAF                     |
+| Reverse dependencies in code  | GitHub code search for `@oaaf/sdk`                                                                                         | integrations in public repos               |
+| Voluntary self-identification | [adopter issue template](https://github.com/espradley/oaaf/issues/new?template=adopter.md) → [ADOPTERS.md](../ADOPTERS.md) | named, verified adopters                   |
 
 ## The two kinds of evidence
 

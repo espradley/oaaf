@@ -54,11 +54,9 @@ against it. See [`@oaaf/sdk` install](../packages/typescript/README.md#install).
 npm install @oaaf/sdk
 ```
 
-> **Status:** the `@oaaf` npm scope is a pending ownership step (see
-> [releasing](releasing.md) and [pre-launch checklist](pre-launch-checklist.md)). Until the
-> first publish, install from a packed tarball or a git reference — the interim path is in
-> the [SDK install section](../packages/typescript/README.md#install). The packed artifact an
-> outsider would install is certified in CI on every change (`npm run check:package`).
+`oaaf` is published on PyPI too (`pip install oaaf`). The published artifact is re-certified in
+CI on every change (`npm run check:package`), so what an outsider installs is exactly what the
+tests run against. Releasing a new version is documented in [releasing](releasing.md).
 
 ## VERIFY — confirm it does what it claims
 

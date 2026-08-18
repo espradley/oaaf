@@ -5,16 +5,16 @@ contract. TypeScript ([`@oaaf/sdk`](../packages/typescript/)) and this package a
 implementations of the same normative behavior — authority verification and evaluation,
 the canonical reason codes, and the `DecisionExplanation` — not a port of one to the other.
 
-> **Status: early (pre-v1, `0.x`).** Not published to PyPI. The RFCs and adopted standards
-> are the specification; both implementations answer to them.
+> **Status: early (pre-v1, `0.x`).** Published on PyPI as `oaaf`. The RFCs and adopted
+> standards are the specification; both implementations answer to them.
 
-## Install (local)
+## Install
 
 ```bash
-pip install -e .        # from this directory
-# or build artifacts:
-pip install build && python -m build
+pip install oaaf
 ```
+
+For local development from this directory: `pip install -e .`.
 
 Requires **Python 3.11+**. Runtime dependencies: `cryptography` (Ed25519/JWS) and
 `rfc8785` (RFC 8785 JSON canonicalization). No network access is needed at runtime.

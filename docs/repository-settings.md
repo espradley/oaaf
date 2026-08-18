@@ -25,10 +25,9 @@ request review should be turned on — see the pending list.
 
 These require a decision or a step that is deliberately not automated:
 
-- [ ] **`@oaaf` npm scope + repository namespace.** Still under a personal namespace;
-      moving to an organization is a branding/governance decision (tracked in the
-      [pre-launch checklist](pre-launch-checklist.md)). Needed before the first package
-      publish.
+- [x] **`@oaaf` npm scope.** Done — `@oaaf/sdk` is published on npm and `oaaf` on PyPI.
+      Moving the _repository_ from the `espradley/oaaf` personal namespace to an organization
+      remains a separate branding/governance decision (not a publish blocker).
 - [ ] **Required PR review + admin enforcement on `main`.** Turn on once a second
       maintainer exists; requiring review now would only block the sole maintainer.
 - [ ] **Release provenance / signed releases.** Not set up. Revisit when the package is

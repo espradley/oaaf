@@ -36,7 +36,8 @@ package all point at it.
 Recorded as a branding and governance decision to make deliberately. Explicitly **not**
 a blocker for the first release.
 
-### npm organization for the `@oaaf` scope
+### npm organization for the `@oaaf` scope — ✅ done
 
-Needed before the first package publish. Should be resolved together with the namespace
-decision above rather than separately.
+Resolved: `@oaaf/sdk` is published on npm (and `oaaf` on PyPI). The first-publish blocker is
+gone. Future publishing hardening (Trusted Publishing / OIDC) is tracked as REL-1 on the
+roadmap.

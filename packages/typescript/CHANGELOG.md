@@ -3,11 +3,10 @@
 All notable changes to `@oaaf/sdk` are documented here. The project is pre-1.0; see the
 [versioning and compatibility policy](../../docs/versioning-and-compatibility.md).
 
-## Unreleased
+## 0.1.0
 
-Not yet published to npm — the `@oaaf` scope is a pending ownership step (see
-[docs/releasing.md](../../docs/releasing.md)). The packed artifact is certified publish-ready
-in CI on every change (`npm run check:package`).
+First public release on npm as `@oaaf/sdk`. The published artifact is re-certified in CI on
+every change (`npm run check:package`).
 
 ### Added
 

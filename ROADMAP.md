@@ -59,15 +59,18 @@ boundary is technical and binds everyone, including Edwin Digital
 | O5D         | Identity / workload interoperability                 | ✅ Complete              |
 | O5E         | Existing PDP / authorization interoperability        | ✅ Complete              |
 | O5F         | Outsider adoption journey                            | ✅ Engineering-ready¹    |
+| O5F-DIST    | Public npm + PyPI distribution                       | ✅ Complete              |
+| O5F-EXT     | Independent outsider completes the journey           | ⬜ External evidence     |
 | O6A         | Normative conformance specification                  | ✅ Complete              |
 | O6B         | Portable conformance vectors                         | ✅ Complete              |
 | O6C         | Cross-language conformance runner + parity           | ✅ Complete              |
 | O6D         | Binding/profile conformance + transport equivalence  | ✅ Complete              |
-| O6E         | Security conformance                                 | ⏸️ Planned               |
+| O6E         | Security / adversarial certification                 | ⏸️ Planned               |
 | O6F         | Upstream standards participation                     | ⏸️ Planned               |
 | O6G         | Competitive collision audit                          | ⏸️ Planned               |
 | O6H         | v1 compatibility / readiness contract                | ⏸️ Planned               |
 | **O6 exit** | **OAAF v1 technical foundation / freeze**            | 🎯                       |
+| REL-1       | Trusted Publishing / OIDC for npm + PyPI             | ⏸️ Future                |
 | O7A         | Integration target research                          | ⏸️ After O6 freeze       |
 | O7B         | OAAF-maintained reference bridges                    | ⏸️ After O6 freeze       |
 | O7C         | Maintainer validation                                | ⏸️ After O6 freeze       |
@@ -186,8 +189,9 @@ contribution can force reserved execution-control IP into OAAF.
   all via public paths
 - clean LICENSE / NOTICE / package contents; no test material or secrets shipped
 
-Not published: the `@oaaf` npm namespace remains a pending ownership step. The artifact is
-certified publish-ready under that name.
+Published: `@oaaf/sdk` is live on npm and `oaaf` on PyPI (O5F-DIST). The published artifacts
+are re-certified in CI on every change. Publishing hardening (Trusted Publishing / OIDC) is
+tracked as REL-1.
 
 ### O5B — Independent Python implementation ✅
 
@@ -239,17 +243,16 @@ The complete path a person outside Edwin Digital follows — DISCOVER → TRY �
 **Two states, deliberately distinct:**
 
 - **Engineering-ready ✅** — everything an outsider needs exists and works:
-  - **Distribution:** honest install story. `@oaaf/sdk` install is documented with a working
-    pre-publish path (packed artifact / git ref); the packed artifact is certified on every
-    change (`npm run check:package`); a one-sitting [release runbook](docs/releasing.md) and a
-    shipped [CHANGELOG](packages/typescript/CHANGELOG.md) make first publish mechanical once
-    the `@oaaf` npm scope is owned (the sole remaining owner action).
+  - **Distribution:** `@oaaf/sdk` is published on npm and `oaaf` on PyPI (see O5F-DIST). The
+    published artifact is re-certified on every change (`npm run check:package`), with a
+    [release runbook](docs/releasing.md) and a shipped
+    [CHANGELOG](packages/typescript/CHANGELOG.md).
   - **Adopter path:** a voluntary [adopter declaration](.github/ISSUE_TEMPLATE/adopter.md) and
     an [ADOPTERS.md](ADOPTERS.md) that is empty by design — entries require self-identification
     _and_ independent verification; no names are manufactured.
   - **Observable without telemetry:** [docs/adoption-signals.md](docs/adoption-signals.md)
     enumerates external signals (GitHub traffic, stars/forks, issues/PRs, npm downloads and
-    dependents once published, code-search integrations). The SDK has **no phone-home**,
+    dependents, code-search integrations). The SDK has **no phone-home**,
     enforced by `npm run check:telemetry`, not merely promised.
 - **Externally certified ⬜** — the journey is only truly proven when an _actual outsider_
   completes it. This is not self-certifiable: maintainers cannot claim it by role-playing an
@@ -259,6 +262,21 @@ The complete path a person outside Edwin Digital follows — DISCOVER → TRY �
 ¹ Engineering-ready: the outsider journey exists and is CI-verified. External certification —
 an independent user actually completing it — is deliberately unclaimed and is not
 self-certifiable.
+
+### O5F-DIST — Public npm + PyPI distribution ✅
+
+The distribution blocker is gone. `@oaaf/sdk` is published on **npm** and `oaaf` on **PyPI**,
+so an outsider installs the real packages (`npm install @oaaf/sdk`, `pip install oaaf`) rather
+than working from the repository. The published artifact is exactly what CI re-certifies on
+every change (`npm run check:package`). This supersedes the earlier "npm scope pending" owner
+action wherever it appeared. Publishing hardening — Trusted Publishing / OIDC from CI instead
+of a manual token — is deferred to **REL-1**.
+
+### O5F-EXT — Independent outsider completes the journey ⬜
+
+Reserved for **external evidence**: a real, independent user completing DISCOVER → CONTRIBUTE
+unaided. Not self-certifiable and deliberately unclaimed — the maintainers cannot manufacture
+it. This is the adoption evidence the funding objective ultimately cares about.
 
 ## O6 — Conformance, standards, and v1 readiness
 
