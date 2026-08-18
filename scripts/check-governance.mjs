@@ -53,6 +53,17 @@ for (const manifest of ['package.json', 'packages/typescript/package.json']) {
   }
 }
 
+// The published package ships its own LICENSE/NOTICE copies; they must not drift.
+for (const legal of ['LICENSE', 'NOTICE']) {
+  const rootPath = path.join(root, legal);
+  const pkgPath = path.join(root, 'packages', 'typescript', legal);
+  if (!existsSync(pkgPath)) {
+    problems.push(`packages/typescript/${legal} is missing (the published package must ship it)`);
+  } else if (readFileSync(rootPath, 'utf8') !== readFileSync(pkgPath, 'utf8')) {
+    problems.push(`packages/typescript/${legal} has drifted from the root ${legal}`);
+  }
+}
+
 if (problems.length > 0) {
   console.error('Governance check failed:\n');
   for (const p of problems) console.error(`  - ${p}`);

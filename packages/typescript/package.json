@@ -1,6 +1,6 @@
 {
   "name": "@oaaf/sdk",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "TypeScript SDK for the Open Agent Authority Framework (OAAF).",
   "license": "Apache-2.0",
   "type": "module",
@@ -22,10 +22,17 @@
     "./a2a": {
       "types": "./dist/a2a/binding.d.ts",
       "default": "./dist/a2a/binding.js"
+    },
+    "./authzen": {
+      "types": "./dist/authzen/map.d.ts",
+      "default": "./dist/authzen/map.js"
     }
   },
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "LICENSE",
+    "NOTICE",
     "README.md"
   ],
   "engines": {
@@ -45,5 +52,21 @@
   "dependencies": {
     "canonicalize": "^4.0.0",
     "jose": "^6.2.9"
-  }
+  },
+  "keywords": [
+    "oaaf",
+    "authorization",
+    "delegation",
+    "agent",
+    "mcp",
+    "a2a",
+    "authzen",
+    "aat",
+    "ai-agents"
+  ],
+  "homepage": "https://github.com/espradley/oaaf/tree/main/packages/typescript",
+  "bugs": {
+    "url": "https://github.com/espradley/oaaf/issues"
+  },
+  "author": "Edwin Digital LLC"
 }

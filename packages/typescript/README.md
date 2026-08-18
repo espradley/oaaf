@@ -5,14 +5,52 @@ TypeScript SDK for the [Open Agent Authority Framework](https://github.com/espra
 Verify a delegated authority chain, decide whether a requested tool call is permitted,
 and explain the answer.
 
-> **Status: early.** Not published to npm yet. OAAF implements an Internet-Draft that
-> may change — see [Standards](#standards).
+> **Status: early (pre-v1, `0.x`).** Not yet published to npm — the artifact is
+> certified publish-ready under the name `@oaaf/sdk`; the `@oaaf` scope is a pending
+> ownership step. OAAF profiles Internet-Drafts that may change — see [Standards](#standards)
+> and the [versioning policy](../../docs/versioning-and-compatibility.md).
 
 ## Install
 
 ```bash
 npm install @oaaf/sdk
 ```
+
+## Runtime and module format
+
+|                          |                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| Node.js                  | **20 and 22**, tested in CI on both                                                |
+| Module format            | **ESM only** (`"type": "module"`). No CommonJS build                               |
+| Browsers / edge runtimes | Not targeted or tested; Node is the supported runtime                              |
+| TypeScript               | Complete `.d.ts` declarations ship; tested against TS 5 with `NodeNext` resolution |
+
+ESM-only is deliberate: OAAF is 2026 agent infrastructure, its one crypto dependency
+(`jose`) is ESM-first, and a dual CJS build would add maintenance surface for no current
+adopter. If a concrete CJS consumer appears, that is an RFC, not an assumption.
+
+## Public API — import paths
+
+Import only these documented paths. Nothing under `dist/` internal to them is public.
+
+| Path                | What                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `@oaaf/sdk`         | Core: `verifyAuthority`, `evaluate`, `verifyAndEvaluate`, `toExplanation`, `explain`, and the authority/explanation/reason types |
+| `@oaaf/sdk/mcp`     | MCP / COAZ binding (RFC-0002): `enforceOaafPrecondition`, `enforceAndMapToCoaz`, `explainMcpResult`                              |
+| `@oaaf/sdk/a2a`     | A2A binding (RFC-0003): `enforceA2aAuthority`, `explainA2aResult`, the extension constants                                       |
+| `@oaaf/sdk/authzen` | AuthZEN request/response mapping and types                                                                                       |
+| `@oaaf/sdk/testing` | Local authority minting for evaluation, tests, and demos — **not a production issuer**                                           |
+
+### Stability
+
+Pre-v1, all of this may still change, but deliberately and documented (see the
+[versioning policy](../../docs/versioning-and-compatibility.md)):
+
+- **Core** (`@oaaf/sdk`) and the **explanation contract** are the most settled.
+- The **MCP and A2A bindings** track draft standards (COAZ-MCP Draft 1, A2A 1.0.1) and
+  move with them — treat them as the most likely to change.
+- `@oaaf/sdk/testing` is for evaluation and tests. It is **not** a production
+  token-issuance service, and building one is out of OAAF's scope.
 
 ## Use
 
@@ -180,6 +218,19 @@ So there is no permissive mode, no default anchor set, and no flag to skip the c
 Omission is a compile error; an empty set is denied with `untrusted_root`. This is the
 same reasoning that makes proof of possession non-optional — see
 [ADR-0004](../../docs/adr/0004-fail-closed-configuration.md).
+
+## Bindings at a glance
+
+```ts
+// MCP: enforce OAAF authority before the COAZ/AuthZEN decision
+import { enforceOaafPrecondition } from '@oaaf/sdk/mcp';
+
+// A2A: enforce OAAF authority on an incoming agent message
+import { enforceA2aAuthority } from '@oaaf/sdk/a2a';
+```
+
+Both return the same canonical explanation via `explainMcpResult` / `explainA2aResult`
+(see [cross-transport equivalence](../../docs/explanation-equivalence.md)).
 
 ## MCP / COAZ
 
