@@ -17,9 +17,9 @@ us where the authority model breaks.
    [CHARTER.md](CHARTER.md), say so. That is a real contribution and it is welcome
    from anyone.
 
-Code contributions are welcome too — but the protocol surface is intentionally
-undefined until the relevant RFC lands, so a large implementation PR right now is
-likely to be premature.
+Code contributions are welcome too — but which standards OAAF profiles, and how, is
+still being settled, so a large implementation PR right now is likely to be
+premature.
 
 ## Before you build something large
 
@@ -27,7 +27,8 @@ Open an issue first. This is not bureaucracy: OAAF's scope is deliberately narro
 we would rather tell you "that belongs in a layer above OAAF" in a two-line issue
 comment than after you have written a thousand lines.
 
-Protocol changes go through the [RFC process](rfcs/README.md).
+Changes to what OAAF adopts, profiles, extends, or invents go through the
+[RFC process](rfcs/README.md).
 
 ## Development
 
@@ -61,7 +62,7 @@ product. `npm run check:boundary` enforces this and fails CI on violation. If it
 on your change, the fix is to remove the dependency, not to add an exemption. See
 [CHARTER.md](CHARTER.md) and [ADR-0001](docs/adr/0001-oaaf-digitalstack360-separation.md).
 
-The same rule applies to vocabulary. Protocol concepts, type names, schema fields, and
+The same rule applies to vocabulary. OAAF concepts, type names, profile fields, and
 enum values use the neutral vocabulary in the charter — never vendor or product terms.
 
 ## Pull requests

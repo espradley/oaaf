@@ -4,7 +4,8 @@ ADRs record decisions that shape the project and would otherwise be re-litigated
 few months by people who were not in the room.
 
 They differ from [RFCs](../../rfcs/README.md) by subject, not by weight. An RFC
-proposes a change to the _protocol_. An ADR records a decision about the _project_ —
+proposes a change to what OAAF implements. An ADR records a decision about the
+_project_ —
 its boundaries, structure, or tooling.
 
 An ADR is immutable once accepted. When a decision changes, write a new ADR that
@@ -13,7 +14,8 @@ to be wrong is often the most useful part.
 
 ## Index
 
-| ADR                                                     | Title                                   | Status   |
-| ------------------------------------------------------- | --------------------------------------- | -------- |
-| [0001](0001-oaaf-digitalstack360-separation.md)         | OAAF and DigitalStack360 separation     | Accepted |
-| [0002](0002-reserved-execution-continuity-semantics.md) | Reserved execution-continuity semantics | Accepted |
+| ADR                                                     | Title                                                                             | Status   |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- | -------- |
+| [0001](0001-oaaf-digitalstack360-separation.md)         | OAAF and DigitalStack360 separation                                               | Accepted |
+| [0002](0002-reserved-execution-continuity-semantics.md) | Reserved execution-continuity semantics                                           | Accepted |
+| [0003](0003-implement-existing-authority-standards.md)  | Implement existing authority standards rather than define a competing wire format | Accepted |

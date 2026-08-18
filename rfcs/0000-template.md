@@ -46,7 +46,7 @@ Show a worked example. Abstract schemas hide ambiguity that examples expose.
 
 ## Security considerations
 
-Required — this is an authority protocol.
+Required — OAAF enforces authority.
 
 - What can an attacker attempt against this design?
 - What happens on malformed, missing, or ambiguous input? Confirm it fails closed.
@@ -72,4 +72,4 @@ What is deliberately left open, and what would settle it.
 ## Prior art
 
 Related work in IAM, capability systems, distributed systems, or other agent
-protocols. Borrowing a solved design is a feature, not a weakness.
+protocols. Borrowing a solved design is the expected outcome, not a weakness.

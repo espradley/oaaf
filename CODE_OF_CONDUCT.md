@@ -33,7 +33,7 @@ Examples of unacceptable behavior:
 - Other conduct which could reasonably be considered inappropriate in a professional
   setting
 
-A note specific to this project: OAAF is a security-adjacent protocol, and rigorous,
+A note specific to this project: OAAF is security-adjacent infrastructure, and rigorous,
 skeptical technical critique is welcome and wanted. Attacking a design is encouraged.
 Attacking a person is not. The difference is usually obvious.
 

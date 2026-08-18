@@ -9,3 +9,7 @@ coverage/
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Internal reviews — competitive and IP analysis, not for publication.
+# See docs/adr/0003-implement-existing-authority-standards.md.
+docs/reviews/

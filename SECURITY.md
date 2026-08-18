@@ -1,6 +1,6 @@
 # Security Policy
 
-OAAF is an authority protocol. A flaw here is not a bug that produces wrong output —
+OAAF enforces authority. A flaw here is not a bug that produces wrong output —
 it is a flaw that lets an action happen which should have been refused. We would
 rather hear about a suspected problem and be wrong than not hear about it.
 
@@ -62,8 +62,8 @@ reference authority service, and production deployment configurations.
 Also out of scope: an agent behaving badly _within_ the authority it was correctly
 granted. OAAF's job is to enforce the boundary of a grant, not to make the grant wise.
 An over-broad grant that permits exactly what it says is a policy problem, not a
-vulnerability — though if the protocol makes over-broad grants the path of least
-resistance, that _is_ worth reporting as a design flaw.
+vulnerability — though if OAAF makes over-broad grants the path of least resistance,
+that _is_ worth reporting as a design flaw.
 
 ## Security posture
 

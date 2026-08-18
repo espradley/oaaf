@@ -11,9 +11,10 @@
 
 ## Not yet written
 
-The normative protocol surface is deliberately absent. Each item below lands through
-the [RFC process](../../rfcs/README.md) rather than by accretion, so that the reasoning
-behind each decision is recorded while it is still cheap to change:
+OAAF defines no wire format of its own. What belongs here is a **profile**: which
+standards OAAF follows, which options it selects, how they compose, and which revisions
+it targets. Each item below lands through the [RFC process](../../rfcs/README.md), so
+the reasoning is recorded while changing course is still cheap:
 
 - `authority-grant.schema.json` — the grant object (RFC-0001, RFC-0002)
 - constraints, validity, and expiration (RFC-0003)

@@ -6,7 +6,7 @@ a committee that does not exist.
 ## Current model
 
 Edwin Digital LLC is the initial maintainer and trademark steward. Maintainers make
-final decisions on protocol scope, releases, and security response.
+final decisions on scope, releases, and security response.
 
 This is a deliberate choice, not an aspiration to permanence. A three-tier steering
 structure with working groups and elected seats, created before there are external
@@ -18,16 +18,16 @@ protecting nobody. The structure should grow when there are people to govern.
 | Change                                                                               | Mechanism                                |
 | ------------------------------------------------------------------------------------ | ---------------------------------------- |
 | Bug fix, docs, tests, tooling                                                        | Pull request, one maintainer approval    |
-| New protocol concept, or a change to grant/decision/evidence semantics               | [RFC](rfcs/README.md), then pull request |
+| A change to what OAAF adopts, profiles, extends, or invents                          | [RFC](rfcs/README.md), then pull request |
 | Change to the scope rule or the DigitalStack360 boundary in [CHARTER.md](CHARTER.md) | RFC plus an [ADR](docs/adr/README.md)    |
 | Security-sensitive change                                                            | See below                                |
 
-Anyone may open an RFC. Maintainer status is not required to propose protocol
-changes, and it is explicitly not required to argue that something is out of scope.
+Anyone may open an RFC. Maintainer status is not required to propose a change, and it
+is explicitly not required to argue that something is out of scope.
 
 ## Scope discipline
 
-The most common way a project like this fails is not a bad protocol decision. It is
+The most common way a project like this fails is not one bad decision. It is
 fifty reasonable ones that each seemed useful. Maintainers are expected to apply the
 litmus test in [CHARTER.md](CHARTER.md) and to reject in-scope-adjacent proposals
 even when the implementation is good and offered for free.

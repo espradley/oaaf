@@ -1,17 +1,32 @@
 # OAAF RFCs
 
-Protocol changes go through an RFC. Everything else does not.
+Changes to what OAAF adopts, profiles, extends, or invents go through an RFC.
+Everything else does not.
 
-The point is not process for its own sake. It is that once independent implementations
-exist, a protocol decision made casually in a pull request becomes very expensive to
-reverse. An RFC forces the reasoning to be written down while it is still cheap to
-change.
+The point is not process for its own sake. OAAF's job is to make existing standards
+work together, so the consequential decisions are which standard to follow, which
+options to select, and where a gap genuinely requires something new. Those decisions
+become expensive to reverse once implementations exist, and an RFC forces the reasoning
+to be written down while changing course is still cheap.
+
+Every RFC carries a classification:
+
+| Class     | Meaning                                                          |
+| --------- | ---------------------------------------------------------------- |
+| `ADOPT`   | Use an existing standard directly.                               |
+| `PROFILE` | Constrain or apply an existing standard to the OAAF use case.    |
+| `EXTEND`  | Add narrowly missing semantics to something that already exists. |
+| `INVENT`  | Create something genuinely new — only when justified.            |
+
+`INVENT` is the classification that requires an argument. The others are the expected
+answers. See [ADR-0003](../docs/adr/0003-implement-existing-authority-standards.md).
 
 ## When you need an RFC
 
 **Yes:**
 
-- adding, removing, or changing a protocol concept
+- adopting a standard, or changing which one OAAF follows
+- changing a profile: which options OAAF selects, or how standards compose
 - changing the shape or meaning of a grant, decision, or evidence record
 - changing delegation or revocation semantics
 - changing conformance requirements

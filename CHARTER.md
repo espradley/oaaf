@@ -4,13 +4,18 @@ This charter defines what the Open Agent Authority Framework is for, what belong
 inside it, and — more importantly — what does not. It is the document to reach for
 when someone proposes a feature and the honest answer is "maybe."
 
-It is deliberately restrictive. A protocol that accepts every good idea becomes a
+It is deliberately restrictive. A project that accepts every good idea becomes a
 platform, and a platform is not what this project is trying to be.
 
 ## Purpose
 
-OAAF is an open, vendor-neutral protocol and reference toolkit for representing and
-verifying the authority under which an autonomous actor performs an action.
+OAAF is an open interoperability framework for carrying, enforcing, and verifying
+delegated authority across AI agents and tools.
+
+It makes existing identity, authorization, delegation, and evidence standards practical
+across MCP, A2A, and agent runtimes without introducing another competing authorization
+protocol. OAAF defines no wire format of its own; see
+[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
 
 The core principle:
 
@@ -27,7 +32,7 @@ revocation or expiration.
 > agent, workload, service, or delegated human performs an action.
 
 The words "independent system" carry weight. If a primitive is only coherent inside
-one vendor's product, it is not a protocol primitive.
+one vendor's product, it is not an interoperability primitive.
 
 ## The litmus test
 
@@ -41,7 +46,7 @@ When a proposal is ambiguous, ask which question it answers.
 
 The test is about the _question_, not the _feature_. Rate limiting expressed as a
 constraint on a grant answers the first question. Rate limiting expressed as a
-scheduler backpressure policy answers the second. Same words, different protocol.
+scheduler backpressure policy answers the second. Same words, different layer.
 
 ## In scope
 
@@ -55,7 +60,7 @@ OAAF should own:
 | Invalidation     | revocation, expiry                                                           |
 | Evaluation       | authority verification, authorization decisions                              |
 | Accountability   | portable audit evidence                                                      |
-| Interoperability | protocol schemas, conformance behavior, enforcement-point interfaces         |
+| Interoperability | standards profiles, transport bindings, conformance, enforcement interfaces  |
 
 ## Out of scope
 
@@ -74,12 +79,12 @@ OAAF must **not** become responsible for:
 - managed execution infrastructure
 
 These are real, valuable capabilities. They belong to **products built on OAAF** —
-including DigitalStack360. They do not belong to the protocol.
+including DigitalStack360. They do not belong to the authority layer.
 
 Note the asymmetry that keeps this honest: OAAF may define a constraint expressing
 _"this action requires approval above a risk threshold."_ It must not define the
-approval workflow, the approver hierarchy, the notification, or the UI. The protocol
-carries the requirement; the product satisfies it.
+approval workflow, the approver hierarchy, the notification, or the UI. The authority
+layer carries the requirement; the product satisfies it.
 
 ## The OAAF Enforcement Point
 
@@ -109,7 +114,7 @@ in front of a consequential action can be one:
 - a commercial execution host, including DigitalStack360's
 
 The last entry is an example of an enforcement point, not a privileged one. OAAF must
-never grant a specific implementation special standing in the protocol.
+never grant a specific implementation special standing.
 
 A consequence worth stating plainly: OAAF assumes the agent may be prompt-injected,
 compromised, or simply wrong. The enforcement point must never rely on agent
@@ -184,7 +189,8 @@ CI on any forbidden dependency or import. See
 
 ## Vocabulary
 
-The protocol is defined in vendor-neutral terms:
+OAAF's vocabulary is vendor-neutral. Where a standard OAAF adopts already names a
+concept, that name wins; these are the terms OAAF uses when it must name one itself:
 
 ```text
 subject      issuer       grant        authority    capability
@@ -192,10 +198,10 @@ resource     constraint   delegation   decision     evidence
 verifier     enforcement point
 ```
 
-Protocol-level concepts must not depend on vendor or product vocabulary — terms such
+OAAF concepts must not depend on vendor or product vocabulary — terms such
 as _ticket_, _workforce_, _AI employee_, _project queue_, or product feature names.
 Such terms may appear in a downstream integration example clearly marked as one; they
-must never define a protocol concept, schema field, type name, or enum value.
+must never define an OAAF concept, profile field, type name, or enum value.
 
 Resource identifiers must be equally neutral. A resource selector names a repository,
 a path, or an environment — not a vendor's tenancy model.

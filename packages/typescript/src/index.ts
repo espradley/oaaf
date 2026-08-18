@@ -3,16 +3,19 @@
  *
  * This package is intentionally almost empty.
  *
- * OAAF's protocol types — authority grants, capabilities, resources,
- * constraints, delegation, decisions, and evidence — are
- * deliberately *not* defined here yet. Defining them prematurely would freeze
- * protocol semantics before they have been argued through the RFC process.
+ * OAAF adopts existing standards for authority, delegation, decisions, and
+ * evidence rather than defining its own. Which standards, at which revisions,
+ * is still being settled through the RFC process, so no types for them are
+ * published here yet — shipping the wrong shapes is much harder to undo than
+ * leaving them unwritten.
  *
- * What exists today is the build, type, and test architecture, plus the spec
- * version this SDK targets. Protocol surface arrives via RFC-0001 onward.
+ * What exists today is the build, type, and test architecture, plus the
+ * profile version this SDK targets. The verification and decision surface
+ * arrives with the first enforcement point.
  *
- * See `rfcs/README.md` for the RFC process and `spec/0.1/architecture.md` for
- * the architectural model.
+ * See `docs/adr/0003-implement-existing-authority-standards.md` for the
+ * decision, `rfcs/README.md` for the RFC process, and
+ * `spec/0.1/architecture.md` for the architectural model.
  */
 
 /** Specification versions this SDK understands. */

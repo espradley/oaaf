@@ -1,120 +1,161 @@
 # Roadmap
 
+> **OAAF is an open interoperability toolkit for carrying, enforcing, and testing
+> delegated authority across agent and tool protocols.**
+
+OAAF implements and profiles existing authority standards rather than defining a
+competing wire format. The reasoning is in
+[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
+
+```text
+              EXISTING STANDARDS
+ Identity        Delegation        Decisions        Evidence
+SPIFFE/etc.         AAT             AuthZEN          receipts
+    │                │                 │                │
+    └────────────────┴─────────────────┴────────────────┘
+                             │
+                             ▼
+                         OAAF
+                ┌─────────────────────┐
+                │ bindings            │
+                │ enforcement         │
+                │ adapters            │
+                │ explainability      │
+                │ conformance         │
+                └──────────┬──────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 ▼                   ▼
+                MCP                 A2A
+                 │                   │
+                 ▼                   ▼
+               Tool                Agent
+```
+
 Programs, not dates. This is a small project; committing to a calendar it cannot keep
 would be its own kind of dishonesty.
 
 Each program has an explicit exit condition — a program is not finished because time
-passed — and an **ecosystem evidence** section. That second part is deliberate. OAAF is
-not being built only to produce protocol artifacts. A specification nobody installs is
-not an open-source project, and each phase should leave behind something an outsider
-can point at: a package they installed, an integration they shipped, an issue they
-filed.
+passed — and an **ecosystem evidence** section. That second part is deliberate. A
+toolkit nobody installs is not an open-source project, and each phase should leave
+behind something an outsider can point at: a package they installed, an integration
+they shipped, an issue they filed.
+
+## Phases
+
+| Phase   | Goal                                                         | Status      |
+| ------- | ------------------------------------------------------------ | ----------- |
+| O1      | OSS foundation + DigitalStack boundary                       | ✅ Closed   |
+| O1.5    | Standards and competitive review                             | ✅ Complete |
+| O1.6    | ADR-0003 + standards implementation strategy                 | ⬅ Current   |
+| O2      | Working enforcement point using existing authority standards | Planned     |
+| O3      | MCP + A2A bindings and delegation demo                       | Planned     |
+| O4      | Explainability + evidence verification                       | Planned     |
+| O5      | Public launch, stars, users, integrations, contributors      | Planned     |
+| O6      | Conformance suite + upstream standards participation         | Planned     |
+| DS-OAAF | DigitalStack integration and proprietary continuity layer    | Separate    |
 
 ## O1 — Foundation and boundary ✅
 
 Establish the repository, architecture vocabulary, contribution model, and the hard
-product boundary _before_ building the authority kernel — so that later work has
-something to drift against.
+product boundary before building anything, so that later work has something to drift
+against.
 
-- Standalone open-source repository
+- Standalone open-source repository; neutral vocabulary; fast CI
 - [Charter](CHARTER.md): scope rule, litmus test, in/out of scope, reserved concepts
-- Neutral domain vocabulary
 - Dependency boundary, mechanically enforced in CI
-- Enforcement point concept
-- Problem-first [README](README.md)
-- Governance, security policy, contribution model, Apache 2.0
-- [RFC framework](rfcs/README.md)
-- Fast CI
-- [ADR-0001](docs/adr/0001-oaaf-digitalstack360-separation.md) — explicit DigitalStack360 separation
+- Governance, security policy, contribution model, Apache 2.0, [RFC framework](rfcs/README.md)
+- [ADR-0001](docs/adr/0001-oaaf-digitalstack360-separation.md) — DigitalStack360 separation
+- [ADR-0002](docs/adr/0002-reserved-execution-continuity-semantics.md) — reserved execution-continuity semantics
 
-**Ecosystem evidence created:** a repository an external developer can encounter,
-clone, and validate with no vendor knowledge and no account — the precondition for
-every phase that follows.
+**Ecosystem evidence created:** a repository an external developer can clone and
+validate with no vendor knowledge and no account — the precondition for every phase
+that follows.
 
-## O2 — Minimum useful authority _(next)_
+## O1.5 — Standards and competitive review ✅
 
-**Goal: an external TypeScript developer can install OAAF and make a useful scoped
-allow/deny decision locally in under ten minutes.**
+Before writing a schema, establish whether a vendor-neutral mechanism already existed
+for attaching narrowable authority, provenance, constraints, and evidence to an
+agent-to-agent or agent-to-tool request.
 
-That sentence is the specification for this phase. Anything not required to reach it
-is out of scope for O2.
+It largely did. Classifying each candidate concept against existing work found nearly
+every primitive available to adopt or profile, and none requiring invention — while
+finding no running code connecting the pieces and no conformance suite.
+
+**Ecosystem evidence created:** none directly, and that was the point. The phase existed
+to avoid producing a redundant specification, which is the cheapest thing this project
+could have got wrong.
+
+## O1.6 — Standards implementation strategy ⬅ current
+
+Record the repositioning and realign the project around it.
+
+- [ADR-0003](docs/adr/0003-implement-existing-authority-standards.md) — implement and
+  profile existing standards rather than define a competing wire format
+- This roadmap
+- Realign public framing and `spec/0.1` from original protocol to profile
+
+_Exit condition:_ the repository describes what OAAF actually intends to build, with no
+document still claiming an original protocol.
+
+**Ecosystem evidence created:** credibility. A project whose stated purpose matches its
+artifacts is one an outside reviewer can evaluate honestly.
+
+## O2 — Working enforcement point
+
+**Goal: an external TypeScript developer can enforce delegated authority locally, using
+existing standards, in under ten minutes.**
 
 Scope:
 
-- subject, capability, resource, constraints
-- the grant object
-- validity and expiration
-- deterministic local evaluation
-- a structured allow/deny decision
-- an understandable denial reason
+- Verify a presented attenuating-token delegation chain, including narrowing invariants
+- Produce an AuthZEN-shaped authorization decision
+- Return a denial reason a developer can act on
+- Deterministic local evaluation
 
-The golden path must require **no** account, database, hosted service, API key, cloud
+No new wire format. Where OAAF must express something the standards do not, the order
+is adopt, profile, extend, invent — and inventing requires a written argument.
+
+The path must require **no** account, database, hosted service, API key, cloud
 infrastructure, or DigitalStack.
 
-```bash
-npm install @oaaf/sdk
-```
-
-followed by a very small TypeScript example.
-
-Explicitly not in O2: a sophisticated policy language. If evaluation starts needing its
-own grammar, the design has gone wrong.
-
-_Exit condition:_ a developer who has never seen this repository installs the package,
-follows the quickstart, and gets a correct deny with a reason they understand — without
-reading the specification.
-
-**Ecosystem evidence created:** an installable package on npm; a runnable quickstart;
-the first point at which independent users can exist at all. Until something is
-installable, there is nothing to adopt and no adoption to measure.
-
-## O3 — MCP guard
-
-**Goal: an MCP server maintainer can place scoped authority around a tool with only a
-few lines of integration code.**
-
-Target developer: someone maintaining an MCP server or agent framework who needs to
-control what autonomous agents may do and does not want to build an authorization
-system.
-
-Conceptually:
-
-```ts
-server.tool(
-  'github.merge_pull_request',
-  oaaf.guard({
-    capability: 'github.pull_request.merge',
-  }),
-  handler,
-);
-```
-
-The exact API is not frozen by this example.
-
-_Exit condition:_ an independent developer can protect an MCP tool, exercise both an
-allowed and a denied call, and understand the denial without reading the full protocol
+_Exit condition:_ a developer who has never seen this repository verifies a delegation
+chain and gets a correct deny with an understandable reason, without reading any
 specification.
 
-**Ecosystem evidence created:** a distribution path through the MCP ecosystem; a
-concrete external integration opportunity rather than a hypothetical one; a third-party
-use case specific enough to be described in someone else's release notes.
+**Ecosystem evidence created:** an installable package; a runnable quickstart; the first
+point at which independent users can exist at all.
 
-## O4 — Developer experience and explainability
+## O3 — MCP and A2A bindings
 
-Only high-value developer experience. The test for including something here is whether
-its absence costs a real user real time.
+**Goal: an MCP server maintainer or A2A agent author can place scoped, delegated
+authority around a tool or a task with only a few lines of integration code.**
 
-Likely surface:
+- MCP binding, aligned with the AuthZEN MCP tool-authorization profile
+- A2A binding published as a URI-identified A2A extension
+- A delegation demo crossing an agent boundary: narrowed authority, verified downstream
 
-```text
-oaaf evaluate
-oaaf explain
-oaaf inspect
-```
+This is the seam the standards review identified — specifications that are individually
+sound, with nothing connecting them across both transports.
 
-`oaaf doctor` is added only if actual users demonstrate a need for it.
+_Exit condition:_ an independent developer protects a tool on each transport, exercises
+an allowed and a denied call, and understands the denial without reading the underlying
+specifications.
 
-Explainability is the point. A denial should answer itself:
+**Ecosystem evidence created:** a distribution path through the MCP and A2A ecosystems;
+a concrete external integration opportunity; a third-party use case specific enough to
+appear in someone else's release notes.
+
+## O4 — Explainability and evidence verification
+
+Only high-value developer experience. The test for inclusion is whether its absence
+costs a real user real time.
+
+- Verify signed decision receipts, including offline
+- Explain a denial in terms of the authority actually presented
+- `oaaf evaluate`, `oaaf explain`, `oaaf inspect`
+
+`oaaf doctor` is added only if users demonstrate a need.
 
 ```text
 DENIED
@@ -134,31 +175,20 @@ Reason
   capability_not_granted
 ```
 
-_Exit condition:_ a developer debugging an unexpected denial resolves it from the tool
+_Exit condition:_ a developer debugging an unexpected denial resolves it from tool
 output alone.
 
 **Ecosystem evidence created:** lower adoption friction, and materially easier support
-and retention — most projects lose users at the first confusing failure, not at the
-install step.
+and retention — most projects lose users at the first confusing failure, not at install.
 
 ## O5 — Public launch and ecosystem
 
-A first-class program, not an afterthought. Protocol work that nobody adopts produces
-no ecosystem, and ecosystem evidence is not a by-product that appears on its own.
+A first-class program, not an afterthought. Implementation work that nobody adopts
+produces no ecosystem, and ecosystem evidence does not appear on its own.
 
-Tracked signals:
-
-- GitHub stars
-- independent users
-- external issues and discussions
-- external contributors
-- MCP integrations
-- agent-framework integrations
-- organizations evaluating OAAF
-- design collaborators
-- future collaboration-letter candidates
-
-The funnel being built:
+Tracked signals: GitHub stars · independent users · external issues and discussions ·
+external contributors · MCP integrations · agent-framework integrations · organizations
+evaluating OAAF · design collaborators · future collaboration-letter candidates
 
 ```text
 GitHub visitor
@@ -178,50 +208,57 @@ GitHub visitor
  Design collaboration
 ```
 
-Each stage has a much lower conversion rate than the one before it, which is why O2
-through O4 exist first: launching before the install-to-decision path is short wastes
-the only first impression available.
+Each stage converts far worse than the one before, which is why O2 through O4 come
+first: launching before the install-to-decision path is short wastes the only first
+impression available.
 
-Operational prerequisites for this phase are tracked in the
+Operational prerequisites are tracked in the
 [pre-launch checklist](docs/pre-launch-checklist.md).
 
-_Exit condition:_ independent users exist who are not prompted by us, and at least one
+_Exit condition:_ independent users exist who were not prompted by us, and at least one
 external integration we did not write.
 
 **Ecosystem evidence created:** stars, users, contributors, integrations, and
-collaboration relationships — the accumulated public record of a project that other
-people actually use.
+collaboration relationships — the accumulated public record of a project other people
+actually use.
 
-## O6 — Standards and IP review
+## O6 — Conformance and upstream participation
 
-Before expanding into advanced protocol semantics, classify every substantial proposed
-primitive:
+The payoff phase for a standards-first project.
 
-| Classification | Meaning                                                          |
-| -------------- | ---------------------------------------------------------------- |
-| `ADOPT`        | Use an existing standard directly.                               |
-| `PROFILE`      | Constrain or apply an existing standard to the OAAF use case.    |
-| `EXTEND`       | Add narrowly missing semantics to something that already exists. |
-| `INVENT`       | Create a genuinely new primitive — only when justified.          |
+```bash
+npx oaaf conform ./my-agent
+```
 
-**The goal is to invent as little as possible.** `INVENT` is the classification that
-requires an argument; the others are the expected answers.
+```text
+OAAF Interop
+AAT delegation                  PASS
+Authority narrowing             PASS
+AuthZEN decision mapping        PASS
+MCP binding                     PASS
+A2A authority extension         PASS
+Evidence receipt verification   PASS
+6/6 compatible
+```
 
-OAAF does not attempt to replace OAuth, MCP authorization, SPIFFE, AuthZEN, OPA, Cedar,
-OpenFGA, or existing IAM systems. Where they solve the problem, OAAF adopts or profiles
-them.
+- Conformance suite runnable against any implementation
+- Adversarial suite as a first-class artifact: narrowing violations, replay, forged
+  lineage, malformed input
+- Interoperability testing contributed upstream to the groups defining the underlying
+  standards, several of which actively solicit exactly this
+- Published threat model
+- A neutral `STANDARDS.md` describing what OAAF implements and why
 
-This program also carries the intellectual-property review that governs the
-[reserved concepts](CHARTER.md#reserved-concepts). Until that review
-completes, those concepts stay out of public OAAF semantics.
+Participation here is contribution, not competition. Helping a standard succeed is a
+better position than asking anyone to choose between standards.
 
-_Exit condition:_ every primitive in the specification carries a classification, and
-each `INVENT` carries a written justification for why an existing standard was
-insufficient.
+_Exit condition:_ a third party runs the conformance suite against their own
+implementation and gets a meaningful pass or fail — and at least one finding is
+contributed back upstream.
 
-**Ecosystem evidence created:** credibility with standards-literate reviewers, who are
-precisely the people whose adoption matters most and who are quickest to dismiss a
-protocol that reinvents solved problems.
+**Ecosystem evidence created:** relationships with organizations participating in the
+relevant standards work; interoperability events; credibility with standards-literate
+reviewers, who are the quickest to dismiss a project that reinvents solved problems.
 
 ## DS-OAAF — DigitalStack integration
 
@@ -248,13 +285,13 @@ enterprise governance UI · cost management · billing · operational dashboards
 customer analytics · managed execution infrastructure
 
 Separately, a set of execution-continuity concepts is
-[reserved pending IP review](CHARTER.md#reserved-concepts). Reserved
-is not the same as out of scope, but the practical effect today is the same: OAAF does
-not define them.
+[reserved pending IP review](CHARTER.md#reserved-concepts). Reserved is not the same as
+out of scope, but the practical effect today is the same: OAAF does not define them.
 
-If OAAF starts growing any of the above, the charter has failed and the right response
-is to remove them.
+Also not on the roadmap: an original authority wire format. See
+[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
 
 ## How this changes
 
-Roadmap changes do not require an RFC. The protocol decisions inside each program do.
+Roadmap changes do not require an RFC. Decisions about what OAAF implements, profiles,
+extends, or invents do.

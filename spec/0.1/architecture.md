@@ -4,9 +4,12 @@
 - **Spec version:** `0.1`
 
 This document describes the architectural model — the actors, where they sit, and what
-each is responsible for. It is not the wire protocol. Object shapes, field names, and
-evaluation rules are normative material that arrives through the
-[RFC process](../../rfcs/README.md); nothing here should be read as fixing them.
+each is responsible for.
+
+It is not a wire format. OAAF defines none — it profiles existing standards, and which
+ones it follows arrives through the [RFC process](../../rfcs/README.md). See
+[ADR-0003](../../docs/adr/0003-implement-existing-authority-standards.md). Nothing here
+should be read as fixing an object shape or a field name.
 
 ## The problem being solved
 
@@ -139,7 +142,7 @@ service — and because independent implementations of it are what conformance t
 exists to compare.
 
 Evaluation is deterministic. The same authority, action, and state must produce the
-same decision everywhere, or the protocol is not portable.
+same decision everywhere, or authority is not portable across the boundary.
 
 ### Decision
 
@@ -147,7 +150,8 @@ A structured allow or deny, carrying a reason a developer can act on. A denial t
 says only `false` forces whoever hit it to read the specification; a denial that says
 `capability_not_granted` and names the missing capability usually does not.
 
-Denial reasons are protocol surface, not a debugging convenience. They are what makes
+Denial reasons are part of the interoperable surface, not a debugging convenience.
+They are what makes
 an enforcement point's behavior explainable to the person operating the agent.
 
 ### Evidence
@@ -191,15 +195,15 @@ unrecognized spec version denies the consequential action. Ambiguity is a denial
 judgement call.
 
 **Least privilege through narrowing.** Delegation only ever narrows. There is no
-protocol path by which authority widens.
+path by which authority widens.
 
 **Secret minimization.** Grants reference named permissions and secret handles. They do
 not carry credential material.
 
 **Policy separation.** OAAF conveys authority and the facts needed to evaluate it.
-Organizations layer proprietary policy above that interface; the protocol does not
-attempt to express every policy anyone might want, and is explicitly not a general
-policy language.
+Organizations layer proprietary policy above that interface; OAAF does not attempt to
+express every policy anyone might want, and is explicitly not a general policy
+language.
 
 ## Relationship to existing standards
 
