@@ -7,15 +7,15 @@ against the GitHub API, not assumed.
 
 ## Verified enabled
 
-| Setting                         | State   | How it helps                                                               |
-| ------------------------------- | ------- | -------------------------------------------------------------------------- |
-| Default branch                  | `main`  | —                                                                          |
-| Visibility                      | public  | An outsider can inspect everything                                         |
-| Secret scanning                 | enabled | Catches committed credentials                                              |
-| Dependabot vulnerability alerts | enabled | Flags vulnerable dependencies                                              |
-| Dependabot security updates     | enabled | Opens fix PRs for vulnerable dependencies                                  |
-| Private vulnerability reporting | enabled | Makes the [SECURITY.md](../SECURITY.md) advisory link real                 |
-| Branch protection on `main`     | enabled | Requires the CI `Check` job to pass; blocks force-push and branch deletion |
+| Setting                         | State   | How it helps                                                                                      |
+| ------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| Default branch                  | `main`  | —                                                                                                 |
+| Visibility                      | public  | An outsider can inspect everything                                                                |
+| Secret scanning                 | enabled | Catches committed credentials                                                                     |
+| Dependabot vulnerability alerts | enabled | Flags vulnerable dependencies                                                                     |
+| Dependabot security updates     | enabled | Opens fix PRs for vulnerable dependencies                                                         |
+| Private vulnerability reporting | enabled | Makes the [SECURITY.md](../SECURITY.md) advisory link real                                        |
+| Branch protection on `main`     | enabled | Requires the CI `Check (20)` and `Check (22)` jobs to pass; blocks force-push and branch deletion |
 
 Branch protection is set with admin enforcement **off**, so the solo maintainer can still
 push directly today. When a second maintainer exists, admin enforcement and required pull
