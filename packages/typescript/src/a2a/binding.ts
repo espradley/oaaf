@@ -16,7 +16,12 @@ import type { ToolArguments } from '../aat/claims.js';
 import { decodeBase64Url } from '../base64url.js';
 import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js';
 import { denial, type Denial } from '../reasons.js';
-import { explainReasons, type ReasonExplanation } from '../explanation.js';
+import {
+  explainDecision,
+  explainReasons,
+  type DecisionExplanation,
+  type ReasonExplanation,
+} from '../explanation.js';
 import {
   extractChain,
   extractPop,
@@ -194,4 +199,17 @@ function readPopAudience(pop: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * The canonical, transport-neutral {@link DecisionExplanation} for an A2A
+ * authority result (O4B).
+ *
+ * Strips the A2A error envelope — the numeric `code` and transport-level
+ * `message` — leaving only OAAF's explanation, so it is directly comparable to
+ * `explainMcpResult` for the same authority input.
+ */
+export function explainA2aResult(result: A2aAuthorityResult): DecisionExplanation {
+  if (result.ok) return explainDecision(true, [], result.authority);
+  return { decision: 'DENY', reasons: result.error.data.reasons };
 }

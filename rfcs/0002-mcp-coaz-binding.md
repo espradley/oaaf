@@ -130,9 +130,12 @@ requirement to validate the access token before using its claims:
 3. **(COAZ steps 4–6, unmodified.)** The PEP constructs the AuthZEN request using COAZ's
    default or declared mapping, exactly as COAZ-MCP specifies.
 4. **Context contribution (optional).** The PEP MAY add a `context.oaaf` member to the
-   constructed request, summarizing the _already-verified_ authority — leaf holder
-   identity, delegation depth, granted tools — as an additional fact for the PDP's
-   policy to consult. This is additive: AuthZEN's core specification states that
+   constructed request, summarizing the _already-verified_ authority as an additional
+   fact for the PDP's policy to consult. Its shape is the canonical OAAF
+   `AuthoritySummary` (`subject`, `requestedTool`, `requestedArgumentNames`,
+   `grantedTools`, `delegationDepth`, `chainLength`, `expiresAt`) — one explanation
+   vocabulary shared with the developer-facing decision explanation, argument names
+   only, no values. This is additive: AuthZEN's core specification states that
    request-side `context` semantics are "an implementation concern … outside the scope
    of this specification," and COAZ's own declared-mapping examples already populate
    `context` with implementation-specific keys (`context.case` alongside

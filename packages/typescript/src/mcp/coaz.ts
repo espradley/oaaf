@@ -24,7 +24,13 @@
 import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js';
 import type { ToolArguments } from '../aat/claims.js';
 import type { Denial } from '../reasons.js';
-import { explainReasons, type ReasonExplanation } from '../explanation.js';
+import {
+  explainDecision,
+  explainReasons,
+  summarizeAuthority,
+  type DecisionExplanation,
+  type ReasonExplanation,
+} from '../explanation.js';
 
 /** COAZ's default `tools/call` mapping (COAZ-MCP §Default Mappings — Tools). */
 export const COAZ_ACTION_NAME = 'tools/call';
@@ -134,13 +140,9 @@ export async function enforceOaafPrecondition(
   return {
     ok: true,
     authority: verification.authority,
-    context: {
-      oaaf: {
-        holder: verification.authority.chain.leafHolder,
-        delegationDepth: verification.authority.chain.depth,
-        capabilities: Object.keys(verification.authority.chain.leafTools).sort(),
-      },
-    },
+    // The PDP-facing context fragment (RFC-0002 step 4) derives from the one
+    // canonical AuthoritySummary, so there is a single explanation vocabulary.
+    context: { oaaf: summarizeAuthority(verification.authority) },
   };
 }
 
@@ -167,4 +169,19 @@ export async function enforceAndMapToCoaz(
   request.context = { ...request.context, ...precondition.context };
 
   return { ok: true, request };
+}
+
+/**
+ * The canonical, transport-neutral {@link DecisionExplanation} for an MCP
+ * precondition result (O4B).
+ *
+ * This strips the JSON-RPC envelope — the numeric `code` and the transport-level
+ * `message` — leaving only OAAF's explanation. `explainMcpResult` and
+ * `explainA2aResult` produce equivalent output for equivalent authority inputs;
+ * that equivalence is certified in CI.
+ */
+export function explainMcpResult(result: OaafPrecondition): DecisionExplanation {
+  if (result.ok) return explainDecision(true, [], result.authority);
+  // The reasons are already the canonical ReasonExplanation[]; wrap them.
+  return { decision: 'DENY', reasons: result.error.data.reasons };
 }

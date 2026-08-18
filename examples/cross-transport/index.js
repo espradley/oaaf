@@ -10,9 +10,10 @@
  * No account, no service, no issuer. Run with:  npm run demo:cross
  */
 
-import { enforceOaafPrecondition } from '@oaaf/sdk'; // MCP / COAZ adapter (RFC-0002)
+import { enforceOaafPrecondition, explainMcpResult } from '@oaaf/sdk'; // MCP / COAZ adapter (RFC-0002)
 import {
   enforceA2aAuthority,
+  explainA2aResult,
   METADATA_KEY_CHAIN,
   METADATA_KEY_POP,
   OAAF_A2A_EXTENSION_URI,
@@ -85,15 +86,21 @@ async function acrossBothTransports(operation, args) {
     now: NOW + 1,
   });
 
-  const mcpOut = mcp.ok ? 'ALLOW' : `DENY (${mcp.error.data.reasons[0].code})`;
-  const a2aOut = a2a.ok ? 'ALLOW' : `DENY (${a2a.error.data.reasons[0].code})`;
-  const agree = mcp.ok === a2a.ok ? 'identical' : 'DIVERGED';
+  // The canonical, transport-neutral explanation from each adapter (O4B).
+  const mcpEx = explainMcpResult(mcp);
+  const a2aEx = explainA2aResult(a2a);
+  const sameExplanation = JSON.stringify(mcpEx) === JSON.stringify(a2aEx);
+
+  const detail = (e) =>
+    e.decision === 'ALLOW'
+      ? `ALLOW  subject=${e.authority.subject.slice(0, 24)}… tool=${e.authority.requestedTool} depth=${e.authority.delegationDepth}`
+      : `DENY   ${e.reasons[0].code}${e.reasons[0].tool ? ` tool=${e.reasons[0].tool}` : ''}`;
 
   console.log(`\n  ${operation}(${JSON.stringify(args)})`);
-  console.log(`    MCP  (Agent → Tool):   ${mcpOut}`);
-  console.log(`    A2A  (Agent → Agent):  ${a2aOut}`);
-  console.log(`    → outcomes ${agree}`);
-  return mcp.ok === a2a.ok;
+  console.log(`    MCP  (Agent → Tool):   ${detail(mcpEx)}`);
+  console.log(`    A2A  (Agent → Agent):  ${detail(a2aEx)}`);
+  console.log(`    → explanation ${sameExplanation ? 'equivalent' : 'DIVERGED'}`);
+  return sameExplanation;
 }
 
 console.log('═'.repeat(64));
@@ -106,9 +113,9 @@ const b = await acrossBothTransports('repo.merge', { branch: 'main' });
 
 console.log(`\n${'═'.repeat(64)}`);
 if (a && b) {
-  console.log('  Both operations decided identically on both transports.');
-  console.log('  The authority is not owned by the transport — it travels with');
-  console.log('  the agent and is enforced the same way wherever it lands.');
+  console.log('  Both operations produced an equivalent explanation on both transports —');
+  console.log('  same decision, same reason, same locators, same authority summary.');
+  console.log('  The explanation belongs to the authority evaluation, not the transport.');
 } else {
   console.log('  DIVERGENCE — the transports disagreed. This should never happen.');
   process.exitCode = 1;

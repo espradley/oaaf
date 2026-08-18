@@ -55,9 +55,11 @@ describe('RFC-0002 seven cases', () => {
     expect(result.request.action).toEqual({ name: 'tools/call' });
     expect(result.request.resource).toEqual({ type: 'tool', id: 'read_file' });
     expect(result.request.context['agent']).toBe(AGENT);
+    // context.oaaf now derives from the canonical AuthoritySummary vocabulary.
     const oaaf = result.request.context['oaaf'] as Record<string, unknown>;
-    expect(oaaf['holder']).toMatch(/^urn:ietf:params:oauth:jwk-thumbprint:sha-256:/);
-    expect(oaaf['capabilities']).toEqual(['read_file', 'search_index']);
+    expect(oaaf['subject']).toMatch(/^urn:ietf:params:oauth:jwk-thumbprint:sha-256:/);
+    expect(oaaf['grantedTools']).toEqual(['read_file', 'search_index']);
+    expect(oaaf['requestedTool']).toBe('read_file');
   });
 
   it('2. missing capability denies', async () => {

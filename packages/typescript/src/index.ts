@@ -99,6 +99,7 @@ export type { AuthoritySummary, DecisionExplanation, ReasonExplanation } from '.
  */
 export {
   enforceA2aAuthority,
+  explainA2aResult,
   A2A_EXTENSION_SUPPORT_REQUIRED,
   A2A_AUTHORIZATION_DENIED,
 } from './a2a/binding.js';
@@ -114,6 +115,7 @@ export {
 } from './a2a/extension.js';
 export type { A2aMessage } from './a2a/extension.js';
 
+export { explainMcpResult } from './mcp/coaz.js';
 export {
   buildCoazToolCallRequest,
   enforceAndMapToCoaz,
