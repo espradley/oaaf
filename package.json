@@ -32,7 +32,9 @@
     "demo:pdp": "npm run build && node examples/pdp-coexistence/index.js",
     "check:telemetry": "node scripts/check-no-telemetry.mjs",
     "check:conformance": "node scripts/check-conformance-spec.mjs",
-    "gen:corpus": "npm run build && node scripts/gen-conformance-corpus.mjs"
+    "gen:corpus": "npm run build && node scripts/gen-conformance-corpus.mjs",
+    "conform": "npm run build && node scripts/oaaf-conform.mjs --adapter \"node adapters/typescript/adapter.mjs\"",
+    "conform:json": "npm run build && node scripts/oaaf-conform.mjs --adapter \"node adapters/typescript/adapter.mjs\" --json"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

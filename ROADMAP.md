@@ -61,7 +61,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O5F         | Outsider adoption journey                            | ✅ Engineering-ready¹    |
 | O6A         | Normative conformance specification                  | ✅ Complete              |
 | O6B         | Portable conformance vectors                         | ✅ Complete              |
-| O6C         | Cross-language conformance                           | ⏸️ Planned               |
+| O6C         | Cross-language conformance runner + parity           | ✅ Complete              |
 | O6D         | Binding / protocol conformance                       | ⏸️ Planned               |
 | O6E         | Security conformance                                 | ⏸️ Planned               |
 | O6F         | Upstream standards participation                     | ⏸️ Planned               |
@@ -316,10 +316,28 @@ one**, enforced in CI by `npm run check:conformance`.
 The old TS-shaped `python/tests/vectors/` corpus is superseded by this portable one; the
 single corpus is now the cross-language source of truth.
 
-### O6C — Cross-language conformance ⏸️
+### O6C — Cross-language conformance runner + parity ✅
 
-Certify the TypeScript and Python implementations against the same normative vectors and
-expected outcomes.
+Makes conformance **executable by outsiders**. `oaaf conform`
+([scripts/oaaf-conform.mjs](scripts/oaaf-conform.mjs)) drives an implementation — in any
+language — against the [portable corpus](spec/0.1/conformance/vectors/README.md) and reports
+self-declared `CONFORMANT` / `NOT CONFORMANT`. The implementation is an **adapter** subprocess
+speaking a small JSON-lines protocol ([runner.md](spec/0.1/conformance/runner.md)); **the
+runner requires no OAAF SDK inside the adapter** — the load-bearing O6C constraint.
+
+- **Not a certification authority:** output is self-declared and self-verifiable, names the
+  corpus version + sha256, and says "OAAF does not certify." No badge, registry, or approval.
+- **Pristine machine output:** `--json` is the report object and nothing else — no telemetry,
+  no promotion, no participation prompt. A tasteful star nudge appears only in human output,
+  only on success (ties into the O5F adoption amendment without contaminating the contract).
+- **Profile-aware:** an adapter declares the profiles it claims; a requested-but-unclaimed
+  profile is NOT CONFORMANT (you cannot be conformant for a profile you do not implement),
+  and its vectors are not run.
+- **Reference adapters, both in CI:** [`adapters/typescript`](adapters/typescript/adapter.mjs)
+  (Core+Status+Identity+A2A, 40/40) and [`adapters/python`](adapters/python/adapter.py)
+  (Core+Status+Identity, 37/37, declines A2A). Both reach CONFORMANT against a **byte-identical
+  corpus hash** — the parity statement, now executed by the runner rather than a test harness.
+- Exit codes 0/1/2 (conformant / not / runner error); `npm run conform`.
 
 ### O6D — Binding / protocol conformance ⏸️
 

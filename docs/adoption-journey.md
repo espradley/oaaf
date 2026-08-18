@@ -70,6 +70,10 @@ npm install @oaaf/sdk
   implementation-independent conformance corpus (O6).
 - The SDK contacts no network: the [no-telemetry guarantee](adoption-signals.md#no-telemetry)
   is enforced by `npm run check:telemetry`, not merely promised.
+- Prove an implementation conformant **without adopting ours**: the
+  [conformance runner](../spec/0.1/conformance/runner.md) drives any implementation (in any
+  language, via a small adapter) against the portable corpus and reports self-declared
+  `CONFORMANT` / `NOT CONFORMANT`. `npm run conform` runs it against the reference adapter.
 
 ## ADOPT — use it, and optionally say so
 

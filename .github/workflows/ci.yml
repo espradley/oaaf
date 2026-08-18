@@ -51,6 +51,9 @@ jobs:
       - name: Package (downstream consumer certification)
         run: npm run check:package
 
+      - name: Conformance runner (TypeScript adapter)
+        run: node scripts/oaaf-conform.mjs --adapter "node adapters/typescript/adapter.mjs"
+
   python:
     name: Python
     runs-on: ubuntu-latest
@@ -73,3 +76,10 @@ jobs:
       - name: Cross-language parity (Python side)
         working-directory: python
         run: python -m pytest tests/ -q
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Conformance runner (Python adapter)
+        run: node scripts/oaaf-conform.mjs --adapter "python adapters/python/adapter.py"
