@@ -24,6 +24,7 @@
 import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js';
 import type { ToolArguments } from '../aat/claims.js';
 import type { Denial } from '../reasons.js';
+import { explainReasons, type ReasonExplanation } from '../explanation.js';
 
 /** COAZ's default `tools/call` mapping (COAZ-MCP §Default Mappings — Tools). */
 export const COAZ_ACTION_NAME = 'tools/call';
@@ -66,7 +67,7 @@ export function buildCoazToolCallRequest(input: {
 export interface JsonRpcError {
   code: number;
   message: string;
-  data?: Record<string, unknown>;
+  data: { reasons: ReasonExplanation[] };
 }
 
 /** JSON-RPC error code for an authorization denial (COAZ-MCP §Error Handling). */
@@ -77,9 +78,8 @@ function toJsonRpcError(denials: readonly Denial[]): JsonRpcError {
   return {
     code: JSONRPC_AUTHORIZATION_DENIED,
     message: primary === undefined ? 'Authorization denied.' : primary.message,
-    data: {
-      reasons: denials.map((d) => ({ code: d.code, stage: d.stage, message: d.message })),
-    },
+    // Full locator fields preserved via the shared explanation model (O4A).
+    data: { reasons: explainReasons(denials) },
   };
 }
 

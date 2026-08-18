@@ -16,6 +16,7 @@ import type { ToolArguments } from '../aat/claims.js';
 import { decodeBase64Url } from '../base64url.js';
 import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js';
 import { denial, type Denial } from '../reasons.js';
+import { explainReasons, type ReasonExplanation } from '../explanation.js';
 import {
   extractChain,
   extractPop,
@@ -40,7 +41,7 @@ export const A2A_AUTHORIZATION_DENIED = -32001;
 export interface A2aAuthorityError {
   code: number;
   message: string;
-  data: { reasons: Array<{ code: string; stage: string; message: string }> };
+  data: { reasons: ReasonExplanation[] };
 }
 
 function toA2aError(code: number, denials: readonly Denial[]): A2aAuthorityError {
@@ -48,9 +49,8 @@ function toA2aError(code: number, denials: readonly Denial[]): A2aAuthorityError
   return {
     code,
     message: primary === undefined ? 'Authorization denied.' : primary.message,
-    data: {
-      reasons: denials.map((d) => ({ code: d.code, stage: d.stage, message: d.message })),
-    },
+    // Full locator fields preserved via the shared explanation model (O4A).
+    data: { reasons: explainReasons(denials) },
   };
 }
 

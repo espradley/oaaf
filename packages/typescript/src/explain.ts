@@ -1,67 +1,85 @@
 /**
- * Human-readable rendering of a decision.
+ * Rendering a decision for a human — a thin text view over the structured
+ * {@link DecisionExplanation} (O4A).
  *
- * A developer who hits an unexpected denial should be able to resolve it from
- * this output without reading a specification: what was asked, what the
- * authority actually permits, and which check refused it.
+ * A developer who hits an unexpected denial should resolve it from this output
+ * without reading a specification: what was asked, what the authority permits,
+ * and which check refused it. It shows argument *names* only — never values, so
+ * the same rendering is safe to log.
  */
 
-import type { Decision } from './decide.js';
-import type { VerifiedAuthority } from './decide.js';
+import type { Decision, VerifiedAuthority } from './decide.js';
+import { explainDecision, type AuthoritySummary, type DecisionExplanation } from './explanation.js';
+
+/**
+ * The structured explanation for a decision.
+ *
+ * Prefer this when a program needs to inspect or assert on the result; use
+ * {@link explain} to render it for a person.
+ */
+export function toExplanation(
+  decision: Decision,
+  authority?: VerifiedAuthority,
+): DecisionExplanation {
+  return explainDecision(decision.allowed, decision.denials, authority);
+}
 
 /**
  * Render a decision as text.
  *
- * `authority` is optional because a decision may exist without one — if
- * verification failed, there is no verified authority to describe.
+ * `authority` is optional: a verification failure has no verified authority to
+ * describe, so only the outcome and reasons are shown.
  */
 export function explain(decision: Decision, authority?: VerifiedAuthority): string {
+  return renderExplanation(toExplanation(decision, authority));
+}
+
+/** Render a structured explanation as text. */
+export function renderExplanation(explanation: DecisionExplanation): string {
   const lines: string[] = [];
 
-  lines.push(decision.allowed ? 'ALLOWED' : 'DENIED');
+  lines.push(explanation.decision === 'ALLOW' ? 'ALLOWED' : 'DENIED');
   lines.push('');
 
+  const authority = explanation.authority;
   if (authority !== undefined) {
     lines.push('Subject');
-    lines.push(`  ${authority.chain.leafHolder}`);
+    lines.push(`  ${authority.subject}`);
     lines.push('');
     lines.push('Requested');
-    lines.push(`  ${authority.tool}`);
-    const args = Object.entries(authority.args);
-    if (args.length > 0) {
-      for (const [name, value] of args) {
-        lines.push(`    ${name} = ${JSON.stringify(value)}`);
-      }
+    lines.push(`  ${authority.requestedTool}`);
+    // Argument names only — values are intentionally omitted.
+    for (const name of authority.requestedArgumentNames) {
+      lines.push(`    ${name}`);
     }
     lines.push('');
     lines.push('Chain');
     lines.push(`  ${describeChain(authority)}`);
     lines.push('');
     lines.push('Leaf permits');
-    const tools = Object.keys(authority.chain.leafTools).sort();
-    if (tools.length === 0) {
+    if (authority.grantedTools.length === 0) {
       lines.push('  (nothing)');
     } else {
-      for (const tool of tools) {
-        lines.push(`  ${tool}${describeConstraints(authority, tool)}`);
+      for (const tool of authority.grantedTools) {
+        lines.push(`  ${tool}`);
       }
     }
     lines.push('');
   }
 
-  if (decision.denials.length > 0) {
-    lines.push(decision.denials.length === 1 ? 'Reason' : 'Reasons');
-    for (const d of decision.denials) {
+  if (explanation.reasons.length > 0) {
+    lines.push(explanation.reasons.length === 1 ? 'Reason' : 'Reasons');
+    for (const r of explanation.reasons) {
       const where = [
-        d.tool === undefined ? undefined : `tool ${d.tool}`,
-        d.argument === undefined ? undefined : `argument ${d.argument}`,
-        d.tokenIndex === undefined ? undefined : `token ${d.tokenIndex}`,
+        r.tool === undefined ? undefined : `tool ${r.tool}`,
+        r.argument === undefined ? undefined : `argument ${r.argument}`,
+        r.tokenIndex === undefined ? undefined : `token ${r.tokenIndex}`,
       ]
         .filter((part): part is string => part !== undefined)
         .join(', ');
 
-      lines.push(`  ${d.code}`);
-      lines.push(`    ${d.message}`);
+      lines.push(`  ${r.code}`);
+      lines.push(`    ${r.message}`);
       if (where.length > 0) lines.push(`    at ${where}`);
     }
   }
@@ -69,17 +87,8 @@ export function explain(decision: Decision, authority?: VerifiedAuthority): stri
   return lines.join('\n').trimEnd();
 }
 
-function describeChain(authority: VerifiedAuthority): string {
-  const length = authority.chain.tokens.length;
-  if (length === 1) return 'root (no delegation)';
-  const hops = Array.from({ length: length - 1 }, (_, i) => `hop ${i + 1}`);
+function describeChain(authority: AuthoritySummary): string {
+  if (authority.chainLength === 1) return 'root (no delegation)';
+  const hops = Array.from({ length: authority.chainLength - 1 }, (_, i) => `hop ${i + 1}`);
   return ['root', ...hops].join(' → ');
-}
-
-function describeConstraints(authority: VerifiedAuthority, tool: string): string {
-  const constraints = authority.chain.leafTools[tool];
-  if (constraints === undefined) return '';
-  const names = Object.keys(constraints).sort();
-  if (names.length === 0) return ' (unconstrained)';
-  return ` (constrained: ${names.join(', ')})`;
 }

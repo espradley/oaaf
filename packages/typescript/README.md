@@ -88,6 +88,84 @@ The mapping between AAT and AuthZEN is an OAAF profile, frozen by
 [RFC-0001](../../rfcs/0001-aat-authzen-enforcement-profile.md). It is not a requirement
 of either standard.
 
+## Understanding a decision (structured explanation)
+
+Every decision can be rendered for a person or inspected as data. `explain()` gives text;
+`toExplanation()` gives a structured, privacy-safe `DecisionExplanation`.
+
+**A DENY, rendered** — the locator tells you exactly which token and argument failed:
+
+```text
+DENIED
+
+Subject
+  urn:ietf:params:oauth:jwk-thumbprint:sha-256:Jl0v…
+
+Requested
+  read_file
+    path
+
+Chain
+  root → hop 1
+
+Leaf permits
+  read_file
+
+Reason
+  argument_constraint_violated
+    Argument "path" does not satisfy the constraint on "read_file".
+    at tool read_file, argument path
+```
+
+Note **`path`** appears as a name; its value never does. The requested path — which may be
+a customer record or a secret — is intentionally omitted.
+
+**The same DENY, structured** (`toExplanation(decision, authority)`):
+
+```jsonc
+{
+  "decision": "DENY",
+  "reasons": [
+    {
+      "code": "argument_constraint_violated",
+      "stage": "evaluation",
+      "message": "Argument \"path\" does not satisfy the constraint on \"read_file\".",
+      "tool": "read_file",
+      "argument": "path", // name only — no value
+    },
+  ],
+  "authority": {
+    "subject": "urn:ietf:params:oauth:jwk-thumbprint:sha-256:Jl0v…",
+    "requestedTool": "read_file",
+    "requestedArgumentNames": ["path"], // names only
+    "grantedTools": ["read_file"],
+    "delegationDepth": 1,
+    "chainLength": 2,
+    "expiresAt": 1780003600,
+  },
+}
+```
+
+Before O4A, the MCP and A2A adapters flattened each reason to `{code, stage, message}` and
+dropped `tool`, `argument`, and `tokenIndex` — so a caller could see _that_ a request was
+denied but not _which_ token or argument caused it. Both adapters now carry the full
+locator set, from one shared model.
+
+### What is standards-aligned vs OAAF-specific
+
+Reasons are placed following AuthZEN Authorization API 1.0's `context` convention (its
+`reason_admin` / `reason_user` distinction): OAAF's stable `code` is the machine reason and
+`message` is developer-facing detail. The `DecisionExplanation` structure itself is
+OAAF-specific and adds no authorization semantics — using it does not make OAAF a PDP or
+require AuthZEN.
+
+### Privacy
+
+Explanations carry **names, never values**: argument names, tool names, stages, reason
+codes, and the subject's public-key thumbprint. They never carry argument values, resource
+contents, token bytes, signatures, PoP material, or keys. This holds for `explain()`,
+`toExplanation()`, and both transport adapters, and is asserted in the test suite.
+
 ## Trust anchors
 
 `trustAnchors` is required, and there is no way to omit it.

@@ -84,7 +84,9 @@ export type {
   AuthZenSubject,
 } from './authzen/types.js';
 
-export { explain } from './explain.js';
+export { explain, renderExplanation, toExplanation } from './explain.js';
+export { explainDecision, explainReasons, summarizeAuthority } from './explanation.js';
+export type { AuthoritySummary, DecisionExplanation, ReasonExplanation } from './explanation.js';
 
 /**
  * MCP / COAZ integration — RFC-0002. COAZ owns the request mapping; these
