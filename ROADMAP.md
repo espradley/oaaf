@@ -58,7 +58,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O5C         | Revocation interoperability                          | ✅ Complete              |
 | O5D         | Identity / workload interoperability                 | ✅ Complete              |
 | O5E         | Existing PDP / authorization interoperability        | ✅ Complete              |
-| O5F         | Outsider adoption journey                            | ⏸️ Planned               |
+| O5F         | Outsider adoption journey                            | ✅ Engineering-ready¹    |
 | O6A         | Normative conformance specification                  | ⏸️ Planned               |
 | O6B         | Conformance vectors                                  | ⏸️ Planned               |
 | O6C         | Cross-language conformance                           | ⏸️ Planned               |
@@ -230,12 +230,35 @@ weaker fit — none a runtime dependency. Hard boundary held: **the PDP owns pol
 verified authority.** Demonstrated by [`examples/pdp-coexistence`](examples/pdp-coexistence/)
 (including a valid-authority / org-policy-deny case) and available in both implementations.
 
-### O5F — Outsider adoption journey ⏸️
+### O5F — Outsider adoption journey ✅ Engineering-ready · ⬜ Externally certified
 
-**Goal:** make the complete outsider path coherent — discovery → install → first
-verification → constrained authority → delegation → explanation/debugging → integration
-guidance. This is product and documentation readiness, distinct from A-series adoption
-metrics.
+The complete path a person outside Edwin Digital follows — DISCOVER → TRY → INSTALL → VERIFY
+→ ADOPT → CONTRIBUTE — is real, runnable, and CI-verified, and mapped end to end in
+[docs/adoption-journey.md](docs/adoption-journey.md).
+
+**Two states, deliberately distinct:**
+
+- **Engineering-ready ✅** — everything an outsider needs exists and works:
+  - **Distribution:** honest install story. `@oaaf/sdk` install is documented with a working
+    pre-publish path (packed artifact / git ref); the packed artifact is certified on every
+    change (`npm run check:package`); a one-sitting [release runbook](docs/releasing.md) and a
+    shipped [CHANGELOG](packages/typescript/CHANGELOG.md) make first publish mechanical once
+    the `@oaaf` npm scope is owned (the sole remaining owner action).
+  - **Adopter path:** a voluntary [adopter declaration](.github/ISSUE_TEMPLATE/adopter.md) and
+    an [ADOPTERS.md](ADOPTERS.md) that is empty by design — entries require self-identification
+    _and_ independent verification; no names are manufactured.
+  - **Observable without telemetry:** [docs/adoption-signals.md](docs/adoption-signals.md)
+    enumerates external signals (GitHub traffic, stars/forks, issues/PRs, npm downloads and
+    dependents once published, code-search integrations). The SDK has **no phone-home**,
+    enforced by `npm run check:telemetry`, not merely promised.
+- **Externally certified ⬜** — the journey is only truly proven when an _actual outsider_
+  completes it. This is not self-certifiable: maintainers cannot claim it by role-playing an
+  outsider, so it is left unclaimed until a real, independent user does it and says so. That
+  is the evidence the funding objective ultimately cares about.
+
+¹ Engineering-ready: the outsider journey exists and is CI-verified. External certification —
+an independent user actually completing it — is deliberately unclaimed and is not
+self-certifiable.
 
 ## O6 — Conformance, standards, and v1 readiness
 

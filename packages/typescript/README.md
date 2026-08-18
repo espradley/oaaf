@@ -16,6 +16,19 @@ and explain the answer.
 npm install @oaaf/sdk
 ```
 
+> **Not yet on npm.** The `@oaaf` scope is a pending ownership step
+> ([docs/releasing.md](../../docs/releasing.md)); the command above will work once the first
+> publish happens. Until then, install the certified packed artifact directly — either from a
+> git reference:
+>
+> ```bash
+> npm install github:espradley/oaaf#main --workspace @oaaf/sdk
+> ```
+>
+> or by packing it yourself from a clone (`npm run build && npm pack -w @oaaf/sdk`, then
+> `npm install /path/to/oaaf-sdk-0.1.0.tgz`). The packed artifact an outsider installs is
+> certified on every change by `npm run check:package`.
+
 ## Runtime and module format
 
 |                          |                                                                                    |

@@ -179,6 +179,21 @@ npm run inspect -- --example deny-argument
 The [authority inspector](examples/inspector/) is local, offline, and privacy-safe by
 default (names, never values).
 
+### Adding OAAF to your own project
+
+The steps above use this monorepo to _try_ OAAF. **Adopting** it does not — you install the
+published SDK into your own project:
+
+```bash
+npm install @oaaf/sdk
+```
+
+The `@oaaf` npm scope is a pending ownership step, so until the first publish you install the
+certified packed artifact instead — the interim path is in the
+[SDK install section](packages/typescript/README.md#install). The whole path from discovering
+OAAF to depending on it is mapped, step by step, in the
+[outsider adoption journey](docs/adoption-journey.md).
+
 ## The standards underneath
 
 The primitives for this mostly exist already. Identity, attenuating delegation,
@@ -246,7 +261,8 @@ decisions are made, how normative changes go through RFCs, how versions and comp
 work, and how to report a vulnerability are written down:
 [GOVERNANCE](GOVERNANCE.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) ·
 [versioning & compatibility](docs/versioning-and-compatibility.md) ·
-[extensions](docs/extensions.md).
+[extensions](docs/extensions.md) · [adoption journey](docs/adoption-journey.md) ·
+[adopters](ADOPTERS.md).
 
 ## Contributing
 

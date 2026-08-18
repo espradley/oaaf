@@ -5,3 +5,8 @@ contact_links:
     about: >-
       Do NOT open a public issue for a vulnerability. Report it privately here.
       See SECURITY.md for what to include and what is in scope.
+  - name: The outsider adoption journey
+    url: https://github.com/espradley/oaaf/blob/main/docs/adoption-journey.md
+    about: >-
+      New here? The step-by-step path from discovering OAAF to depending on it —
+      try, install, verify, adopt, contribute.

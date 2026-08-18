@@ -35,6 +35,11 @@ These require a decision or a step that is deliberately not automated:
       first published; npm provenance via CI is the likely mechanism.
 - [ ] **CODEOWNERS review enforcement.** `.github/CODEOWNERS` exists, but "require review
       from code owners" is only meaningful once review is required — same gate as above.
+- [ ] **Enable GitHub Discussions.** A lower-friction venue than issues for
+      evaluation questions and adopter conversations. The adopter and interoperability
+      _issue_ templates already exist; Discussions is a repo-settings toggle
+      (Settings → Features → Discussions) that cannot be set from git. Enable it when there
+      is enough inbound to warrant a second channel.
 
 ## Re-checking
 
