@@ -28,7 +28,8 @@
     "demo:cross": "npm run build && node examples/cross-transport/index.js",
     "inspect": "npm run build && node examples/inspector/inspect.js",
     "check:governance": "node scripts/check-governance.mjs",
-    "check:package": "node scripts/check-downstream.mjs"
+    "check:package": "node scripts/check-downstream.mjs",
+    "gen:vectors": "npm run build && node scripts/gen-vectors.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

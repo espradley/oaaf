@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "oaaf"
+version = "0.1.0"
+description = "Independent Python implementation of the Open Agent Authority Framework (OAAF) authority contract."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.11"
+authors = [{ name = "Edwin Digital LLC" }]
+keywords = ["oaaf", "authorization", "delegation", "agent", "aat", "authzen", "ai-agents"]
+dependencies = ["cryptography>=42", "rfc8785>=0.1"]
+
+[project.urls]
+Homepage = "https://github.com/espradley/oaaf/tree/main/python"
+Issues = "https://github.com/espradley/oaaf/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["oaaf"]
+
+[tool.hatch.build.targets.sdist]
+include = ["oaaf", "README.md", "LICENSE", "NOTICE"]

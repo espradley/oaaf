@@ -50,3 +50,26 @@ jobs:
 
       - name: Package (downstream consumer certification)
         run: npm run check:package
+
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install (Python package + test deps)
+        working-directory: python
+        run: pip install -e . pytest
+
+      - name: Cross-language parity (Python side)
+        working-directory: python
+        run: python -m pytest tests/ -q

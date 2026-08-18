@@ -1,0 +1,332 @@
+{
+  "generatedForNow": 1780000000,
+  "vectors": [
+    {
+      "name": "allow",
+      "note": "valid delegated authority",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoibU80OERKQTFsVXlrd1dDcmZuV2ZEdzl6Q1dWMkd3dktUeEo1RGkwUkFnNCIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e30sInJlcG8ubWVyZ2UiOnt9fX1dfQ.FEAUiLwlrkEzsTGAXx-fRMRjnN8_0ttT5_QW11YT3hq5pFOsRXeMgnJPCfbphr8Ip58BZvDYxCAse9pA2TsQBw",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6Sk1tODhWY0dhMzZCLXh6ckgtTTM4U014TFhHZFpwemkzTkZoeElyMGN6NCIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiUk4xMFE0Yk9mTUgyT1Nfel94Z0hWUVVtWUhQaU5CNXlzUkF1Sm9oTTZkcyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6Il9kaXRCZ3lWVnowUUhSdFh4VGhnb1g1M0lpMzBRV2hDaWZxQ2NXM2lTbTAiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.8AsONpcQLNYNMP6ahg9Q6SllKdKrTXv8WcckwALnPBOlx53erEaS0PEpwQdEkOtv4WRRXUbpuxE-k6eWbY_SAA"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "y-pGSTqpVyd1kk0rgv9kGUIAtitra5eGbQCBdQT9S2g",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnsicGF0aCI6InNyYy8ifSwiaWF0IjoxNzgwMDAwMDAwLCJqdGkiOiJwb3AtMTc4MDAwMDAwMCJ9.KiDg1XTETSBi1hLwCW24EHouAA86alAz_g7WoV7OgbkiTu8RBpLpQr9CxYa1rOgjLENhzADnoMlE8-TZwTFVDg",
+        "tool": "repo.read",
+        "args": {
+          "path": "src/"
+        },
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "ALLOW",
+        "reasons": [],
+        "authority": {
+          "subject": "urn:ietf:params:oauth:jwk-thumbprint:sha-256:hoF3vcz5jpGcZ8j5vKihiBIGi5mYgk8rv0pijJpjUqM",
+          "requestedTool": "repo.read",
+          "requestedArgumentNames": [
+            "path"
+          ],
+          "grantedTools": [
+            "repo.read"
+          ],
+          "delegationDepth": 1,
+          "chainLength": 2,
+          "expiresAt": 1780001800
+        }
+      }
+    },
+    {
+      "name": "deny_tool_not_authorized",
+      "note": "child never delegated repo.merge",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiZjJTX2RtNVNDbzFtS2t1OEpwVDRhYng2Nk9maFpIR2I4Rkk1YzhfRHRwbyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e30sInJlcG8ubWVyZ2UiOnt9fX1dfQ.Ch9MXOhBiGPQntcFZ2AB5kqWVeBEuPdCMlG6_8wv2HvtJjURgMo1SejDeXsu3KuBKIbwQg_heX-RS_emZVmsAw",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6STcxZzA4elBDX1dudk1lQ3hfOFlVWkV6dEktOU05WTdzVzhPS056UXRVcyIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiZFluUVNTUkx3dENoZmljVmJVa1hCclc0aDdmanp3MHZDRDhkc2Q2Z1pPTSIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6Imc4NWFvcFJWVlIzbzRTY2tmaHdCOVQya3ZwWnFMSlJJZWhDelBOa1cxUFUiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.Te4Qv96fyFwlYnzq0TM8PKbAeylnqXItOQm_7r9lEU2p3cLo70T9D7jN8FCOFm2P-rFs89uU31wviCfKHOi7Aw"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "0_bTjjOZ7GAK3CInFY-wzFLph3JhDM8NCj4bGj6Viuc",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLm1lcmdlIiwiaHRhIjp7fSwiaWF0IjoxNzgwMDAwMDAwLCJqdGkiOiJwb3AtMTc4MDAwMDAwMCJ9.Wnd1Di-7GSbYtHg3BTNbtYqDGhvE88Xp4aDcw_fbDXF3nu68F3A23U3YEKk23Gv9HJ8lqbV-ITI5vccI0ZxrCg",
+        "tool": "repo.merge",
+        "args": {},
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "tool_not_authorized",
+            "stage": "evaluation",
+            "message": "Tool \"repo.merge\" is not permitted by this authority.",
+            "tool": "repo.merge"
+          }
+        ],
+        "authority": {
+          "subject": "urn:ietf:params:oauth:jwk-thumbprint:sha-256:VWScoNWvUJeCRzMBCTC4EuYcGUE-NCVcfUh52T39270",
+          "requestedTool": "repo.merge",
+          "requestedArgumentNames": [],
+          "grantedTools": [
+            "repo.read"
+          ],
+          "delegationDepth": 1,
+          "chainLength": 2,
+          "expiresAt": 1780001800
+        }
+      }
+    },
+    {
+      "name": "deny_argument_constraint",
+      "note": "value outside narrowed constraint",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4Ijoia2dPMGN4Nll4R1AwZ3JUTlR5Z3dNbS1mUHgwaGRZdldJbDRCU1Y5ZnVUdyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6eyJwYXRoIjp7ImNvbnN0cmFpbnRfdHlwZSI6Im9uZV9vZiIsInZhbHVlcyI6WyJhIiwiYiJdfX19fV19.tGlw-4XmUzuaICln1ctct_rFXQ65PpoO9vHhEHcbm5kgkAywjssPUCCSflKJGvOEdwcoqMb3dNqTKqTyJJhWDg",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6SURva3RlNzIxT2FnVHMtQ1JRNGl0dGMxVEkxRU9SZE9yVEFxWTF3amw3SSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiRkxmd0dCb3VQWnFjSkh3b2NMNUdsOXd6UEtfWUg4RmtZWWRWQUJwaFNzTSIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6IkNyVkQ4a2sycWhudmVONHY3YXdzSF9TbXpWRGdWeWVFelNYOUdldjdlQVUiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6eyJwYXRoIjp7ImNvbnN0cmFpbnRfdHlwZSI6ImV4YWN0IiwidmFsdWUiOiJhIn19fX1dfQ.JAekV3skPo1_xsFfw-HVlI3Cg5bRawGZz65jBYBlsVLsV9Z2gdzUsc2GIMIsH8LydAOXsTE-yD2c7oCBULvEBA"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "hfJ-3tppuHnih7H-uxU8E7-lo3DMS4WWjdn9CK1-NJQ",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnsicGF0aCI6ImIifSwiaWF0IjoxNzgwMDAwMDAwLCJqdGkiOiJwb3AtMTc4MDAwMDAwMCJ9.mJqq88qw92Kxr2TdVHWpoEE-12p624g5KNB4cU4Hyazv520jR-ygrDNUxCXD1RF4KSPXhLezyXnvhI9b0Eb_Dg",
+        "tool": "repo.read",
+        "args": {
+          "path": "b"
+        },
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "argument_constraint_violated",
+            "stage": "evaluation",
+            "message": "Argument \"path\" does not satisfy the constraint on \"repo.read\".",
+            "tool": "repo.read",
+            "argument": "path"
+          }
+        ],
+        "authority": {
+          "subject": "urn:ietf:params:oauth:jwk-thumbprint:sha-256:lXM3CzkiDte2o2W_PBQpCiKHt1_FIqGwDLgdHTuYH4I",
+          "requestedTool": "repo.read",
+          "requestedArgumentNames": [
+            "path"
+          ],
+          "grantedTools": [
+            "repo.read"
+          ],
+          "delegationDepth": 1,
+          "chainLength": 2,
+          "expiresAt": 1780001800
+        }
+      }
+    },
+    {
+      "name": "deny_expired",
+      "note": "evaluated after expiry",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiWGtuOUNNZGx0cEwzMHp2TVowbzJENGYwTHc1NnQyVHlDakhrdjVEQnlaTSIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.3rHcDwst8aQSw8B6vfZklVcVUGvIFOtm6QBVWFba0Ge57_EeaHDEsQ7l3qe1VYlpXoc-kuVFBmNBhiStHjU2AQ",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6SERWLWhzcDFrNGpFYzNodUw0MDNwQ1MzaDVQd0lwXy1fSTl0dFk5emE3byIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiMlljSUZyVXFyZ1EtcmFXSTR5R1kyWS1HeU8waG5yNjZUSlROc0NCQzE4SSIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6Ild2X3JSMWlYTzlxenF5NDZWVnBDTDY1blk0Q241T0diTkRMazEtVDZDMzgiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.Ynxr3Y0GXBx5cv-Uk1XMMDW8WHMgVFuriJHPkIy8ePOUZyixeenzD-XB719PWc_yEAtPQqXKgDFxVX0xbKUVCg"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "8O2qFnpCcC15P3s7VYTjnScGjhpsGdDZNye1t99L4sg",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnt9LCJpYXQiOjE3ODAwMDAwMDAsImp0aSI6InBvcC0xNzgwMDAwMDAwIn0.71zdR275izs_Dk6W6mZl8jo8P79qcHdHOC_VM2HZjE8luJOMavGNLNQ3HFWB_lnYtKvjWrZskM-P6vsrbnsGCg",
+        "tool": "repo.read",
+        "args": {},
+        "now": 1780003700
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "expired",
+            "stage": "chain",
+            "message": "Token has expired.",
+            "tokenIndex": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "deny_holder_mismatch",
+      "note": "PoP not signed by leaf holder",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoidENMdl8tSGxEejl4YS1ZZGhhLUVtVDV1Y21yVzlVeEh2bFNQbTBuNlhPcyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.HW_Fd5u_TYffVr5--4SqdxIiDLeLg5ZUJb0HZKaMQ9L1aBrDpfCr5iiKUJumzonVNIPX-fbjDR5Tdvqu3osICw",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6WHlRUWVhN3lTd3lPM19pLURpcWRQdHFwRHhMNVZQQXB2V1dhc1dGdkk1VSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiWkJzM1RWZTQ0d25vT0o5R3ZsTi05WnFKeUY1SEpuS0NIUzZPbHRoWFJTcyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6ImI3RE1UWmNEZnlNY19udXc3RXcxY2NyRmtweVR0cURGLUZCREU2cG16bzgiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.EWDMLgiRfFXY7Ih8rmnEBEJEIp3SuKStWFmAk6FwsYxQOaympKG5nVjwbc12hBFHjpV-FEmaK75NuB_aj43xBg"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "CuSKen-YBZtjhrgSje1_9FrQ_xrG2OGkmhyjv3I2YFU",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnt9LCJpYXQiOjE3ODAwMDAwMDAsImp0aSI6InBvcC0xNzgwMDAwMDAwIn0.coHCb4sf4lYzo0KKcHUyHHSomcgvxZIkf8lS7-5kOnm1cnE5HWhyOpOOB4wwQ9i-xX9KQlW4AZv2Q_8fqlMJCA",
+        "tool": "repo.read",
+        "args": {},
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "pop_signature_invalid",
+            "stage": "pop",
+            "message": "Proof of possession is not signed by the leaf holder key."
+          }
+        ]
+      }
+    },
+    {
+      "name": "deny_pop_binding",
+      "note": "PoP hta does not match requested args",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiaFNlMWF0MnJWNERmeVNtRHRsU045bnhldmxMSlNud0diS0NVcndqZjg4YyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6eyJwYXRoIjp7ImNvbnN0cmFpbnRfdHlwZSI6ImV4YWN0IiwidmFsdWUiOiJhIn19fX1dfQ.7uKpGQ_RSs-TZIPOz1TxiFv8R-bloiZ4l-q2Pq-7t-SAG_4IYL3vFbChJbwb3GGj5qJWz0ErNTB_85kPcaPdBQ",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6eGVlTWJSZHhsMnpleHI5NENXVy1ORUtzWW5iOUh4OVN6cG13TU1FVEotNCIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiU0tDc0dkUlp1eWVZTVQzaTVyNU1GUVBjX0tGaGpCaTRYZzV6WGxTRnJjNCIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6ImtIN1NnejhTQm5ZX3pibkFXR3ZIQno0Z2xoVFFhaE1qNHVhc3oxdzhwNkUiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6eyJwYXRoIjp7ImNvbnN0cmFpbnRfdHlwZSI6ImV4YWN0IiwidmFsdWUiOiJhIn19fX1dfQ.IWY_Quqe4QFar811lCtRwAQDc3CVkGsjfOwuDjzE2HCz8XZN7G_J14LpfvqsqA0ZPjuCtuVWcXQGIzXMyrL1Ag"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "lViswCAF-zAHCquznLJ7-uCkT78Tw0oFn2ZjioP1D0w",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnsicGF0aCI6ImEifSwiaWF0IjoxNzgwMDAwMDAwLCJqdGkiOiJwb3AtMTc4MDAwMDAwMCJ9.KRPnKB6QbUdxhGnwTiy525kg1OWnItzWGnXyte3LOyf0nw1IK9C9v0pqg0euZX_pWbrZFeypSWiCd1mnKTdxBg",
+        "tool": "repo.read",
+        "args": {
+          "path": "a",
+          "extra": "x"
+        },
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "pop_binding_mismatch",
+            "stage": "pop",
+            "message": "Proof of possession is bound to a different argument map.",
+            "tool": "repo.read"
+          }
+        ]
+      }
+    },
+    {
+      "name": "deny_invalid_signature",
+      "note": "root signature tampered",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiWG9DTnVLVmY5dUI2aEFlZzd4RFh2QUNzdm45aEZtdkFiV1JNTmlQQTc1byIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.PBIVT3V6Xaj3Q9fJd5dU6yrZHtj7UhVT3AOHRMy3dWdbZOuQmMfgAI5SRF16i-H9gx0M6aHdwxhCbLNj5hAAAA",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6OGNWdDctc1Y0OW5JQjl3SWJlVnByV3RFbFhFam5Ra1dRblFydTlscUM5byIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiSHp4QzM0ZjlLUnRpSlVOUGVFanRUbmJreUYyZVh1Y3V6cmdFZzhSbnlmMCIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6InpkSFZFdnRqRWFCaVZkYWlyM05GVzlNeVdJZFR5Mk9vd3h3ZXRmdC1EbU0iLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.tbm5zxK23kzIJZKwUUkJ1xcEYmr4bpy8v__t1GQ1jXqGsNX-NyfBOCWJLH7KJFXc-0I3I8yifjrPMZ77dyaTAw"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "tyKuEZbrt7s9RRb6bHDYf6qkexxn6olg3Aa1OCNnX5c",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnt9LCJpYXQiOjE3ODAwMDAwMDAsImp0aSI6InBvcC0xNzgwMDAwMDAwIn0.WFiiKmNQiezL4wq7VltoLonyLnond9yjK2h_njYeEeMKhqC3asMxr20aMWmQGlzhDdrS7gPfQlimZ5nz8bFuCA",
+        "tool": "repo.read",
+        "args": {},
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "untrusted_root",
+            "stage": "chain",
+            "message": "Root token is not signed by any configured trust anchor.",
+            "tokenIndex": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "deny_chain_reordered",
+      "note": "leaf presented before root",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6cmNhX0RmdXlLUXc2QktTbWdGRTlsQjJaaHJGb3ZJMzhUXzA3YXI1aWp5byIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoidjVJWDJrMVkyb2lZR0dqSmsxaXVISUJjOWpxM0JKU3pCVjRjQVJxTTE4YyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6Im0zRXB1ckRvdEN3eGI3Z2FEeFctM1J6b1RxMDZoc1h0Nkp2VzFFanM4TE0iLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6eyJwYXRoIjp7ImNvbnN0cmFpbnRfdHlwZSI6ImV4YWN0IiwidmFsdWUiOiJhIn19fX1dfQ.zdSASaAFmTXRyUs_eOzxKvIfqwf0iEqnouOb6Xm2wo8aEstsoCnFSUOgwJuGzIhUfuVibWwYM1HuWmGFJ_avDA",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiT1U5YWJYeF9aOG1ZUFhMZmJxLWtQU3VvU09VSXBsdnFxQktoOXFtOVFjUSIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.CNF9sD5CA7VHpMXqSXrjZEOSKx3-68jZwarKWlE0RwTnvMa7s3WbD18pc6aJ5GjNwUqoTnYFDSLaTM691IRuAw"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "dlt_7X2g75VCCVR8r9n86KZjOl1wG10IClF1dp5PtPw",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfaWQiOiJkZXJpdmVkIiwiYWF0X3Rvb2wiOiJyZXBvLnJlYWQiLCJodGEiOnsicGF0aCI6ImEifSwiaWF0IjoxNzgwMDAwMDAwLCJqdGkiOiJwb3AtMTc4MDAwMDAwMCJ9.GPndoS_iphLpixBTK7W8JnWMExlYxLH0LkUMQGjNP6iWxTTu5Rrx8GRk2teatZEPU5cTz1hOPJWEQ30RFDjwBQ",
+        "tool": "repo.read",
+        "args": {
+          "path": "a"
+        },
+        "now": 1780000001
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "untrusted_root",
+            "stage": "chain",
+            "message": "Root token is not signed by any configured trust anchor.",
+            "tokenIndex": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "deny_recipient_mismatch",
+      "note": "PoP aat_aud bound to a different recipient",
+      "input": {
+        "tokens": [
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJyb290IiwiaXNzIjoiaHR0cHM6Ly9hdXRob3JpdHkuZXhhbXBsZSIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAzNjAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoiTVRJUzUtRDBJcVZ6cF9pTjVwSUZ4TF9YbWZHb2JqV2YtMVFsc0hZWlRtdyIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjowLCJkZWxfbWF4X2RlcHRoIjoyLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.oeibgj7PdPbYV5RLW59_LozMXgQX3vN0nR3bWuLCOmvcDQbP40R4mvgT9msCl_mE8couGxaerDrJPIgmOvfBBQ",
+          "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZXJpdmVkIiwiaXNzIjoidXJuOmlldGY6cGFyYW1zOm9hdXRoOmp3ay10aHVtYnByaW50OnNoYS0yNTY6RGVpTzRuczQ2ZG1RRmR1MDZ2NjZoOENpUGx4ZnpwcW5KTFcyWFI0RmpmNCIsImlhdCI6MTc4MDAwMDAwMCwiZXhwIjoxNzgwMDAxODAwLCJjbmYiOnsiandrIjp7ImNydiI6IkVkMjU1MTkiLCJ4IjoibDNrVUs5T2VFSU1BNGJWNmlqVjJ2eW5UWmhONkhiVGNpd25nWExCU2NONCIsImt0eSI6Ik9LUCJ9fSwiZGVsX2RlcHRoIjoxLCJkZWxfbWF4X2RlcHRoIjoyLCJwYXJfaGFzaCI6IkxoSm90LS16LVY4ZHg3RGFvZl95T2xRMmVHU0FyYm12S0ZNUEhiQkpzeXMiLCJhdXRob3JpemF0aW9uX2RldGFpbHMiOlt7InR5cGUiOiJhdHRlbnVhdGluZ19hZ2VudF90b2tlbiIsInRvb2xzIjp7InJlcG8ucmVhZCI6e319fV19.rGoll12sVY5QcLmQXxo9LgW38jQwr9a-jU_AAM5HRwfMGpGlYB_lxtv6b9Q8XEznMNCaXu8lYehNPadhdPHCDQ"
+        ],
+        "trustAnchors": [
+          {
+            "crv": "Ed25519",
+            "x": "6Dvd-pPEKF3JrOd4TV3KxGV_Tnx7Y1fQYdYQXCyXuac",
+            "kty": "OKP"
+          }
+        ],
+        "pop": "eyJhbGciOiJFZERTQSJ9.eyJhYXRfYXVkIjoiaHR0cHM6Ly9zb21lb25lLWVsc2UuZXhhbXBsZSIsImFhdF9pZCI6ImRlcml2ZWQiLCJhYXRfdG9vbCI6InJlcG8ucmVhZCIsImh0YSI6e30sImlhdCI6MTc4MDAwMDAwMCwianRpIjoicG9wLTE3ODAwMDAwMDAifQ.Bz2TI99He5QCjb6nqVbNrHmeMuGah7HFtF0xW4aYbOMtnNHjWP28WH4qQBffBJz7PwcVcOKsbHVe-BYWq-DUDg",
+        "tool": "repo.read",
+        "args": {},
+        "now": 1780000001,
+        "recipient": "https://recipient.example"
+      },
+      "expected": {
+        "decision": "DENY",
+        "reasons": [
+          {
+            "code": "pop_recipient_mismatch",
+            "stage": "a2a",
+            "message": "The proof of possession is bound to a different recipient than this agent."
+          }
+        ]
+      }
+    }
+  ]
+}

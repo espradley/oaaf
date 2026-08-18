@@ -16,3 +16,12 @@ docs/reviews/
 
 # Adoption tracking — private outreach data, never published.
 docs/adoption/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+python/dist/
+python/build/
+.venv/
