@@ -1,6 +1,6 @@
 # OAAF Specification 0.1
 
-- **Status:** Draft — under active design. Not stable, not implemented.
+- **Status:** Draft profile — under active design. Partially implemented (see the SDK); not stable.
 - **Spec version:** `0.1`
 
 ## Contents

@@ -106,7 +106,9 @@ same reasoning that makes proof of possession non-optional — see
 ## MCP / COAZ
 
 `@oaaf/sdk` also implements [RFC-0002](../../rfcs/0002-mcp-coaz-binding.md): an
-integration with COAZ, OpenID's MCP tool-authorization binding for AuthZEN.
+integration with COAZ, OpenID's MCP tool-authorization binding for AuthZEN. For a
+runnable version of the snippet below, see
+[examples/mcp-tool-guard](../../examples/mcp-tool-guard/) (`npm run demo:mcp`).
 
 COAZ owns the MCP-to-authorization-request mapping; OAAF does not redefine it.
 `enforceOaafPrecondition` is inserted as an additional step in COAZ-MCP's own PEP

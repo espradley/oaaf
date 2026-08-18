@@ -7,9 +7,9 @@ It makes existing identity, authorization, delegation, and evidence standards pr
 across MCP, A2A, and agent runtimes without introducing another competing authorization
 protocol.
 
-> **Status: early.** OAAF is being built in the open and is not yet implemented.
-> Nothing here is production-ready or security-audited. See
-> [Project maturity](#project-maturity) before you plan around it.
+> **Status: early, but runnable.** A verified authority kernel and an MCP tool-guard
+> integration work today; `npm run demo:mcp` shows them. Not production-ready and not
+> security-audited — see [Project maturity](#project-maturity) before you plan around it.
 
 ## The problem
 
@@ -41,46 +41,17 @@ Reason:
 The agent held a valid GitHub token the whole time. The token could merge. The
 _authority_ could not, and something had to be positioned to notice the difference.
 
-## Where OAAF sits
+**See it work in one command** — an MCP `tools/call` allowed, and a structurally valid
+one denied before the authorization PDP is ever consulted:
 
-The primitives for this mostly exist already. Identity, attenuating delegation,
-authorization decisions, and portable evidence are each being standardized by people
-who have been doing this longer than we have.
-
-What does not exist is running code that makes them work together across an agent
-boundary. That is OAAF.
-
-```text
-EXISTING STANDARDS
-────────────────────────────────
-Identity        SPIFFE / WIMSE
-Delegation      Attenuating authorization tokens
-Decisions       AuthZEN
-MCP auth        COAZ
-Evidence        Signed receipts
-A2A transport   A2A extensions
-                  │
-                  ▼
-OAAF
-────────────────────────────────
-Profiles
-Bindings
-Enforcement
-Verification
-Explainability
-Conformance
-Developer tooling
-             ┌────┴────┐
-             ▼         ▼
-            MCP       A2A
-             │         │
-             ▼         ▼
-           Tools     Agents
+```bash
+npm install
+npm run demo:mcp
 ```
 
-OAAF defines no wire format of its own. Where a standard already solves something, OAAF
-adopts or profiles it; the reasoning is in
-[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
+If you maintain an MCP server or gateway, start with
+[examples/mcp-tool-guard](examples/mcp-tool-guard/) — it answers "where does OAAF sit
+in my request path?" in about five minutes.
 
 ## The model
 
@@ -120,7 +91,7 @@ OAAF is aimed at the infrastructure layer — the people who end up owning this 
 whether or not they wanted to:
 
 - **MCP server maintainers** who expose consequential tools and need scoped authority
-  around them
+  around them — there is a runnable [MCP tool-guard example](examples/mcp-tool-guard/)
 - **A2A agent authors** who delegate work across an agent boundary and need the
   narrowing to be verifiable
 - **Tool gateway and proxy operators** enforcing what reaches a downstream system
@@ -181,6 +152,47 @@ The SDK verifies an AAT `-01` delegation chain, maps the request into an AuthZEN
 decision, and explains any denial. See [`@oaaf/sdk`](packages/typescript/README.md) and
 the [quickstart](examples/quickstart/index.js).
 
+## The standards underneath
+
+The primitives for this mostly exist already. Identity, attenuating delegation,
+authorization decisions, and portable evidence are each being standardized by people
+who have been doing this longer than we have.
+
+What does not exist is running code that makes them work together across an agent
+boundary. That is OAAF.
+
+```text
+EXISTING STANDARDS
+────────────────────────────────
+Identity        SPIFFE / WIMSE
+Delegation      Attenuating authorization tokens
+Decisions       AuthZEN
+MCP auth        COAZ
+Evidence        Signed receipts
+A2A transport   A2A extensions
+                  │
+                  ▼
+OAAF
+────────────────────────────────
+Profiles
+Bindings
+Enforcement
+Verification
+Explainability
+Conformance
+Developer tooling
+             ┌────┴────┐
+             ▼         ▼
+            MCP       A2A
+             │         │
+             ▼         ▼
+           Tools     Agents
+```
+
+OAAF defines no wire format of its own. Where a standard already solves something, OAAF
+adopts or profiles it; the reasoning is in
+[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
+
 ## Project maturity
 
 Honest accounting of where this stands:
@@ -189,7 +201,8 @@ Honest accounting of where this stands:
 | ------------------ | ------------------------------------------------------------------------------- |
 | Standards profile  | AAT `-01` and AuthZEN 1.0, pinned. Mapping frozen by RFC-0001.                  |
 | TypeScript SDK     | Chain verification, proof of possession, decision, explanation. Not yet on npm. |
-| MCP / A2A bindings | Not started — next phase.                                                       |
+| MCP / COAZ binding | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path.   |
+| A2A binding        | Not started — demand-gated.                                                     |
 | Conformance suite  | Not started.                                                                    |
 | Security review    | None. No formal audit, no certification, no threat model published yet.         |
 | External adopters  | None yet.                                                                       |

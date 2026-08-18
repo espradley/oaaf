@@ -1,10 +1,14 @@
 /**
- * Minting helpers for tests, fixtures, and the demo.
+ * Minting helpers for evaluation, tests, fixtures, and demos.
  *
- * **Not an issuer.** No key management, no persistence, no policy. This exists
- * so tests can construct chains that a real issuer would produce, and so the
- * demo can run without a service. An issuer is out of scope for O2 and is not
- * on the roadmap for OAAF at all.
+ * These let you construct the AAT chains and proofs a real issuer would produce,
+ * so you can run and evaluate the whole authorization flow without deploying an
+ * issuer. That is a supported use — the examples rely on it.
+ *
+ * What this is *not* is a production token-issuance service: no key management,
+ * no persistence, no revocation, no policy. A production issuer is intentionally
+ * outside OAAF's scope, not a missing feature. Verification and enforcement are
+ * OAAF's job; issuing and storing credentials is the deployment's.
  */
 
 import { CompactSign, exportJWK, generateKeyPair } from 'jose';

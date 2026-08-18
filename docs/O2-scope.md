@@ -1,6 +1,6 @@
 # O2 Scope — First standards-based enforcement path
 
-- **Status:** Proposed. Not approved, not implemented.
+- **Status:** Historical — the plan for O2, now implemented and closed. Retained as a record.
 - **Date:** 2026-08-18
 
 **Canonical question.** Given a delegated authority token conforming to
