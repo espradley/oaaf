@@ -53,6 +53,22 @@ If you maintain an MCP server or gateway, start with
 [examples/mcp-tool-guard](examples/mcp-tool-guard/) — it answers "where does OAAF sit
 in my request path?" in about five minutes.
 
+**The core idea in one demo** — the _same_ delegated authority enforced identically across
+both an MCP tool call and an A2A agent handoff:
+
+```text
+        SAME AUTHORITY CHAIN  (Alice → Bob, narrowed to repo.read)
+                     │
+          ┌──────────┴──────────┐
+          ▼                     ▼
+         MCP                   A2A
+     Agent → Tool          Agent → Agent
+     read ALLOW · merge DENY   read ALLOW · merge DENY
+```
+
+`npm run demo:cross` runs it. The authority is not owned by the transport — that is what
+OAAF is for.
+
 ## The model
 
 ```text

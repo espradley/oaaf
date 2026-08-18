@@ -180,14 +180,20 @@ specifications.
 concrete external integration opportunity; a third-party use case specific enough to
 appear in someone else's release notes.
 
-## O3C — Agent delegation demo
+## O3C — Cross-transport delegation demo ✅
 
-**Goal: a single demo crossing an agent boundary on each transport — narrowed authority
-issued to one agent, delegated to a second, and verified downstream — showing the same
-OAAF verification layer working under both the MCP and A2A bindings.**
+**Goal: one runnable proof that the same delegated authority chain is enforced identically
+through both the MCP and A2A adapters — that authority is not owned by the transport.**
 
-_Exit condition:_ the demo runs with no account or service, on both transports, from one
-shared authority chain.
+Reduced to a proof-and-communication scope after O3B, since the per-transport delegation
+demos already existed. The `examples/cross-transport` demo mints one chain (Alice → Bob,
+narrowed to `repo.read`) and one proof of possession, feeds the identical material through
+`enforceOaafPrecondition` (MCP) and `enforceA2aAuthority` (A2A), and shows equal allow/deny
+outcomes down to the reason code. A CI test asserts the equivalence so a future change that
+made the transports diverge fails the build. No new core semantics; reserved-IP gate clean.
+
+_Exit condition:_ met — `npm run demo:cross` runs from a clean clone, both transports decide
+identically, and the README carries the shareable diagram.
 
 **Ecosystem evidence created:** the first artifact that demonstrates OAAF's core claim —
 portable authority — actually crossing a transport boundary, not just being verified
