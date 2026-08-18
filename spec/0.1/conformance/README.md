@@ -31,7 +31,7 @@ Every normative requirement lives in the machine-readable catalog
 | [`requirements.json`](requirements.json) | Canonical requirement catalog (the traceability spine).                                                                             |
 | [classification.md](classification.md)   | The U/O/B/R/E/X normative-surface matrix; reason-code, stage, and explanation-field classification; experimental-feature treatment. |
 | [standards.md](standards.md)             | Exact adopted-standard versions, status, and what OAAF inherits vs profiles.                                                        |
-| [traceability.md](traceability.md)       | Existing shared vectors mapped to requirements, and the O6B coverage-gap list.                                                      |
+| [traceability.md](traceability.md)       | Every corpus vector mapped to requirements, and the coverage/gap tables.                                                            |
 | [reserved-ip.md](reserved-ip.md)         | Reserved-DigitalStack-IP assessment over every requirement.                                                                         |
 
 ## Requirement identifiers
@@ -142,11 +142,12 @@ vectors.
 
 ## Relationship to the vector suite
 
-This document defines _requirements_. [O6B](../../../ROADMAP.md) will turn them into versioned
-fixtures. Every planned vector traces to one or more requirement IDs, and every testable
-`MUST` should have a planned certification method; [traceability.md](traceability.md) records
-the current mapping and the gaps O6B must close. The existing shared vectors are excellent
-seeds — mapped here, **not** promoted to the final suite.
+This document defines _requirements_; the [portable corpus](vectors/README.md) (O6B) turns
+the security-relevant ones into language-neutral static vectors. Every vector traces to one or
+more requirement IDs, and every Core security-invariant requirement that can be a static
+vector has one — enforced by `npm run check:conformance`. [traceability.md](traceability.md)
+records the full mapping and the remaining gaps (binding/PDP depth) for O6C–O6D. The corpus is
+not yet frozen; O6H owns the v1 suite.
 
 ## Status of this specification
 

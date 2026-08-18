@@ -236,7 +236,8 @@
       "security_invariant": true,
       "testable": true,
       "source": ["RFC-0001"],
-      "statement": "There MUST NOT be an option that disables proof-of-possession verification while still presenting the result as an authorization decision."
+      "statement": "There MUST NOT be an option that disables proof-of-possession verification while still presenting the result as an authorization decision.",
+      "portable_vector": false
     },
     {
       "id": "CORE-POP-003",
@@ -299,7 +300,8 @@
       "security_invariant": true,
       "testable": false,
       "source": ["spec/0.1"],
-      "statement": "An implementation that encounters an unrecognized spec or profile version MUST refuse the exchange rather than guess at its meaning."
+      "statement": "An implementation that encounters an unrecognized spec or profile version MUST refuse the exchange rather than guess at its meaning.",
+      "portable_vector": false
     },
     {
       "id": "CORE-DEC-004",
@@ -308,7 +310,8 @@
       "security_invariant": true,
       "testable": true,
       "source": ["RFC-0003", "O3C"],
-      "statement": "Where the same authority material is accepted through more than one supported binding, the canonical authority decision MUST NOT change because of the transport."
+      "statement": "Where the same authority material is accepted through more than one supported binding, the canonical authority decision MUST NOT change because of the transport.",
+      "portable_vector": false
     },
     {
       "id": "CORE-EXPL-001",
@@ -353,7 +356,8 @@
       "security_invariant": false,
       "testable": false,
       "source": ["CHARTER", "O3C"],
-      "statement": "Core conformance MUST NOT depend on MCP, A2A, or any particular transport binding."
+      "statement": "Core conformance MUST NOT depend on MCP, A2A, or any particular transport binding.",
+      "portable_vector": false
     },
     {
       "id": "CORE-NEUTRAL-002",
@@ -362,7 +366,8 @@
       "security_invariant": false,
       "testable": false,
       "source": ["RFC-0005", "CHARTER"],
-      "statement": "Core conformance MUST NOT require any particular identity provider (e.g. SPIFFE, WIMSE, OIDC)."
+      "statement": "Core conformance MUST NOT require any particular identity provider (e.g. SPIFFE, WIMSE, OIDC).",
+      "portable_vector": false
     },
     {
       "id": "CORE-NEUTRAL-003",
@@ -371,7 +376,8 @@
       "security_invariant": false,
       "testable": false,
       "source": ["RFC-0006", "CHARTER"],
-      "statement": "Core conformance MUST NOT require any particular policy decision point or an OAAF-hosted authorization service."
+      "statement": "Core conformance MUST NOT require any particular policy decision point or an OAAF-hosted authorization service.",
+      "portable_vector": false
     },
     {
       "id": "CORE-NEUTRAL-004",
@@ -380,7 +386,8 @@
       "security_invariant": false,
       "testable": false,
       "source": ["RFC-0004", "CHARTER"],
-      "statement": "Core conformance MUST NOT require an OAAF-hosted revocation or status service."
+      "statement": "Core conformance MUST NOT require an OAAF-hosted revocation or status service.",
+      "portable_vector": false
     },
     {
       "id": "CORE-NEUTRAL-005",
@@ -389,7 +396,8 @@
       "security_invariant": false,
       "testable": false,
       "source": ["O5B"],
-      "statement": "A conformant implementation MUST NOT be required to share a language, library, internal API, object model, source structure, or package name with any reference implementation."
+      "statement": "A conformant implementation MUST NOT be required to share a language, library, internal API, object model, source structure, or package name with any reference implementation.",
+      "portable_vector": false
     },
     {
       "id": "STATUS-001",

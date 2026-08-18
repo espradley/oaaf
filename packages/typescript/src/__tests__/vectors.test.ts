@@ -12,20 +12,48 @@ import { revokedSetResolver } from '../status.js';
 import { boundSubjectsVerifier } from '../identity.js';
 
 /**
- * The reference side of the cross-language parity gate (O5B). The same shared
- * vectors that the Python suite verifies are verified here against the
- * reference. Neither implementation calls the other; both answer to the
- * committed expected result. Keeps the reference honest against its own vectors
- * and guarantees the fixtures stay self-consistent.
+ * The reference side of the portable conformance corpus (O6B). The reference runs
+ * every vector in the language-neutral corpus and must produce each vector's
+ * declared portable contract (expected_decision + expected_normative_reason) as
+ * well as its advisory full `reference` explanation. The Python suite consumes the
+ * SAME corpus for the profiles it implements; neither calls the other.
  */
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
-const vectorsPath = path.join(repoRoot, 'python', 'tests', 'vectors', 'vectors.json');
-const { vectors } = JSON.parse(readFileSync(vectorsPath, 'utf8')) as {
-  vectors: Array<{ name: string; input: Record<string, unknown>; expected: DecisionExplanation }>;
-};
+const A2A_CHAIN = 'https://oaaf.dev/a2a/authority/v1/chain';
+const A2A_POP = 'https://oaaf.dev/a2a/authority/v1/pop';
+const A2A_EXT = 'https://oaaf.dev/a2a/authority/v1';
 
-/** Compare only the normative fields; message prose is not normative. */
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
+const corpusPath = path.join(repoRoot, 'spec', '0.1', 'conformance', 'vectors', 'corpus.json');
+
+interface VectorInput {
+  tokens: string[];
+  trust_anchors: Record<string, unknown>[];
+  pop: string;
+  tool: string;
+  args?: Record<string, unknown>;
+  now?: number;
+  revoked_jti?: string[];
+  unknown_jti?: string[];
+  bound_subjects?: string[];
+  unavailable_subjects?: string[];
+  recipient?: string;
+  a2a_extension_activated?: boolean;
+  a2a_authority_material_present?: boolean;
+}
+interface Vector {
+  vector_id: string;
+  requirements: string[];
+  profile: string;
+  expected_decision: 'allow' | 'deny';
+  expected_normative_reason: string | null;
+  input: VectorInput;
+  notes: string;
+  reference: DecisionExplanation;
+}
+
+const { vectors } = JSON.parse(readFileSync(corpusPath, 'utf8')) as { vectors: Vector[] };
+
 function normalize(e: DecisionExplanation) {
   return {
     decision: e.decision,
@@ -40,69 +68,70 @@ function normalize(e: DecisionExplanation) {
   };
 }
 
-async function evaluateVector(input: Record<string, unknown>): Promise<DecisionExplanation> {
-  const i = input as {
-    tokens: string[];
-    trustAnchors: Record<string, unknown>[];
-    pop: string;
-    tool: string;
-    args?: Record<string, unknown>;
-    now?: number;
-    recipient?: string;
-    revokedJti?: string[];
-    unknownJti?: string[];
-    boundSubjects?: string[];
-    unavailableSubjects?: string[];
-  };
+async function runVector(v: Vector): Promise<DecisionExplanation> {
+  const i = v.input;
+  const now = i.now;
   const statusResolver =
-    i.revokedJti !== undefined || i.unknownJti !== undefined
-      ? revokedSetResolver(i.revokedJti ?? [], i.unknownJti ?? [])
+    i.revoked_jti !== undefined || i.unknown_jti !== undefined
+      ? revokedSetResolver(i.revoked_jti ?? [], i.unknown_jti ?? [])
       : undefined;
   const identityBindingVerifier =
-    i.boundSubjects !== undefined || i.unavailableSubjects !== undefined
-      ? boundSubjectsVerifier(i.boundSubjects ?? [], i.unavailableSubjects ?? [])
+    i.bound_subjects !== undefined || i.unavailable_subjects !== undefined
+      ? boundSubjectsVerifier(i.bound_subjects ?? [], i.unavailable_subjects ?? [])
       : undefined;
-  // The recipient case exercises the A2A binding path (aat_aud binding).
-  if (i.recipient !== undefined) {
+
+  if (v.profile === 'A2A') {
+    const activated = i.a2a_extension_activated === false ? [] : [A2A_EXT];
+    const metadata =
+      i.a2a_authority_material_present === false ? {} : { [A2A_CHAIN]: i.tokens, [A2A_POP]: i.pop };
     const a2a = await enforceA2aAuthority({
-      message: {
-        metadata: {
-          'https://oaaf.dev/a2a/authority/v1/chain': i.tokens,
-          'https://oaaf.dev/a2a/authority/v1/pop': i.pop,
-        },
-      },
-      activatedExtensionUris: ['https://oaaf.dev/a2a/authority/v1'],
-      trustAnchors: i.trustAnchors,
+      message: { metadata },
+      activatedExtensionUris: activated,
+      trustAnchors: i.trust_anchors,
       skillId: i.tool,
       args: i.args ?? {},
-      recipient: i.recipient,
+      recipient: i.recipient ?? 'https://recipient.example',
       requireRecipientBinding: true,
-      ...(i.now === undefined ? {} : { now: i.now }),
-      ...(statusResolver === undefined ? {} : { statusResolver }),
-      ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
+      ...(now === undefined ? {} : { now }),
     });
     return explainA2aResult(a2a);
   }
+
   const common = {
     tokens: i.tokens,
-    trustAnchors: i.trustAnchors,
+    trustAnchors: i.trust_anchors,
     pop: i.pop,
     tool: i.tool,
     args: i.args ?? {},
-    ...(i.now === undefined ? {} : { now: i.now }),
+    ...(now === undefined ? {} : { now }),
     ...(statusResolver === undefined ? {} : { statusResolver }),
     ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
   };
   const decision = await verifyAndEvaluate(common);
-  const v = await verifyAuthority(common);
-  return toExplanation(decision, v.ok ? v.authority : undefined);
+  const auth = await verifyAuthority(common);
+  return toExplanation(decision, auth.ok ? auth.authority : undefined);
 }
 
-describe('cross-language vectors (reference side)', () => {
-  for (const vector of vectors) {
-    it(`reference matches expected: ${vector.name}`, async () => {
-      const result = await evaluateVector(vector.input);
-      expect(normalize(result)).toEqual(normalize(vector.expected));
+describe('portable conformance corpus (reference side)', () => {
+  for (const v of vectors) {
+    it(`${v.vector_id}`, async () => {
+      const result = await runVector(v);
+
+      // Portable normative contract: decision + normative reason.
+      expect(result.decision).toBe(v.expected_decision === 'allow' ? 'ALLOW' : 'DENY');
+      const primaryReason = result.reasons[0]?.code ?? null;
+      expect(primaryReason).toBe(v.expected_normative_reason);
+
+      // Advisory regression: the reference's full explanation is stable.
+      expect(normalize(result)).toEqual(normalize(v.reference));
+
+      // Privacy vectors: no argument value may appear in the serialized decision.
+      if (v.requirements.includes('CORE-EXPL-003')) {
+        const serialized = JSON.stringify(result);
+        for (const value of Object.values(v.input.args ?? {})) {
+          expect(serialized).not.toContain(String(value));
+        }
+      }
     });
   }
 });

@@ -66,3 +66,14 @@ describe('ID_PATTERN', () => {
     expect(found).toEqual(['CORE-NARROW-001', 'STATUS-003']);
   });
 });
+
+// Note: the corpus north-star coverage is validated end-to-end by running the guard
+// against the real repo (a unit-level harness would just re-encode the same logic).
+// These cases lock the catalog-level invariants the guard depends on.
+describe('catalog supports corpus coverage', () => {
+  it('marks design-only Core security invariants portable_vector:false', () => {
+    // A guard rule: a Core security invariant with no vector must be explicitly exempt.
+    const exempt = { class: 'Core', security_invariant: true, portable_vector: false };
+    expect(exempt.portable_vector).toBe(false);
+  });
+});

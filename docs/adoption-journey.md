@@ -66,7 +66,7 @@ npm install @oaaf/sdk
   typecheck, tests).
 - The behavior is the same across two independent implementations — the TypeScript reference
   and the [Python implementation](../python/README.md) — certified against
-  [shared cross-language vectors](../python/tests/vectors). That is the beginning of an
+  [portable conformance corpus](../spec/0.1/conformance/vectors/README.md). That is the beginning of an
   implementation-independent conformance corpus (O6).
 - The SDK contacts no network: the [no-telemetry guarantee](adoption-signals.md#no-telemetry)
   is enforced by `npm run check:telemetry`, not merely promised.

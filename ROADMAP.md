@@ -60,7 +60,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O5E         | Existing PDP / authorization interoperability        | ✅ Complete              |
 | O5F         | Outsider adoption journey                            | ✅ Engineering-ready¹    |
 | O6A         | Normative conformance specification                  | ✅ Complete              |
-| O6B         | Conformance vectors                                  | ⏸️ Planned               |
+| O6B         | Portable conformance vectors                         | ✅ Complete              |
 | O6C         | Cross-language conformance                           | ⏸️ Planned               |
 | O6D         | Binding / protocol conformance                       | ⏸️ Planned               |
 | O6E         | Security conformance                                 | ⏸️ Planned               |
@@ -289,10 +289,32 @@ are evidence, not the definition. Lives in
   authority, badge, or registry. Reserved-IP assessment: **PASS** — conformance covers
   authority, not execution control.
 
-### O6B — Conformance vectors ⏸️
+### O6B — Portable conformance vectors ✅
 
-Versioned, implementation-independent fixtures: positive, negative, and adversarial. Exact
-vector contents are not frozen here.
+A **language-neutral** conformance corpus an independent implementation consumes **without
+importing OAAF code** — [spec/0.1/conformance/vectors/](spec/0.1/conformance/vectors/README.md).
+North star met: **every Core security-invariant requirement that can be a static vector has
+one**, enforced in CI by `npm run check:conformance`.
+
+- **40 vectors**, snake_case with no TS/Python object shapes, each tagged with its O6A
+  requirement IDs and carrying `expected_decision` + `expected_normative_reason` (the portable
+  contract) plus an advisory reference explanation.
+- **Priority coverage** per the brief: the central no-widening thesis `CORE-NARROW-001` now
+  has a dedicated vector, alongside all authority-widening, chain-integrity/parent-binding,
+  PoP/holder-binding, expiry/window, and constraint-subsumption security invariants, plus a
+  privacy-safe-output vector (`CORE-EXPL-003`).
+- **Self-validating generation** (`npm run gen:corpus`): each vector's declared intent is
+  checked against the reference, so a wrong expectation fails the build — which surfaced real
+  truths (a tampered root denies as `untrusted_root`; a reordered chain likewise).
+- **Consumed by both implementations** from the one corpus: the TypeScript reference runs all
+  40; the Python implementation runs Core + Status + Identity (37) and cleanly **skips the A2A
+  profile it does not claim** — a live demonstration of the conformance-class model.
+- **Traceability** ([traceability.md](spec/0.1/conformance/traceability.md)) regenerated from
+  the corpus: 40 requirements vector-covered, 12 design-only, remaining gaps (MCP/PDP binding
+  depth) handed to O6D.
+
+The old TS-shaped `python/tests/vectors/` corpus is superseded by this portable one; the
+single corpus is now the cross-language source of truth.
 
 ### O6C — Cross-language conformance ⏸️
 

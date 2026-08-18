@@ -1,150 +1,148 @@
 # Traceability — requirements ↔ vectors
 
-Two directions of traceability, both required by the O6A brief: every existing shared
-vector maps to the requirement(s) it exercises, and every requirement records whether a
-vector covers it. The gap column is the concrete work list handed to O6B.
+Two directions of traceability: every portable corpus vector maps to the requirement(s)
+it exercises, and every requirement records whether a vector covers it. This file is
+regenerated from the corpus and the catalog; do not hand-edit the tables.
 
-> The 18 shared TS/Python vectors are **evidence and seeds**, not the O6 conformance
-> suite. O6B owns the final, versioned corpus; this mapping tells it where to start and
-> what is missing. A vector without a requirement, or a testable `MUST` without a planned
-> vector, is a defect this table exists to prevent.
+> The corpus lives in [vectors/corpus.json](vectors/corpus.json) (schema in
+> [vectors/README.md](vectors/README.md)). It is consumable without importing OAAF code.
+> O6C runs it across implementations; O6H owns the v1 freeze. Coverage is enforced by
+> `npm run check:conformance` (the O6B north star: every Core security invariant that can
+> be a static vector has one).
 
-## Existing shared vectors → requirements
+## Corpus vectors → requirements (40 vectors)
 
-| Vector                                  | Exercises                                                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `allow`                                 | `CORE-CRYPTO-001`, `CORE-CHAIN-001`, `CORE-CRYPTO-003`, `CORE-POP-001`, `CORE-CONSTR-003`, `CORE-SUBJ-001`, `CORE-DEC-001`, `CORE-EXPL-001` |
-| `deny_tool_not_authorized`              | `CORE-CONSTR-003`, `CORE-EXPL-002`                                                                                                          |
-| `deny_argument_constraint`              | `CORE-CONSTR-002`, `CORE-EXPL-002`                                                                                                          |
-| `deny_expired`                          | `CORE-TIME-001`                                                                                                                             |
-| `deny_holder_mismatch`                  | `CORE-POP-003`                                                                                                                              |
-| `deny_pop_binding`                      | `CORE-POP-001`, `CORE-POP-003`                                                                                                              |
-| `deny_invalid_signature`                | `CORE-CRYPTO-001`                                                                                                                           |
-| `deny_chain_reordered`                  | `CORE-CHAIN-001`                                                                                                                            |
-| `deny_recipient_mismatch`               | `A2A-003`                                                                                                                                   |
-| `status_allow_active`                   | `STATUS-001`, `STATUS-006`                                                                                                                  |
-| `status_deny_leaf_revoked`              | `STATUS-002`                                                                                                                                |
-| `status_deny_ancestor_revoked`          | `STATUS-004`                                                                                                                                |
-| `status_deny_unavailable`               | `STATUS-003`                                                                                                                                |
-| `identity_allow_thumbprint`             | `CORE-SUBJ-001`, `CORE-SUBJ-002`                                                                                                            |
-| `identity_allow_spiffe`                 | `CORE-SUBJ-001`, `IDENT-003`                                                                                                                |
-| `identity_allow_spiffe_issuer_asserted` | `IDENT-003`                                                                                                                                 |
-| `identity_deny_mismatch`                | `IDENT-001`                                                                                                                                 |
-| `identity_deny_unavailable`             | `IDENT-002`                                                                                                                                 |
+| Vector                                      | Profile  | Decision | Normative reason                | Requirements                                                                                                               |
+| ------------------------------------------- | -------- | -------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `core-narrow-widening-tool`                 | Core     | deny     | `tool_not_delegated`            | `CORE-NARROW-001`                                                                                                          |
+| `core-narrow-constraint-widened`            | Core     | deny     | `constraint_expansion`          | `CORE-NARROW-002`                                                                                                          |
+| `core-narrow-constraint-type-not-permitted` | Core     | deny     | `constraint_type_not_permitted` | `CORE-NARROW-002`, `CORE-NARROW-004`                                                                                       |
+| `core-narrow-argument-key-set-mismatch`     | Core     | deny     | `argument_key_set_mismatch`     | `CORE-NARROW-003`                                                                                                          |
+| `core-narrow-constraint-type-unrecognized`  | Core     | deny     | `constraint_type_unrecognized`  | `CORE-NARROW-004`                                                                                                          |
+| `core-trust-untrusted-root`                 | Core     | deny     | `untrusted_root`                | `CORE-TRUST-001`, `CORE-TRUST-002`                                                                                         |
+| `core-crypto-issuer-thumbprint-mismatch`    | Core     | deny     | `issuer_thumbprint_mismatch`    | `CORE-CRYPTO-003`                                                                                                          |
+| `core-chain-par-hash-missing`               | Core     | deny     | `par_hash_missing`              | `CORE-CHAIN-003`                                                                                                           |
+| `core-crypto-invalid-signature`             | Core     | deny     | `invalid_signature`             | `CORE-CRYPTO-001`                                                                                                          |
+| `core-crypto-alg-none-rejected`             | Core     | deny     | `algorithm_not_permitted`       | `CORE-CRYPTO-002`                                                                                                          |
+| `core-crypto-private-key-material`          | Core     | deny     | `private_key_material`          | `CORE-CRYPTO-004`                                                                                                          |
+| `core-chain-reordered`                      | Core     | deny     | `untrusted_root`                | `CORE-CHAIN-001`                                                                                                           |
+| `core-chain-empty`                          | Core     | deny     | `chain_empty`                   | `CORE-CHAIN-002`                                                                                                           |
+| `core-token-malformed`                      | Core     | deny     | `token_malformed`               | `CORE-DEC-002`                                                                                                             |
+| `core-pop-holder-mismatch`                  | Core     | deny     | `pop_signature_invalid`         | `CORE-POP-003`                                                                                                             |
+| `core-pop-argument-binding-mismatch`        | Core     | deny     | `pop_binding_mismatch`          | `CORE-POP-001`, `CORE-POP-003`, `CORE-CRYPTO-005`                                                                          |
+| `core-pop-signature-invalid`                | Core     | deny     | `pop_signature_invalid`         | `CORE-POP-003`                                                                                                             |
+| `core-pop-missing`                          | Core     | deny     | `pop_missing`                   | `CORE-POP-001`                                                                                                             |
+| `core-time-expired`                         | Core     | deny     | `expired`                       | `CORE-TIME-001`                                                                                                            |
+| `core-time-not-yet-valid`                   | Core     | deny     | `not_yet_valid`                 | `CORE-TIME-002`                                                                                                            |
+| `core-time-expiry-exceeds-parent`           | Core     | deny     | `expiry_exceeds_parent`         | `CORE-TIME-003`                                                                                                            |
+| `core-deleg-ceiling-raised`                 | Core     | deny     | `delegation_ceiling_raised`     | `CORE-DELEG-001`                                                                                                           |
+| `core-deleg-depth-exceeded`                 | Core     | deny     | `delegation_depth_exceeded`     | `CORE-DELEG-002`                                                                                                           |
+| `core-constr-argument-missing`              | Core     | deny     | `argument_missing`              | `CORE-CONSTR-001`                                                                                                          |
+| `core-constr-argument-violated`             | Core     | deny     | `argument_constraint_violated`  | `CORE-CONSTR-002`                                                                                                          |
+| `core-constr-tool-not-authorized`           | Core     | deny     | `tool_not_authorized`           | `CORE-CONSTR-003`                                                                                                          |
+| `core-expl-privacy-safe`                    | Core     | deny     | `argument_constraint_violated`  | `CORE-EXPL-003`                                                                                                            |
+| `core-allow-baseline`                       | Core     | allow    | `—`                             | `CORE-CRYPTO-001`, `CORE-CHAIN-001`, `CORE-CRYPTO-003`, `CORE-POP-001`, `CORE-CONSTR-003`, `CORE-SUBJ-001`, `CORE-DEC-001` |
+| `status-allow-active`                       | Status   | allow    | `—`                             | `STATUS-001`, `STATUS-006`                                                                                                 |
+| `status-deny-leaf-revoked`                  | Status   | deny     | `authority_revoked`             | `STATUS-002`                                                                                                               |
+| `status-deny-ancestor-revoked`              | Status   | deny     | `authority_revoked`             | `STATUS-004`                                                                                                               |
+| `status-deny-unavailable`                   | Status   | deny     | `status_unavailable`            | `STATUS-003`                                                                                                               |
+| `identity-allow-thumbprint-subject`         | Core     | allow    | `—`                             | `CORE-SUBJ-001`, `CORE-SUBJ-002`                                                                                           |
+| `identity-allow-spiffe-bound`               | Identity | allow    | `—`                             | `CORE-SUBJ-001`, `IDENT-001`                                                                                               |
+| `identity-allow-spiffe-issuer-asserted`     | Core     | allow    | `—`                             | `IDENT-003`                                                                                                                |
+| `identity-deny-mismatch`                    | Identity | deny     | `subject_identity_mismatch`     | `IDENT-001`                                                                                                                |
+| `identity-deny-unavailable`                 | Identity | deny     | `identity_binding_unavailable`  | `IDENT-002`                                                                                                                |
+| `a2a-deny-recipient-mismatch`               | A2A      | deny     | `pop_recipient_mismatch`        | `A2A-003`                                                                                                                  |
+| `a2a-deny-extension-not-activated`          | A2A      | deny     | `extension_not_activated`       | `A2A-001`                                                                                                                  |
+| `a2a-deny-authority-material-missing`       | A2A      | deny     | `authority_material_missing`    | `A2A-002`                                                                                                                  |
 
-All 18 map to at least one requirement; there are **no orphan vectors**.
+Every vector tags at least one requirement; there are **no orphan vectors**.
 
-## Requirements → coverage (the O6B gap list)
+## Requirements → coverage
 
-Coverage kinds: **V** = a shared vector already exercises it; **G** = gap, O6B must add a
-vector; **D** = design/structural requirement certified by inspection or an API-shape
-check rather than a data vector (noted where mechanical testing does not apply).
+**V** = ≥1 portable vector. **D** = design/structural, certified by inspection or an API
+check (cannot be a static data vector). **G** = gap for a later phase.
 
-| Requirement        | Kind | Covered by / O6B action                                                                    |
-| ------------------ | ---- | ------------------------------------------------------------------------------------------ |
-| `CORE-TRUST-001`   | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-TRUST-002`   | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CRYPTO-001`  | V    | `allow`, `deny_invalid_signature`                                                          |
-| `CORE-CRYPTO-002`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CRYPTO-003`  | V    | `allow`                                                                                    |
-| `CORE-CRYPTO-004`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CRYPTO-005`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CHAIN-001`   | V    | `allow`, `deny_chain_reordered`                                                            |
-| `CORE-CHAIN-002`   | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CHAIN-003`   | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-DELEG-001`   | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-DELEG-002`   | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-NARROW-001`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-NARROW-002`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-NARROW-003`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-NARROW-004`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CONSTR-001`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-CONSTR-002`  | V    | `deny_argument_constraint`                                                                 |
-| `CORE-CONSTR-003`  | V    | `allow`, `deny_tool_not_authorized`                                                        |
-| `CORE-CONSTR-004`  | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-TIME-001`    | V    | `deny_expired`                                                                             |
-| `CORE-TIME-002`    | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-TIME-003`    | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-POP-001`     | V    | `allow`, `deny_pop_binding`                                                                |
-| `CORE-POP-002`     | D    | design/structural — certified by inspection; not a data vector                             |
-| `CORE-POP-003`     | V    | `deny_holder_mismatch`, `deny_pop_binding`                                                 |
-| `CORE-POP-004`     | D    | design/structural — certified by inspection; not a data vector                             |
-| `CORE-SUBJ-001`    | V    | `allow`, `identity_allow_thumbprint`, `identity_allow_spiffe`                              |
-| `CORE-SUBJ-002`    | V    | `identity_allow_thumbprint`                                                                |
-| `CORE-DEC-001`     | V    | `allow`                                                                                    |
-| `CORE-DEC-002`     | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-DEC-003`     | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `CORE-DEC-004`     | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-EXPL-001`    | V    | `allow`                                                                                    |
-| `CORE-EXPL-002`    | V    | `deny_tool_not_authorized`, `deny_argument_constraint`                                     |
-| `CORE-EXPL-003`    | G    | **gap** — O6B to add a vector                                                              |
-| `CORE-EXPL-004`    | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `CORE-NEUTRAL-001` | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `CORE-NEUTRAL-002` | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `CORE-NEUTRAL-003` | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `CORE-NEUTRAL-004` | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `CORE-NEUTRAL-005` | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `STATUS-001`       | V    | `status_allow_active`                                                                      |
-| `STATUS-002`       | V    | `status_deny_leaf_revoked`                                                                 |
-| `STATUS-003`       | V    | `status_deny_unavailable`                                                                  |
-| `STATUS-004`       | V    | `status_deny_ancestor_revoked`                                                             |
-| `STATUS-005`       | G    | **gap** — O6B to add a vector                                                              |
-| `STATUS-006`       | V    | `status_allow_active`                                                                      |
-| `IDENT-001`        | V    | `identity_deny_mismatch`                                                                   |
-| `IDENT-002`        | V    | `identity_deny_unavailable`                                                                |
-| `IDENT-003`        | V    | `identity_allow_spiffe`, `identity_allow_spiffe_issuer_asserted`                           |
-| `IDENT-004`        | G    | **gap** — O6B to add a vector                                                              |
-| `IDENT-005`        | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `MCP-001`          | G    | **gap** — O6B to add a vector                                                              |
-| `MCP-002`          | D    | design/structural — certified by inspection; not a data vector                             |
-| `MCP-003`          | D    | design/structural — certified by inspection; not a data vector                             |
-| `A2A-001`          | G    | **gap** — O6B to add a vector                                                              |
-| `A2A-002`          | G    | **gap** — O6B to add a vector                                                              |
-| `A2A-003`          | V    | `deny_recipient_mismatch`                                                                  |
-| `A2A-004`          | D    | design/structural — certified by inspection; not a data vector                             |
-| `PDP-001`          | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `PDP-002`          | G    | **gap** — O6B to add a vector                                                              |
-| `PDP-003`          | D    | design/structural — certified by inspection; not a data vector (not mechanically testable) |
-| `PDP-004`          | G    | **gap** — O6B to add a vector                                                              |
+| Requirement        | Class    | Sec. | Kind | Covered by / note                                                                              |
+| ------------------ | -------- | ---- | ---- | ---------------------------------------------------------------------------------------------- |
+| `CORE-TRUST-001`   | Core     | ●    | V    | `core-trust-untrusted-root`                                                                    |
+| `CORE-TRUST-002`   | Core     | ●    | V    | `core-trust-untrusted-root`                                                                    |
+| `CORE-CRYPTO-001`  | Core     | ●    | V    | `core-crypto-invalid-signature`, `core-allow-baseline`                                         |
+| `CORE-CRYPTO-002`  | Core     | ●    | V    | `core-crypto-alg-none-rejected`                                                                |
+| `CORE-CRYPTO-003`  | Core     | ●    | V    | `core-crypto-issuer-thumbprint-mismatch`, `core-allow-baseline`                                |
+| `CORE-CRYPTO-004`  | Core     | ●    | V    | `core-crypto-private-key-material`                                                             |
+| `CORE-CRYPTO-005`  | Core     | ·    | V    | `core-pop-argument-binding-mismatch`                                                           |
+| `CORE-CHAIN-001`   | Core     | ●    | V    | `core-chain-reordered`, `core-allow-baseline`                                                  |
+| `CORE-CHAIN-002`   | Core     | ·    | V    | `core-chain-empty`                                                                             |
+| `CORE-CHAIN-003`   | Core     | ●    | V    | `core-chain-par-hash-missing`                                                                  |
+| `CORE-DELEG-001`   | Core     | ●    | V    | `core-deleg-ceiling-raised`                                                                    |
+| `CORE-DELEG-002`   | Core     | ●    | V    | `core-deleg-depth-exceeded`                                                                    |
+| `CORE-NARROW-001`  | Core     | ●    | V    | `core-narrow-widening-tool`                                                                    |
+| `CORE-NARROW-002`  | Core     | ●    | V    | `core-narrow-constraint-widened`, `core-narrow-constraint-type-not-permitted`                  |
+| `CORE-NARROW-003`  | Core     | ●    | V    | `core-narrow-argument-key-set-mismatch`                                                        |
+| `CORE-NARROW-004`  | Core     | ●    | V    | `core-narrow-constraint-type-not-permitted`, `core-narrow-constraint-type-unrecognized`        |
+| `CORE-CONSTR-001`  | Core     | ●    | V    | `core-constr-argument-missing`                                                                 |
+| `CORE-CONSTR-002`  | Core     | ●    | V    | `core-constr-argument-violated`                                                                |
+| `CORE-CONSTR-003`  | Core     | ●    | V    | `core-constr-tool-not-authorized`, `core-allow-baseline`                                       |
+| `CORE-CONSTR-004`  | Core     | ·    | G    | gap                                                                                            |
+| `CORE-TIME-001`    | Core     | ●    | V    | `core-time-expired`                                                                            |
+| `CORE-TIME-002`    | Core     | ·    | V    | `core-time-not-yet-valid`                                                                      |
+| `CORE-TIME-003`    | Core     | ●    | V    | `core-time-expiry-exceeds-parent`                                                              |
+| `CORE-POP-001`     | Core     | ●    | V    | `core-pop-argument-binding-mismatch`, `core-pop-missing`, `core-allow-baseline`                |
+| `CORE-POP-002`     | Core     | ●    | D    | design/structural — certified by inspection                                                    |
+| `CORE-POP-003`     | Core     | ●    | V    | `core-pop-holder-mismatch`, `core-pop-argument-binding-mismatch`, `core-pop-signature-invalid` |
+| `CORE-POP-004`     | Core     | ·    | G    | gap                                                                                            |
+| `CORE-SUBJ-001`    | Core     | ·    | V    | `core-allow-baseline`, `identity-allow-thumbprint-subject`, `identity-allow-spiffe-bound`      |
+| `CORE-SUBJ-002`    | Core     | ·    | V    | `identity-allow-thumbprint-subject`                                                            |
+| `CORE-DEC-001`     | Core     | ●    | V    | `core-allow-baseline`                                                                          |
+| `CORE-DEC-002`     | Core     | ●    | V    | `core-token-malformed`                                                                         |
+| `CORE-DEC-003`     | Core     | ●    | D    | design/structural — certified by inspection                                                    |
+| `CORE-DEC-004`     | Core     | ●    | D    | design/structural — certified by inspection                                                    |
+| `CORE-EXPL-001`    | Core     | ·    | G    | gap                                                                                            |
+| `CORE-EXPL-002`    | Core     | ·    | G    | gap                                                                                            |
+| `CORE-EXPL-003`    | Core     | ●    | V    | `core-expl-privacy-safe`                                                                       |
+| `CORE-EXPL-004`    | Core     | ·    | D    | design/structural — certified by inspection                                                    |
+| `CORE-NEUTRAL-001` | Core     | ·    | D    | design/structural — certified by inspection                                                    |
+| `CORE-NEUTRAL-002` | Core     | ·    | D    | design/structural — certified by inspection                                                    |
+| `CORE-NEUTRAL-003` | Core     | ·    | D    | design/structural — certified by inspection                                                    |
+| `CORE-NEUTRAL-004` | Core     | ·    | D    | design/structural — certified by inspection                                                    |
+| `CORE-NEUTRAL-005` | Core     | ·    | D    | design/structural — certified by inspection                                                    |
+| `STATUS-001`       | Status   | ●    | V    | `status-allow-active`                                                                          |
+| `STATUS-002`       | Status   | ●    | V    | `status-deny-leaf-revoked`                                                                     |
+| `STATUS-003`       | Status   | ●    | V    | `status-deny-unavailable`                                                                      |
+| `STATUS-004`       | Status   | ●    | V    | `status-deny-ancestor-revoked`                                                                 |
+| `STATUS-005`       | Status   | ●    | G    | gap                                                                                            |
+| `STATUS-006`       | Status   | ·    | V    | `status-allow-active`                                                                          |
+| `IDENT-001`        | Identity | ●    | V    | `identity-allow-spiffe-bound`, `identity-deny-mismatch`                                        |
+| `IDENT-002`        | Identity | ●    | V    | `identity-deny-unavailable`                                                                    |
+| `IDENT-003`        | Identity | ·    | V    | `identity-allow-spiffe-issuer-asserted`                                                        |
+| `IDENT-004`        | Identity | ●    | G    | gap                                                                                            |
+| `IDENT-005`        | Identity | ●    | D    | design/structural — certified by inspection                                                    |
+| `MCP-001`          | MCP      | ●    | G    | gap                                                                                            |
+| `MCP-002`          | MCP      | ·    | G    | gap                                                                                            |
+| `MCP-003`          | MCP      | ·    | G    | gap                                                                                            |
+| `A2A-001`          | A2A      | ●    | V    | `a2a-deny-extension-not-activated`                                                             |
+| `A2A-002`          | A2A      | ●    | V    | `a2a-deny-authority-material-missing`                                                          |
+| `A2A-003`          | A2A      | ●    | V    | `a2a-deny-recipient-mismatch`                                                                  |
+| `A2A-004`          | A2A      | ●    | G    | gap                                                                                            |
+| `PDP-001`          | PDP      | ●    | D    | design/structural — certified by inspection                                                    |
+| `PDP-002`          | PDP      | ●    | G    | gap                                                                                            |
+| `PDP-003`          | PDP      | ·    | D    | design/structural — certified by inspection                                                    |
+| `PDP-004`          | PDP      | ●    | G    | gap                                                                                            |
 
-## O6B coverage-gap summary
+## Coverage summary
 
-- Requirements exercised by an existing vector: **22**
-- Design/structural (inspection, not a vector): **15**
-- **Gaps for O6B to close: 27**
+- Requirements with ≥1 portable vector: **40**
+- Design/structural (inspection, not a data vector): **12**
+- Remaining gaps: **12** — `CORE-CONSTR-004`, `CORE-POP-004`, `CORE-EXPL-001`, `CORE-EXPL-002`, `STATUS-005`, `IDENT-004`, `MCP-001`, `MCP-002`, `MCP-003`, `A2A-004`, `PDP-002`, `PDP-004`
 
-Highest-value gaps (security invariants with no current vector):
+**North star:** of 27 Core security-invariant requirements, 24 have a portable vector and 3 are design-only (`portable_vector:false`): `CORE-POP-002`, `CORE-DEC-003`, `CORE-DEC-004`. Every Core security invariant that can be a static vector has one — enforced in CI.
 
-- `CORE-TRUST-001` — Verification MUST require an explicit trust-anchor set. Its absence is a configuration error, never a permissive default, and there MUST NOT be a mode that returns an authorization decision without one.
-- `CORE-TRUST-002` — The root token MUST be verified against a configured trust anchor, not against its own cnf.jwk. A self-signed root that matches no anchor MUST be rejected.
-- `CORE-CRYPTO-002` — An unsecured token (alg "none") MUST NOT be accepted, and a token MUST be verified only under a signature algorithm the pinned AAT profile permits; algorithm substitution MUST be rejected.
-- `CORE-CRYPTO-004` — A cnf.jwk MUST NOT contain private key material; a confirmation key carrying a private component MUST be rejected.
-- `CORE-CHAIN-003` — A derived token's par_hash MUST match its parent, and a root token MUST NOT carry par_hash; either violation MUST deny.
-- `CORE-DELEG-001` — A derived token MUST NOT raise del_max_depth above its parent's value; the ceiling is monotonic down the chain.
-- `CORE-DELEG-002` — A token whose delegation depth exceeds the effective ceiling MUST deny.
-- `CORE-NARROW-001` — A verifier MUST reject a delegation that grants authority (a tool) absent from its parent. Authority may only narrow across a delegation, never widen.
-- `CORE-NARROW-002` — A derived constraint on a tool MUST NOT expand the parent's constraint; a derived clause MUST admit only a subset of the parent's permitted invocations.
-- `CORE-NARROW-003` — For a constrained tool under a closed-world key set, a derived token MUST name exactly the same argument keys as its parent; adding or dropping a key MUST deny.
-- `CORE-NARROW-004` — An unrecognized constraint type, or a subsumption pair the profile does not permit, MUST deny (fail closed) rather than be treated as satisfied.
-- `CORE-CONSTR-001` — A constrained argument is required: a request that omits an argument the leaf authority constrains MUST deny.
-- `CORE-TIME-003` — A derived token's validity window MUST NOT exceed its parent's; a later expiry or an earlier issuance than the parent MUST deny.
-- `CORE-DEC-002` — Unknown, malformed, or unverifiable required authority MUST NOT degrade into ALLOW.
-- `CORE-DEC-004` — Where the same authority material is accepted through more than one supported binding, the canonical authority decision MUST NOT change because of the transport.
-- `CORE-EXPL-003` — An explanation MUST NOT include key material, raw token bytes, signatures, proof-of-possession material, or argument values the caller did not already supply.
-- `STATUS-005` — A resolver backed by a bounded-freshness status artifact MUST treat an artifact past its freshness as unknown, not as its last-known contents.
-- `IDENT-004` — An OIDC subject MUST be composed with its issuer into a collision-safe URI; a bare sub MUST NOT be used alone across issuers.
-- `MCP-001` — OAAF authority MUST be enforced as a precondition before the COAZ AuthZEN request is constructed; on any OAAF denial the PEP MUST refuse immediately and MUST NOT proceed to the PDP.
-- `A2A-001` — A skill gated by OAAF MUST declare the OAAF extension required; if the extension was not activated, the agent MUST refuse the operation and MUST NOT perform it.
-- `A2A-002` — Before any consequential operation on a gated skill, the agent MUST verify OAAF authority; a request lacking verifiable authority material MUST deny.
-- `PDP-002` — The authority context MUST be derived only from a verified authority; its authorityVerified marker states OAAF's authority decision, not that the action is permitted.
-- `PDP-004` — The authority context MUST carry names, never values, matching the privacy rule of the explanation.
+## Remaining work for later O6 phases
 
-Notably, the project's central thesis requirement `CORE-NARROW-001` (a delegation MUST NOT
-grant authority absent from its parent — no widening) has **no dedicated static vector
-yet**: the existing `allow` chain narrows correctly and `deny_tool_not_authorized` covers a
-leaf overreach, but a child token that _widens_ its parent's tool set is not yet a shared
-fixture. O6B should treat it as a first vector to add.
-
-Binding and PDP profiles (`MCP-001`, `A2A-001`, `A2A-002`, `PDP-002`, `PDP-004`) are
-exercised today only by in-implementation tests, not shared cross-language vectors; O6D
-owns binding conformance and will promote them.
+- **Binding/PDP profiles (O6D):** MCP and PDP have no portable vectors yet (they need a
+  PEP/PDP harness rather than a pure verify call); `MCP-*` and `PDP-*` are exercised today
+  only by in-implementation tests. A2A has three vectors; more binding depth is O6D.
+- **Transport equivalence (`CORE-DEC-004`):** best certified by O6D as a paired-binding
+  check rather than a single static vector.
+- **Non-security Core niceties:** e.g. `CORE-CONSTR-004` (argument-not-permitted) and
+  `CORE-CHAIN-002` beyond the empty-chain case can gain vectors as the corpus grows.

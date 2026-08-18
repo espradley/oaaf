@@ -15,6 +15,9 @@
  *      the catalog (no dangling references).
  *   3. Every catalogued requirement is referenced by at least one prose document
  *      (no orphan requirements nobody traces).
+ *   4. The portable corpus is well-formed and traces to real requirements, and every
+ *      Core security-invariant requirement that can be a static vector has at least one
+ *      (the O6B north star, enforced).
  *
  * It does NOT judge whether a requirement is correct — that is human review.
  */
@@ -26,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SPEC_DIR = path.join('spec', '0.1', 'conformance');
 const CATALOG = path.join(SPEC_DIR, 'requirements.json');
+const CORPUS = path.join(SPEC_DIR, 'vectors', 'corpus.json');
 
 /** A requirement ID: CLASS(-GROUP)*-NNN, e.g. CORE-NARROW-001, STATUS-003, MCP-001. */
 export const ID_PATTERN = /\b[A-Z][A-Z0-9]*(?:-[A-Z][A-Z0-9]*)*-\d{3}\b/g;
@@ -103,6 +107,54 @@ async function main() {
     if (!referenced.has(id)) errors.push(`orphan requirement (never referenced in prose): ${id}`);
   }
 
+  // --- Portable corpus validation (O6B) ---
+  let corpus;
+  try {
+    corpus = JSON.parse(await readFile(path.join(REPO_ROOT, CORPUS), 'utf8'));
+  } catch (e) {
+    errors.push(`conformance corpus is missing or not valid JSON: ${e.message}`);
+    corpus = { vectors: [] };
+  }
+  const classes = new Set(catalog.classes ?? []);
+  const covered = new Map(); // requirement id -> vector count
+  const seenVectorIds = new Set();
+  for (const v of corpus.vectors ?? []) {
+    const where = `corpus vector ${v.vector_id ?? '(no id)'}`;
+    if (!v.vector_id) errors.push(`${where}: missing vector_id`);
+    if (seenVectorIds.has(v.vector_id)) errors.push(`${where}: duplicate vector_id`);
+    seenVectorIds.add(v.vector_id);
+    if (!classes.has(v.profile)) errors.push(`${where}: unknown profile "${v.profile}"`);
+    if (v.expected_decision !== 'allow' && v.expected_decision !== 'deny') {
+      errors.push(`${where}: expected_decision must be allow|deny`);
+    }
+    if (v.expected_decision === 'deny' && !v.expected_normative_reason) {
+      errors.push(`${where}: a deny vector must carry expected_normative_reason`);
+    }
+    if (v.expected_decision === 'allow' && v.expected_normative_reason !== null) {
+      errors.push(`${where}: an allow vector must have expected_normative_reason null`);
+    }
+    if (!Array.isArray(v.requirements) || v.requirements.length === 0) {
+      errors.push(`${where}: must tag at least one requirement`);
+    }
+    for (const rid of v.requirements ?? []) {
+      if (!ids.has(rid)) errors.push(`${where}: references unknown requirement "${rid}"`);
+      covered.set(rid, (covered.get(rid) ?? 0) + 1);
+    }
+  }
+
+  // North star: every Core security-invariant requirement that can be a static
+  // vector MUST have at least one.
+  for (const r of catalog.requirements ?? []) {
+    const mustHaveVector =
+      r.class === 'Core' && r.security_invariant === true && r.portable_vector !== false;
+    if (mustHaveVector && !(covered.get(r.id) > 0)) {
+      errors.push(
+        `north-star gap: Core security-invariant ${r.id} has no portable vector ` +
+          `(mark portable_vector:false in the catalog if it genuinely cannot be one)`,
+      );
+    }
+  }
+
   if (errors.length > 0) {
     console.error('OAAF conformance-spec guard failed:\n');
     for (const e of errors) console.error(`  - ${e}`);
@@ -112,7 +164,8 @@ async function main() {
 
   console.log(
     `OAAF conformance-spec guard intact: ${ids.size} requirements across ` +
-      `${catalog.classes.length} classes, all IDs unique, referenced, and in scope.`,
+      `${catalog.classes.length} classes; ${corpus.vectors.length} portable vectors; ` +
+      `all IDs unique, referenced, in scope, and Core security invariants vector-covered.`,
   );
 }
 

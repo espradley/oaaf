@@ -29,10 +29,10 @@
     "inspect": "npm run build && node examples/inspector/inspect.js",
     "check:governance": "node scripts/check-governance.mjs",
     "check:package": "node scripts/check-downstream.mjs",
-    "gen:vectors": "npm run build && node scripts/gen-vectors.mjs",
     "demo:pdp": "npm run build && node examples/pdp-coexistence/index.js",
     "check:telemetry": "node scripts/check-no-telemetry.mjs",
-    "check:conformance": "node scripts/check-conformance-spec.mjs"
+    "check:conformance": "node scripts/check-conformance-spec.mjs",
+    "gen:corpus": "npm run build && node scripts/gen-conformance-corpus.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

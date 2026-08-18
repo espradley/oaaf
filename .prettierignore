@@ -1,6 +1,6 @@
 dist/
 coverage/
 package-lock.json
-python/tests/vectors/
+spec/0.1/conformance/vectors/corpus.json
 **/.venv/
 python/.venv*/

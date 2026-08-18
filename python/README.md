@@ -77,9 +77,10 @@ operation it reproduces the same:
 with the same privacy properties: **names, never values** — no argument values, token
 bytes, signatures, PoP material, or keys.
 
-That equivalence is enforced by the cross-language parity vectors in
-[`tests/vectors`](tests/vectors), which carry real signed material verified independently
-by both implementations.
+That equivalence is enforced by the language-neutral
+[portable conformance corpus](../spec/0.1/conformance/vectors/README.md), which carries real
+signed material both implementations verify independently. Python runs the Core, Status, and
+Identity profiles; it does not claim the A2A binding, and skips those vectors.
 
 ## Relationship to the TypeScript reference
 
