@@ -174,6 +174,22 @@ async function main() {
     }
   }
 
+  // Every security-invariant requirement must have adversarial evidence recorded in the
+  // security certification (O6E), so the security artifact stays complete against the catalog.
+  const securityDoc = path.join(REPO_ROOT, SPEC_DIR, 'security.md');
+  let securityText = '';
+  try {
+    securityText = await readFile(securityDoc, 'utf8');
+  } catch {
+    errors.push('security.md is missing (O6E security certification)');
+  }
+  const securityRefs = new Set(securityText.match(ID_PATTERN) ?? []);
+  for (const r of catalog.requirements ?? []) {
+    if (r.security_invariant === true && !securityRefs.has(r.id)) {
+      errors.push(`security invariant ${r.id} has no adversarial evidence recorded in security.md`);
+    }
+  }
+
   // North star: every Core security-invariant requirement that can be a static
   // vector MUST have at least one.
   for (const r of catalog.requirements ?? []) {

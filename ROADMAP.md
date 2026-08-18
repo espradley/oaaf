@@ -65,7 +65,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O6B         | Portable conformance vectors                         | ✅ Complete              |
 | O6C         | Cross-language conformance runner + parity           | ✅ Complete              |
 | O6D         | Binding/profile conformance + transport equivalence  | ✅ Complete              |
-| O6E         | Security / adversarial certification                 | ⏸️ Planned               |
+| O6E         | Security / adversarial certification                 | ✅ Complete              |
 | O6F         | Upstream standards participation                     | ⏸️ Planned               |
 | O6G         | Competitive collision audit                          | ⏸️ Planned               |
 | O6H         | v1 compatibility / readiness contract                | ⏸️ Planned               |
@@ -384,12 +384,28 @@ simulating full MCP servers, A2A agents, or policy engines.
   denies as `token_malformed` in the closed-world model) — a corpus-growth candidate, not a
   blocker.
 
-### O6E — Security conformance ⏸️
+### O6E — Security / adversarial certification ✅
 
-Security-critical and adversarial cases — chain truncation, reordering, authority widening,
-malformed signatures, holder/recipient mismatch, PoP failures, expired/revoked authority,
-constraint boundaries, malformed input, unsupported required extensions, and privacy-safe
-explanation behavior. Kept high-level here; exact cases are not pre-frozen.
+Every OAAF **security invariant** now has adversarial evidence, traced from the O6A
+requirement catalog (the 44 `security_invariant` IDs) rather than from implementation
+internals — [spec/0.1/conformance/security.md](spec/0.1/conformance/security.md).
+
+- **Adversarial suite** ([security.test.ts](packages/typescript/src/__tests__/security.test.ts)):
+  41 attacks across 13 families — authority widening, constraint enforcement, chain integrity,
+  cryptography, PoP, identity binding, recipient binding, temporal validity, revocation/status,
+  transport equivalence, PDP boundary, privacy, and fail-closed/parser robustness. Each mutates a
+  valid baseline toward the attacker's goal and requires a DENY (fail closed), rather than
+  re-checking happy paths.
+- **Catalog-derived completeness:** `check:conformance` now fails if any security invariant lacks
+  adversarial evidence recorded in security.md — the artifact cannot drift from the catalog.
+  Reused the 51-vector corpus as evidence where it already proves an invariant, rather than
+  duplicating.
+- **Cross-language + binding:** TypeScript runs every family; Python
+  ([test_security.py](python/tests/test_security.py)) asserts the security-invariant deny vectors
+  fail closed for the profiles it claims (Core/Status/Identity/PDP); the transport-equivalence
+  family proves an attack denied on one binding is denied on the others — no weaker path.
+- **Reserved space stayed out:** per ADR-0002, the phase attacked the published authority system
+  only — no continuity/supersession/recovery/fencing, and no "freshness" as execution control.
 
 ### O6F — Upstream standards participation ⏸️
 
