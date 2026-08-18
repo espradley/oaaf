@@ -18,6 +18,7 @@
  */
 
 import type { VerifiedAuthority } from './decide.js';
+import { subjectProfile } from './identity.js';
 import type { Denial, ReasonCode, VerificationStage } from './reasons.js';
 
 /**
@@ -53,8 +54,12 @@ export interface ReasonExplanation {
  * execution. No values, no token material.
  */
 export interface AuthoritySummary {
-  /** The leaf holder's JWK Thumbprint URI — a public-key hash, a safe identifier. */
+  /** Canonical subject: the external identity (`sub`, RFC-0005) if present, else the holder thumbprint. */
   subject: string;
+  /** Identity profile of the subject — its URI scheme (e.g. `spiffe`, `wimse`, `thumbprint`). */
+  subjectProfile: string;
+  /** The proof-of-possession key identity (holder thumbprint); always present, distinct from subject. */
+  holder: string;
   /** The tool/capability that was requested. */
   requestedTool: string;
   /** The *names* of the arguments supplied with the request. Never their values. */
@@ -105,7 +110,9 @@ export function explainReasons(denials: readonly Denial[]): ReasonExplanation[] 
  */
 export function summarizeAuthority(authority: VerifiedAuthority): AuthoritySummary {
   return {
-    subject: authority.chain.leafHolder,
+    subject: authority.chain.leafSubject,
+    subjectProfile: subjectProfile(authority.chain.leafSubject),
+    holder: authority.chain.leafHolder,
     requestedTool: authority.tool,
     requestedArgumentNames: Object.keys(authority.args),
     grantedTools: Object.keys(authority.chain.leafTools).sort(),

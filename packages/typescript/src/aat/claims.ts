@@ -44,6 +44,8 @@ export interface AatPayload {
   authorization_details: AatAuthorizationDetail[];
   /** Derived tokens only. MUST be absent on a root token. */
   par_hash?: string;
+  /** Optional external subject identity URI (RFC-0005) — SPIFFE ID, WIMSE identifier, etc. */
+  sub?: string;
 }
 
 /** Proof-of-possession JWT payload binding a presentation to one invocation. */

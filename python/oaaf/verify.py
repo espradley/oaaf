@@ -13,6 +13,7 @@ from typing import Any, Optional
 
 from . import crypto
 from .constraints import is_constraint, is_permitted_pair, subsumes
+from .identity import is_subject_uri
 from .reasons import Denial, denial
 
 MAX_CHAIN_LENGTH = 16
@@ -30,6 +31,7 @@ class VerifiedChain:
     tokens: list[dict]
     leaf_tools: dict[str, dict]
     leaf_holder: str
+    leaf_subject: str
     expires_at: int
     depth: int
 
@@ -302,6 +304,7 @@ def verify_chain(tokens: list[str], trust_anchors: list[dict], now: int) -> tupl
             tokens=[v[0] for v in verified],
             leaf_tools=leaf_tools,
             leaf_holder=leaf_holder,
+            leaf_subject=leaf_payload["sub"] if is_subject_uri(leaf_payload.get("sub")) else leaf_holder,
             expires_at=leaf_payload["exp"],
             depth=leaf_payload["del_depth"],
         ),

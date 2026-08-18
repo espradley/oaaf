@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .reasons import Denial
+from .identity import subject_profile
 from .verify import VerifiedChain
 
 
@@ -22,6 +23,8 @@ class ReasonExplanation:
 @dataclass(frozen=True)
 class AuthoritySummary:
     subject: str
+    subject_profile: str
+    holder: str
     requested_tool: str
     requested_argument_names: list[str]
     granted_tools: list[str]
@@ -53,7 +56,9 @@ def explain_reasons(denials: list[Denial]) -> list[ReasonExplanation]:
 
 def summarize_authority(chain: VerifiedChain, tool: str, args: dict) -> AuthoritySummary:
     return AuthoritySummary(
-        subject=chain.leaf_holder,
+        subject=chain.leaf_subject,
+        subject_profile=subject_profile(chain.leaf_subject),
+        holder=chain.leaf_holder,
         requested_tool=tool,
         requested_argument_names=list(args.keys()),
         granted_tools=sorted(chain.leaf_tools.keys()),

@@ -81,9 +81,11 @@ describe('inspector — correctness against the canonical decision', () => {
       'delegationDepth',
       'expiresAt',
       'grantedTools',
+      'holder',
       'requestedArgumentNames',
       'requestedTool',
       'subject',
+      'subjectProfile',
     ]);
   });
 });

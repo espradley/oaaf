@@ -77,6 +77,10 @@ export const REASON_CODES = [
   'authority_revoked',
   'status_unavailable',
 
+  // External subject identity binding (RFC-0005)
+  'subject_identity_mismatch',
+  'identity_binding_unavailable',
+
   // A2A binding (RFC-0003)
   'extension_not_activated',
   'authority_material_missing',
@@ -86,7 +90,8 @@ export const REASON_CODES = [
 export type ReasonCode = (typeof REASON_CODES)[number];
 
 /** Stage of verification that produced a denial. */
-export type VerificationStage = 'chain' | 'leaf' | 'pop' | 'evaluation' | 'a2a' | 'status';
+export type VerificationStage =
+  'chain' | 'leaf' | 'pop' | 'evaluation' | 'a2a' | 'status' | 'identity';
 
 /** A single denial, tied to the check that produced it. */
 export interface Denial {

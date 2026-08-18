@@ -15,6 +15,7 @@
 import type { ToolArguments } from '../aat/claims.js';
 import { decodeBase64Url } from '../base64url.js';
 import type { StatusResolver } from '../status.js';
+import type { IdentityBindingVerifier } from '../identity.js';
 import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js';
 import { denial, type Denial } from '../reasons.js';
 import {
@@ -86,6 +87,9 @@ export interface A2aAuthorityInput {
   /** Revocation/status resolver (RFC-0004); transport-neutral, same as the core. */
   statusResolver?: StatusResolver;
   allowUnknownStatus?: boolean;
+  /** External subject identity-binding verifier (RFC-0005); transport-neutral. */
+  identityBindingVerifier?: IdentityBindingVerifier;
+  allowUnknownIdentity?: boolean;
 }
 
 export type A2aAuthorityResult =
@@ -143,6 +147,12 @@ export async function enforceA2aAuthority(input: A2aAuthorityInput): Promise<A2a
     ...(input.allowUnknownStatus === undefined
       ? {}
       : { allowUnknownStatus: input.allowUnknownStatus }),
+    ...(input.identityBindingVerifier === undefined
+      ? {}
+      : { identityBindingVerifier: input.identityBindingVerifier }),
+    ...(input.allowUnknownIdentity === undefined
+      ? {}
+      : { allowUnknownIdentity: input.allowUnknownIdentity }),
   });
   if (!verification.ok) {
     return { ok: false, error: toA2aError(A2A_AUTHORIZATION_DENIED, verification.denials) };

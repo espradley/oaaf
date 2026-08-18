@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal, Optional
 
-Stage = Literal["chain", "leaf", "pop", "evaluation", "a2a", "status"]
+Stage = Literal["chain", "leaf", "pop", "evaluation", "a2a", "status", "identity"]
 
 # The 49 canonical reason codes. Order mirrors the reference for readability only;
 # membership and spelling are what matter.
@@ -71,6 +71,9 @@ REASON_CODES: tuple[str, ...] = (
     # revocation / status (RFC-0004)
     "authority_revoked",
     "status_unavailable",
+    # external subject identity binding (RFC-0005)
+    "subject_identity_mismatch",
+    "identity_binding_unavailable",
     # a2a binding
     "extension_not_activated",
     "authority_material_missing",

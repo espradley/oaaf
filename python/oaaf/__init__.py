@@ -14,6 +14,7 @@ from .explanation import (
 )
 from .reasons import REASON_CODES, Denial
 from .status import revoked_set_resolver, StatusResolver, TokenStatus
+from .identity import bound_subjects_verifier, subject_profile, is_subject_uri, IdentityBindingVerifier, IdentityBinding
 from .verify import VerifiedChain, verify_chain
 
 __all__ = [
@@ -28,5 +29,10 @@ __all__ = [
     "revoked_set_resolver",
     "StatusResolver",
     "TokenStatus",
+    "bound_subjects_verifier",
+    "subject_profile",
+    "is_subject_uri",
+    "IdentityBindingVerifier",
+    "IdentityBinding",
 ]
 __version__ = "0.1.0"

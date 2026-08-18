@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from oaaf import verify_and_evaluate, revoked_set_resolver
+from oaaf import verify_and_evaluate, revoked_set_resolver, bound_subjects_verifier
 
 VECTORS = json.loads((Path(__file__).parent / "vectors" / "vectors.json").read_text())["vectors"]
 
@@ -38,6 +38,8 @@ def normalize(explanation) -> dict:
         if explanation.authority is None
         else {
             "subject": explanation.authority.subject,
+            "subject_profile": explanation.authority.subject_profile,
+            "holder": explanation.authority.holder,
             "requested_tool": explanation.authority.requested_tool,
             "requested_argument_names": explanation.authority.requested_argument_names,
             "granted_tools": explanation.authority.granted_tools,
@@ -66,6 +68,8 @@ def expected_normalized(expected: dict) -> dict:
         if expected.get("authority") is None
         else {
             "subject": expected["authority"]["subject"],
+            "subject_profile": expected["authority"]["subjectProfile"],
+            "holder": expected["authority"]["holder"],
             "requested_tool": expected["authority"]["requestedTool"],
             "requested_argument_names": expected["authority"]["requestedArgumentNames"],
             "granted_tools": expected["authority"]["grantedTools"],
@@ -84,6 +88,11 @@ def test_python_matches_reference(vector):
         if ("revokedJti" in i or "unknownJti" in i)
         else None
     )
+    identity = (
+        bound_subjects_verifier(i.get("boundSubjects", []), i.get("unavailableSubjects", []))
+        if ("boundSubjects" in i or "unavailableSubjects" in i)
+        else None
+    )
     result = verify_and_evaluate(
         tokens=i["tokens"],
         trust_anchors=i["trustAnchors"],
@@ -94,6 +103,7 @@ def test_python_matches_reference(vector):
         recipient=i.get("recipient"),
         require_recipient_binding="recipient" in i,
         status_resolver=resolver,
+        identity_binding_verifier=identity,
     )
     assert normalize(result) == expected_normalized(vector["expected"])
 
@@ -114,6 +124,10 @@ def test_all_required_cases_present():
         "status_deny_leaf_revoked",
         "status_deny_ancestor_revoked",
         "status_deny_unavailable",
+        "identity_allow_thumbprint",
+        "identity_allow_spiffe",
+        "identity_deny_mismatch",
+        "identity_deny_unavailable",
     }
     assert required.issubset(names)
 

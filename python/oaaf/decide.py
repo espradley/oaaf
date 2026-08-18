@@ -20,6 +20,7 @@ from .explanation import (
 from .pop import pop_audience, verify_pop
 from .reasons import Denial, denial
 from .status import StatusResolver
+from .identity import IdentityBindingVerifier
 from .verify import VerifiedChain, verify_chain
 
 
@@ -70,6 +71,8 @@ def verify_and_evaluate(
     require_recipient_binding: bool = False,
     status_resolver: Optional[StatusResolver] = None,
     allow_unknown_status: bool = False,
+    identity_binding_verifier: Optional[IdentityBindingVerifier] = None,
+    allow_unknown_identity: bool = False,
 ) -> DecisionExplanation:
     """Full enforcement, returning the canonical explanation. Fails closed."""
     import time
@@ -95,6 +98,20 @@ def verify_and_evaluate(
                     decision="DENY",
                     reasons=explain_reasons([denial("status_unavailable", "status", "Required revocation status could not be established.", token_index=i)]),
                 )
+
+    # External subject identity binding (RFC-0005).
+    if identity_binding_verifier is not None and chain.leaf_subject != chain.leaf_holder:
+        binding = identity_binding_verifier(chain.leaf_subject, chain.leaf_holder, now)
+        if binding == "mismatch":
+            return DecisionExplanation(
+                decision="DENY",
+                reasons=explain_reasons([denial("subject_identity_mismatch", "identity", "The external subject does not correspond to the holder key.")]),
+            )
+        if binding == "unavailable" and not allow_unknown_identity:
+            return DecisionExplanation(
+                decision="DENY",
+                reasons=explain_reasons([denial("identity_binding_unavailable", "identity", "Required external identity binding could not be established.")]),
+            )
 
     pop_denials = verify_pop(pop, chain, tool, args, now)
     if pop_denials:

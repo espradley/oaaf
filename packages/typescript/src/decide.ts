@@ -23,6 +23,7 @@ import { toAccessEvaluationRequest, toAccessEvaluationResponse } from './authzen
 import type { AccessEvaluationRequest, AccessEvaluationResponse } from './authzen/types.js';
 import { denial, type Denial } from './reasons.js';
 import type { StatusResolver } from './status.js';
+import type { IdentityBindingVerifier } from './identity.js';
 
 /** Authority that has passed every AAT check, including proof of possession. */
 export interface VerifiedAuthority {
@@ -53,6 +54,16 @@ export interface VerifyAuthorityInput {
   statusResolver?: StatusResolver;
   /** Proceed when a status is unknown rather than denying. Weakens the guarantee. */
   allowUnknownStatus?: boolean;
+  /**
+   * Optional external subject identity-binding verifier (RFC-0005). When the leaf
+   * carries an external `sub`, this confirms it corresponds to the holder key.
+   * `mismatch` denies with `subject_identity_mismatch`; `unavailable` denies with
+   * `identity_binding_unavailable` (fail closed) unless `allowUnknownIdentity`.
+   * When absent, the issuer's signed `sub` assertion is trusted.
+   */
+  identityBindingVerifier?: IdentityBindingVerifier;
+  /** Proceed when an identity binding is unavailable rather than denying. Weakens the guarantee. */
+  allowUnknownIdentity?: boolean;
 }
 
 export type VerifyAuthorityResult =
@@ -109,6 +120,38 @@ export async function verifyAuthority(input: VerifyAuthorityInput): Promise<Veri
           ],
         };
       }
+    }
+  }
+
+  // External subject identity binding (RFC-0005): when the leaf carries an
+  // external `sub` and a verifier is configured, confirm it corresponds to the
+  // holder key. PoP (below) is unchanged and always binds to cnf.jwk.
+  const chain = chainResult.chain;
+  if (input.identityBindingVerifier !== undefined && chain.leafSubject !== chain.leafHolder) {
+    const binding = await input.identityBindingVerifier(chain.leafSubject, chain.leafHolder, now);
+    if (binding === 'mismatch') {
+      return {
+        ok: false,
+        denials: [
+          denial(
+            'subject_identity_mismatch',
+            'identity',
+            'The external subject does not correspond to the holder key.',
+          ),
+        ],
+      };
+    }
+    if (binding === 'unavailable' && input.allowUnknownIdentity !== true) {
+      return {
+        ok: false,
+        denials: [
+          denial(
+            'identity_binding_unavailable',
+            'identity',
+            'Required external identity binding could not be established.',
+          ),
+        ],
+      };
     }
   }
 

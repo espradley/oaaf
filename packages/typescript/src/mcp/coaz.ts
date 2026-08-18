@@ -25,6 +25,7 @@ import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js'
 import type { ToolArguments } from '../aat/claims.js';
 import type { Denial } from '../reasons.js';
 import type { StatusResolver } from '../status.js';
+import type { IdentityBindingVerifier } from '../identity.js';
 import {
   explainDecision,
   explainReasons,
@@ -102,6 +103,9 @@ export interface OaafPreconditionInput {
   /** Revocation/status resolver (RFC-0004); transport-neutral, same as the core. */
   statusResolver?: StatusResolver;
   allowUnknownStatus?: boolean;
+  /** External subject identity-binding verifier (RFC-0005); transport-neutral. */
+  identityBindingVerifier?: IdentityBindingVerifier;
+  allowUnknownIdentity?: boolean;
 }
 
 export type OaafPrecondition =
@@ -134,6 +138,12 @@ export async function enforceOaafPrecondition(
     ...(input.allowUnknownStatus === undefined
       ? {}
       : { allowUnknownStatus: input.allowUnknownStatus }),
+    ...(input.identityBindingVerifier === undefined
+      ? {}
+      : { identityBindingVerifier: input.identityBindingVerifier }),
+    ...(input.allowUnknownIdentity === undefined
+      ? {}
+      : { allowUnknownIdentity: input.allowUnknownIdentity }),
   });
 
   if (!verification.ok) {

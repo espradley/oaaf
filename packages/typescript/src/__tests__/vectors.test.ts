@@ -9,6 +9,7 @@ import { toExplanation } from '../explain.js';
 import { enforceA2aAuthority, explainA2aResult } from '../a2a/binding.js';
 import type { DecisionExplanation } from '../explanation.js';
 import { revokedSetResolver } from '../status.js';
+import { boundSubjectsVerifier } from '../identity.js';
 
 /**
  * The reference side of the cross-language parity gate (O5B). The same shared
@@ -50,10 +51,16 @@ async function evaluateVector(input: Record<string, unknown>): Promise<DecisionE
     recipient?: string;
     revokedJti?: string[];
     unknownJti?: string[];
+    boundSubjects?: string[];
+    unavailableSubjects?: string[];
   };
   const statusResolver =
     i.revokedJti !== undefined || i.unknownJti !== undefined
       ? revokedSetResolver(i.revokedJti ?? [], i.unknownJti ?? [])
+      : undefined;
+  const identityBindingVerifier =
+    i.boundSubjects !== undefined || i.unavailableSubjects !== undefined
+      ? boundSubjectsVerifier(i.boundSubjects ?? [], i.unavailableSubjects ?? [])
       : undefined;
   // The recipient case exercises the A2A binding path (aat_aud binding).
   if (i.recipient !== undefined) {
@@ -72,6 +79,7 @@ async function evaluateVector(input: Record<string, unknown>): Promise<DecisionE
       requireRecipientBinding: true,
       ...(i.now === undefined ? {} : { now: i.now }),
       ...(statusResolver === undefined ? {} : { statusResolver }),
+      ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
     });
     return explainA2aResult(a2a);
   }
@@ -83,6 +91,7 @@ async function evaluateVector(input: Record<string, unknown>): Promise<DecisionE
     args: i.args ?? {},
     ...(i.now === undefined ? {} : { now: i.now }),
     ...(statusResolver === undefined ? {} : { statusResolver }),
+    ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
   };
   const decision = await verifyAndEvaluate(common);
   const v = await verifyAuthority(common);

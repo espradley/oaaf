@@ -13,6 +13,7 @@
 import { calculateJwkThumbprintUri, importJWK, compactVerify, decodeProtectedHeader } from 'jose';
 
 import { decodeBase64Url, sha256Base64Url } from '../base64url.js';
+import { isSubjectUri } from '../identity.js';
 import { denial, type Denial } from '../reasons.js';
 import {
   extractToolGrants,
@@ -57,8 +58,13 @@ export interface VerifiedDelegationChain {
   readonly tokens: readonly VerifiedToken[];
   /** Authority the leaf actually holds, after all narrowing. */
   readonly leafTools: Record<string, ToolConstraints>;
-  /** JWK Thumbprint URI of the leaf holder key. Subject identity per RFC-0001. */
+  /** JWK Thumbprint URI of the leaf holder key — the proof-of-possession key. */
   readonly leafHolder: string;
+  /**
+   * Canonical subject: the leaf token's `sub` (an external identity URI, RFC-0005)
+   * when present, otherwise the holder thumbprint. Distinct from `leafHolder`.
+   */
+  readonly leafSubject: string;
   /** Effective expiry — the leaf's, which the chain guarantees is the earliest. */
   readonly expiresAt: number;
   readonly depth: number;
@@ -748,6 +754,9 @@ export async function verifyDelegationChain(
       tokens: verified,
       leafTools: leaf.tools,
       leafHolder: leaf.holder,
+      leafSubject: isSubjectUri((leaf.payload as { sub?: unknown }).sub)
+        ? ((leaf.payload as { sub?: unknown }).sub as string)
+        : leaf.holder,
       expiresAt: leaf.payload.exp,
       depth: leaf.payload.del_depth,
     },

@@ -17,6 +17,7 @@ import {
   verifyAuthority,
   toExplanation,
   revokedSetResolver,
+  boundSubjectsVerifier,
 } from '../packages/typescript/dist/index.js';
 import { enforceA2aAuthority, explainA2aResult } from '../packages/typescript/dist/a2a/binding.js';
 import {
@@ -429,6 +430,178 @@ async function statusExpected(input, revoked, unknown) {
     input,
     await statusExpected(input, [], ['derived']),
     'required status unknown, fail closed',
+  );
+}
+
+// --- External subject identity binding vectors (RFC-0005) ---
+const SPIFFE_ALICE = 'spiffe://company.example/agents/alice';
+const SPIFFE_BOB = 'spiffe://company.example/agents/bob';
+
+async function chainWithLeafSub(sub) {
+  const issuerKey = await generateHolderKey();
+  const alice = await generateHolderKey();
+  const bob = await generateHolderKey();
+  const root = await mintRootToken({
+    issuer: 'https://authority.example',
+    issuerKey,
+    holder: alice,
+    tools: { 'repo.read': {} },
+    issuedAt: NOW,
+    expiresAt: NOW + HOUR,
+    maxDepth: 2,
+    jti: 'root',
+  });
+  const derived = await mintDerivedToken({
+    parentToken: root,
+    parentKey: alice,
+    parentPayload: { del_depth: 0, del_max_depth: 2, exp: NOW + HOUR, iat: NOW },
+    holder: bob,
+    tools: { 'repo.read': {} },
+    issuedAt: NOW,
+    expiresAt: NOW + HOUR / 2,
+    jti: 'derived',
+    overrides: { sub },
+  });
+  return { tokens: [root, derived], trustAnchors: [issuerKey.publicJwk], bob };
+}
+
+async function identityExpected(input, bound, unavailable) {
+  const verifier = boundSubjectsVerifier(bound, unavailable);
+  const withVerifier = { ...input, identityBindingVerifier: verifier };
+  const decision = await verifyAndEvaluate(withVerifier);
+  const v = await verifyAuthority(withVerifier);
+  return toExplanation(decision, v.ok ? v.authority : undefined);
+}
+
+// ALLOW — thumbprint subject (regression: no sub, current model unchanged)
+{
+  const c = await chain({ rootTools: { 'repo.read': {} }, leafTools: { 'repo.read': {} } });
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+  };
+  record(
+    'identity_allow_thumbprint',
+    input,
+    await coreExpected(input),
+    'no sub — subject is the holder thumbprint',
+  );
+}
+// ALLOW — external SPIFFE subject, binding confirmed
+{
+  const c = await chainWithLeafSub(SPIFFE_BOB);
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    boundSubjects: [SPIFFE_BOB],
+    unavailableSubjects: [],
+  };
+  record(
+    'identity_allow_spiffe',
+    input,
+    await identityExpected(input, [SPIFFE_BOB], []),
+    'authority binds to a verified SPIFFE ID',
+  );
+}
+// ALLOW — SPIFFE subject, no verifier configured (issuer assertion trusted)
+{
+  const c = await chainWithLeafSub(SPIFFE_BOB);
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+  };
+  record(
+    'identity_allow_spiffe_issuer_asserted',
+    input,
+    await coreExpected(input),
+    'external sub trusted from the issuer signature',
+  );
+}
+// DENY — external identity differs from authority holder (verifier says mismatch)
+{
+  const c = await chainWithLeafSub(SPIFFE_BOB);
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    boundSubjects: [SPIFFE_ALICE],
+    unavailableSubjects: [],
+  };
+  record(
+    'identity_deny_mismatch',
+    input,
+    await identityExpected(input, [SPIFFE_ALICE], []),
+    'subject does not correspond to the holder',
+  );
+}
+// DENY — required identity binding unavailable (fail closed)
+{
+  const c = await chainWithLeafSub(SPIFFE_BOB);
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    boundSubjects: [],
+    unavailableSubjects: [SPIFFE_BOB],
+  };
+  record(
+    'identity_deny_unavailable',
+    input,
+    await identityExpected(input, [], [SPIFFE_BOB]),
+    'required binding unavailable, fail closed',
   );
 }
 
