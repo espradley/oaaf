@@ -71,12 +71,18 @@ export const REASON_CODES = [
   'pop_tool_mismatch',
   'pop_binding_mismatch',
   'pop_stale',
+  'pop_recipient_mismatch',
+
+  // A2A binding (RFC-0003)
+  'extension_not_activated',
+  'authority_material_missing',
+  'caller_holder_mismatch',
 ] as const;
 
 export type ReasonCode = (typeof REASON_CODES)[number];
 
 /** Stage of verification that produced a denial. */
-export type VerificationStage = 'chain' | 'leaf' | 'pop' | 'evaluation';
+export type VerificationStage = 'chain' | 'leaf' | 'pop' | 'evaluation' | 'a2a';
 
 /** A single denial, tied to the check that produced it. */
 export interface Denial {

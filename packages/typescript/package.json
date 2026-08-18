@@ -18,6 +18,10 @@
     "./mcp": {
       "types": "./dist/mcp/coaz.d.ts",
       "default": "./dist/mcp/coaz.js"
+    },
+    "./a2a": {
+      "types": "./dist/a2a/binding.d.ts",
+      "default": "./dist/a2a/binding.js"
     }
   },
   "files": [

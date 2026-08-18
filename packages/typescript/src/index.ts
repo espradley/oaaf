@@ -91,6 +91,27 @@ export { explain } from './explain.js';
  * exports are the OAAF precondition step and, for demonstration, COAZ's own
  * unmodified default `tools/call` mapping.
  */
+/**
+ * A2A binding — RFC-0003. OAAF delegated authority carried through A2A's
+ * extension mechanism and enforced as a precondition before consequential work.
+ */
+export {
+  enforceA2aAuthority,
+  A2A_EXTENSION_SUPPORT_REQUIRED,
+  A2A_AUTHORIZATION_DENIED,
+} from './a2a/binding.js';
+export type { A2aAuthorityInput, A2aAuthorityResult, A2aAuthorityError } from './a2a/binding.js';
+export {
+  OAAF_A2A_EXTENSION_URI,
+  OAAF_AGENT_EXTENSION,
+  METADATA_KEY_CHAIN,
+  METADATA_KEY_POP,
+  isExtensionActivated,
+  extractChain,
+  extractPop,
+} from './a2a/extension.js';
+export type { A2aMessage } from './a2a/extension.js';
+
 export {
   buildCoazToolCallRequest,
   enforceAndMapToCoaz,

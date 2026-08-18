@@ -73,29 +73,29 @@ Acceptance means the design is agreed. It is not a promise of an implementation 
 | ----------------------------------------------- | ---------------------------------- | --------- | -------- |
 | [0001](0001-aat-authzen-enforcement-profile.md) | AAT to AuthZEN Enforcement Profile | `PROFILE` | Accepted |
 | [0002](0002-mcp-coaz-binding.md)                | MCP / COAZ Binding                 | `PROFILE` | Accepted |
+| [0003](0003-a2a-binding.md)                     | A2A Binding                        | `EXTEND`  | Accepted |
 
 ## Anticipated RFCs
 
-These are the decisions the next program needs. They are scoped to the **minimum useful
-local authority flow** — what is required for a developer to install the SDK and get a
-correct, explainable allow/deny decision without a service. Nothing below has been
-designed yet, and the numbering is provisional.
+RFC-0001 through RFC-0003 are accepted (see the index above): the transport-neutral
+AAT → AuthZEN profile, and the MCP and A2A bindings. What the authority core actually
+needed for a local allow/deny decision was resolved within RFC-0001 rather than split
+across several RFCs, so the original provisional numbering is superseded.
 
-| RFC      | Subject                                     |
-| -------- | ------------------------------------------- |
-| RFC-0001 | Grant representation                        |
-| RFC-0002 | Capability and resource representation      |
-| RFC-0003 | Constraints, validity, and expiration       |
-| RFC-0004 | Deterministic evaluation and decision shape |
-| RFC-0005 | Delegation and authority narrowing          |
+Likely near-term subjects, not yet designed:
 
-Presentation and verification are in scope only to the extent the golden path requires
-them. Hosted authority-state infrastructure is explicitly not an early RFC question:
-defining a service before anyone has used the local path would be designing for a user
-who does not exist yet.
+| Subject                 | Note                                        |
+| ----------------------- | ------------------------------------------- |
+| Portable audit evidence | O4 — signed decision receipts               |
+| Conformance profile     | O6 — cross-implementation test requirements |
 
-Do not treat an entry above as reserved. If you want to write one, say so in an issue
-first so two people do not draft the same thing.
+Hosted authority-state infrastructure is explicitly not an early RFC question: defining a
+service before anyone has used the local path would be designing for a user who does not
+exist yet. The reserved execution-continuity concepts
+([ADR-0002](../docs/adr/0002-reserved-execution-continuity-semantics.md)) remain deferred.
+
+If you want to write one, say so in an issue first so two people do not draft the same
+thing.
 
 ## Deferred RFC questions
 

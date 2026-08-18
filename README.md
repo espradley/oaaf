@@ -8,7 +8,7 @@ across MCP, A2A, and agent runtimes without introducing another competing author
 protocol.
 
 > **Status: early, but runnable.** A verified authority kernel and an MCP tool-guard
-> integration work today; `npm run demo:mcp` shows them. Not production-ready and not
+> integration work today, across MCP (`npm run demo:mcp`) and A2A (`npm run demo:a2a`). Not production-ready and not
 > security-audited — see [Project maturity](#project-maturity) before you plan around it.
 
 ## The problem
@@ -202,7 +202,7 @@ Honest accounting of where this stands:
 | Standards profile  | AAT `-01` and AuthZEN 1.0, pinned. Mapping frozen by RFC-0001.                  |
 | TypeScript SDK     | Chain verification, proof of possession, decision, explanation. Not yet on npm. |
 | MCP / COAZ binding | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path.   |
-| A2A binding        | Not started — demand-gated.                                                     |
+| A2A binding        | Shipped (O3B): OAAF authority as an A2A extension, verified before work.        |
 | Conformance suite  | Not started.                                                                    |
 | Security review    | None. No formal audit, no certification, no threat model published yet.         |
 | External adopters  | None yet.                                                                       |

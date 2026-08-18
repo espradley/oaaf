@@ -23,7 +23,8 @@
     "check": "npm run check:boundary && npm run format:check && npm run typecheck && npm run test",
     "clean": "tsc --build --clean",
     "demo": "npm run build && node examples/quickstart/index.js",
-    "demo:mcp": "npm run build && node examples/mcp-tool-guard/index.js"
+    "demo:mcp": "npm run build && node examples/mcp-tool-guard/index.js",
+    "demo:a2a": "npm run build && node examples/a2a-delegation/index.js"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
