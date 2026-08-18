@@ -5,9 +5,11 @@ TypeScript SDK for the [Open Agent Authority Framework](https://github.com/espra
 Verify a delegated authority chain, decide whether a requested tool call is permitted,
 and explain the answer.
 
-> **Status: early (pre-v1, `0.x`).** Published on npm as `@oaaf/sdk`. OAAF profiles
-> Internet-Drafts that may change — see [Standards](#standards) and the
-> [versioning policy](../../docs/versioning-and-compatibility.md).
+> **Status:** the **package** is `0.x` (its API may still change); it implements the **frozen
+> OAAF Core 1.0 conformance contract** ([spec](../../spec/0.1/conformance/README.md)). Package
+> version and contract version are deliberately decoupled — see
+> [compatibility](../../spec/0.1/conformance/compatibility.md). Published on npm as `@oaaf/sdk`;
+> OAAF profiles Internet-Drafts that may change — see [Standards](#standards).
 
 ## Install
 
@@ -45,8 +47,9 @@ Import only these documented paths. Nothing under `dist/` internal to them is pu
 
 ### Stability
 
-Pre-v1, all of this may still change, but deliberately and documented (see the
-[versioning policy](../../docs/versioning-and-compatibility.md)):
+The **SDK API** is pre-1.0 and may still change (deliberately and documented, see the
+[versioning policy](../../docs/versioning-and-compatibility.md)); the **conformance contract** it
+implements is frozen at OAAF Core 1.0:
 
 - **Core** (`@oaaf/sdk`) and the **explanation contract** are the most settled.
 - The **MCP and A2A bindings** track draft standards (COAZ-MCP Draft 1, A2A 1.0.1) and

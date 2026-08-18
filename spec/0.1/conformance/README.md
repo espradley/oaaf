@@ -1,12 +1,18 @@
 # OAAF Conformance Specification
 
-- **Conformance spec version:** `0.1` (pre-v1)
-- **Status:** Draft — normative but not frozen. **This is not v1.** The v1 freeze is O6H's decision.
+- **Conformance contract:** **OAAF Core 1.0 — frozen** (v1.0 release candidate).
+- **Spec document revision:** `0.1` (the writing; the frozen contract it defines is Core 1.0 —
+  the authoritative version statement is the [manifest](manifest.json)).
+- **Status:** **Frozen.** The normative contract is final; changes follow the
+  [compatibility policy](compatibility.md) (1.x additive, 2.0 breaking). Publishing 1.0.0
+  packages is a separate, deliberate step — the contract and SDK versions are decoupled.
 - **Normative language:** the key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
   SHOULD NOT, RECOMMENDED, MAY, and OPTIONAL are to be interpreted as described in
   BCP 14 ([RFC 2119](https://www.rfc-editor.org/rfc/rfc2119),
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174)) when, and only when, they appear in
   capitals.
+
+> **New here? Start with [What is OAAF 1.0?](oaaf-1.0.md)** — the definitive artifact set.
 
 ## What this document is
 
@@ -42,7 +48,7 @@ IDs never encode a reference-implementation filename. They are the spine that O6
 O6C (cross-language), O6D (bindings), and O6E (security) will trace back to.
 
 Adding a requirement ID is a minor change; renaming or removing one is breaking, exactly as
-for reason codes. O6H owns any renumbering at the v1 freeze.
+for reason codes. Renumbering would be a breaking (2.0) change under the compatibility policy.
 
 ## Conformance classes
 
@@ -147,11 +153,11 @@ the security-relevant ones into language-neutral static vectors. Every vector tr
 more requirement IDs, and every Core security-invariant requirement that can be a static
 vector has one — enforced by `npm run check:conformance`. [traceability.md](traceability.md)
 records the full mapping and the remaining gaps (binding/PDP depth) for O6C–O6D. The corpus is
-not yet frozen; O6H owns the v1 suite.
+frozen as the OAAF Core 1.0 corpus (additions are 1.x; see the compatibility policy).
 
 ## Status of this specification
 
-Draft, pre-v1, and deliberately not frozen. It may change as O6B–O6G proceed. The
-experimental parts (Status wire mechanism, WIMSE identity) are isolated in
-[classification.md](classification.md) and [standards.md](standards.md) so that unstable
-upstream work cannot silently become a mandatory v1 requirement.
+**Frozen** as OAAF Core 1.0 (v1.0 release candidate). The experimental parts (Status wire
+mechanism, WIMSE identity) remain isolated in [classification.md](classification.md) and
+[standards.md](standards.md) so unstable upstream work cannot become a mandatory Core requirement;
+those profiles evolve independently under the [compatibility policy](compatibility.md).

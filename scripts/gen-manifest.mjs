@@ -7,7 +7,7 @@
  * "OAAF Core 1.0" is without interpreting git history. It records each normative artifact's
  * sha256. `check:manifest` re-computes those hashes and fails if the committed manifest drifts.
  *
- * Status is `release-candidate` until O6H stamps the freeze; the target is 1.0.
+ * Status is `frozen` (O6H): the OAAF Core 1.0 contract is final; the target is 1.0.
  */
 
 import { createHash } from 'node:crypto';
@@ -39,12 +39,13 @@ export function buildManifest() {
   core.aat_profile.revision = '01';
   return {
     oaaf_version: '1.0',
-    status: 'release-candidate',
+    status: 'frozen',
     spec_version: '0.1',
     note:
-      'The definitive artifact set for OAAF Core 1.0 and its profiles. status is ' +
-      'release-candidate until the O6H freeze. Hashes are sha256 of the referenced files; ' +
-      'check:manifest fails if any drifts. See compatibility.md for the versioning contract.',
+      'The definitive, FROZEN artifact set for OAAF Core 1.0 and its profiles (v1.0 release ' +
+      'candidate; the normative contract is frozen, package publication is a separate deliberate ' +
+      'step). Hashes are sha256 of the referenced files; check:manifest fails if any drifts. See ' +
+      'compatibility.md for the versioning contract.',
     core,
     profiles: { status: '1.0', identity: '1.0', mcp: '1.0', a2a: '1.0', pdp: '1.0' },
     standards: {

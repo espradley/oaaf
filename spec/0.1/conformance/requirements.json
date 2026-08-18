@@ -1,7 +1,7 @@
 {
   "specVersion": "0.1",
-  "status": "draft-pre-v1",
-  "note": "Canonical, machine-checkable requirement catalog for OAAF conformance. This file is the traceability spine (O6A). It is NOT the v1 conformance suite; O6H owns the v1 freeze. Statements are observable behaviors, not implementation algorithms. `keyword` uses BCP 14 (RFC 2119/8174). `source` cites the standard/RFC/ADR a requirement derives from \u2014 never a reference-implementation file.",
+  "status": "frozen",
+  "note": "Canonical, machine-checkable requirement catalog for OAAF conformance (O6A). This file is the traceability spine and is FROZEN as the OAAF Core 1.0 requirement catalog (O6H). Changes follow the compatibility policy: additions are 1.x, renames/removals/meaning changes are 2.0. Statements are observable behaviors, not implementation algorithms. `keyword` uses BCP 14 (RFC 2119/8174). `source` cites the standard/RFC/ADR a requirement derives from \u2014 never a reference-implementation file.",
   "classes": ["Core", "Status", "Identity", "MCP", "A2A", "PDP"],
   "classPrefixes": {
     "Core": "CORE",

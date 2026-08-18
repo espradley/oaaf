@@ -10,7 +10,8 @@ TypeScript or Python object shapes** — it is snake_case JSON and nothing else.
 
 > The 18 original shared vectors are the ancestor of this corpus; O6B extended them into a
 > requirement-tagged corpus that materially covers the security-relevant Core requirements.
-> This is not yet frozen — O6C runs it across implementations, and O6H owns the v1 freeze.
+> The corpus is **frozen** as part of OAAF Core 1.0 (its sha256 is pinned in the
+> [manifest](../manifest.json)); additions follow the [compatibility policy](../compatibility.md).
 
 ## File shape
 

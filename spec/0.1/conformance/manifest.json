@@ -1,12 +1,12 @@
 {
   "oaaf_version": "1.0",
-  "status": "release-candidate",
+  "status": "frozen",
   "spec_version": "0.1",
-  "note": "The definitive artifact set for OAAF Core 1.0 and its profiles. status is release-candidate until the O6H freeze. Hashes are sha256 of the referenced files; check:manifest fails if any drifts. See compatibility.md for the versioning contract.",
+  "note": "The definitive, FROZEN artifact set for OAAF Core 1.0 and its profiles (v1.0 release candidate; the normative contract is frozen, package publication is a separate deliberate step). Hashes are sha256 of the referenced files; check:manifest fails if any drifts. See compatibility.md for the versioning contract.",
   "core": {
     "requirements": {
       "path": "spec/0.1/conformance/requirements.json",
-      "sha256": "b40da030e257ec7a9eda37462df17141411a7279af357b13499c1e84228ea69d"
+      "sha256": "9a9784c7f6a29b8c42c71be07ebe445e42dbb575bd754e6755c13e24bba8cce2"
     },
     "corpus": {
       "path": "spec/0.1/conformance/vectors/corpus.json",

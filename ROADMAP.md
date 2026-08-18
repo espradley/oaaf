@@ -68,8 +68,8 @@ boundary is technical and binds everyone, including Edwin Digital
 | O6E         | Security / adversarial certification                   | ✅ Complete              |
 | O6F         | Standards reconciliation + v1 dependency readiness     | ✅ Complete              |
 | O6G         | Compatibility contract + permanent v1 freeze artifacts | ✅ Complete              |
-| O6H         | v1 compatibility / readiness contract                  | ⏸️ Planned               |
-| **O6 exit** | **OAAF v1 technical foundation / freeze**              | 🎯                       |
+| O6H         | Final normative cleanup + v1 RC                        | ✅ Complete              |
+| **O6 exit** | **OAAF v1 technical foundation / freeze**              | ✅ Reached (frozen)      |
 | REL-1       | Trusted Publishing / OIDC for npm + PyPI               | ⏸️ Future                |
 | O7A         | Integration target research                            | ⏸️ After O6 freeze       |
 | O7B         | OAAF-maintained reference bridges                      | ⏸️ After O6 freeze       |
@@ -470,14 +470,31 @@ implement OAAF Core 1.0 from OAAF's archive alone — no expired draft hunt requ
 (The competitive-collision review originally sketched here is repositioned as a lighter,
 post-freeze ecosystem activity; it is not a v1 technical-freeze prerequisite.)
 
-### O6H — v1 compatibility / readiness contract ⏸️
+### O6H — Final normative cleanup + v1 RC ✅
 
-Decide whether the technical foundation is ready to become OAAF v1 and freeze the
-compatibility guarantees adopters may rely on.
+Freeze validation and consistency only — no new architecture, semantics, or features. Six
+audits, a from-scratch release-candidate dry run, the definitive artifact index, and the freeze
+stamp.
 
-### O6 exit — OAAF v1 technical foundation / freeze 🎯
+- **Six audits, all clean.** Normative language (all BCP-14; no duplicative MUSTs), pre-v1
+  wording (contract-level "not frozen / O6H owns" resolved to **frozen**, while the Status
+  _wire-format_ correctly stays experimental), manifest integrity (hashes reproducible),
+  reserved-IP (no continuity/recovery/supersession/fencing; the only "freshness" is status-artifact
+  staleness, walled off from execution control), security/privacy (security.md's 41 attacks match
+  the suite exactly — no overclaim), claim language ("conformant" stays self-declared, never
+  "certified").
+- **RC dry run from a fresh clone:** install TS + Python → full checks → pytest (79) → runner (TS
+  51/51, Python 42/42) → manifest hashes verified → doc links → package install lines present →
+  no stale publication claims → no telemetry, no install hooks. All green.
+- **Definitive artifact index** — [spec/0.1/conformance/oaaf-1.0.md](spec/0.1/conformance/oaaf-1.0.md):
+  the human answer to "what exactly is OAAF 1.0?" (the 9-artifact set), backed by the manifest.
+- **Freeze stamp:** the [manifest](spec/0.1/conformance/manifest.json) status is now **`frozen`**
+  and the runner reports "Manifest 1.0 frozen" in its evidence. Package publication (1.0.0) is a
+  separate, deliberate step — contract and SDK versions stay decoupled.
 
-Normative behavior documented, independent implementations possible, conformance exists,
+### O6 exit — OAAF v1 technical foundation / freeze ✅ Reached
+
+**The OAAF Core 1.0 conformance contract is frozen** (manifest status `frozen`; O6H). Normative behavior documented, independent implementations possible, conformance exists,
 standards positioning reassessed, compatibility promises explicit. This does **not** mean
 development stops. New core semantics after the freeze must be justified by external
 adoption evidence, interoperability defects, security findings, upstream standards changes,

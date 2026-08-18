@@ -52,7 +52,7 @@ prompt, no implementation-specific diagnostics contaminating the contract.
 ```text
 OAAF Core + Status + Identity 0.1
 Corpus 0.1 (sha256:ae11f06af3a5…)
-Manifest 1.0 release-candidate (sha256:…)
+Manifest 1.0 frozen (sha256:…)
 37 applicable vectors
 37 passed
 0 failed
