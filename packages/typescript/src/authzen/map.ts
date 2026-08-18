@@ -15,6 +15,7 @@
  */
 
 import type { ToolArguments } from '../aat/claims.js';
+import { subjectProfile } from '../identity.js';
 import type { VerifiedDelegationChain } from '../aat/verify.js';
 import type { Denial } from '../reasons.js';
 import type { AccessEvaluationRequest, AccessEvaluationResponse } from './types.js';
@@ -38,9 +39,16 @@ export function toAccessEvaluationRequest(
     subject: { type: OAAF_SUBJECT_TYPE, id: chain.leafHolder },
     action: { name: tool, properties: { arguments: args } },
     resource: { type: OAAF_RESOURCE_TYPE, id: tool },
+    // context.oaaf carries the canonical authority context (RFC-0006) for the PDP.
     context: {
       oaaf: {
-        aatRevision: chain.aatRevision,
+        authorityVerified: true,
+        subject: chain.leafSubject,
+        subjectProfile: subjectProfile(chain.leafSubject),
+        holder: chain.leafHolder,
+        requestedTool: tool,
+        requestedArgumentNames: Object.keys(args),
+        grantedTools: Object.keys(chain.leafTools).sort(),
         delegationDepth: chain.depth,
         chainLength: chain.tokens.length,
         expiresAt: chain.expiresAt,

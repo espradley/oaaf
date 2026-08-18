@@ -29,7 +29,8 @@
     "inspect": "npm run build && node examples/inspector/inspect.js",
     "check:governance": "node scripts/check-governance.mjs",
     "check:package": "node scripts/check-downstream.mjs",
-    "gen:vectors": "npm run build && node scripts/gen-vectors.mjs"
+    "gen:vectors": "npm run build && node scripts/gen-vectors.mjs",
+    "demo:pdp": "npm run build && node examples/pdp-coexistence/index.js"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

@@ -66,3 +66,41 @@ def summarize_authority(chain: VerifiedChain, tool: str, args: dict) -> Authorit
         chain_length=len(chain.tokens),
         expires_at=chain.expires_at,
     )
+
+
+@dataclass(frozen=True)
+class AuthorityContext:
+    """The canonical authority context (RFC-0006): the verified-authority facts an
+    external PDP consults when making the organization's policy decision.
+
+    OAAF conveys this to the PDP; the PDP owns the policy decision. `authority_verified`
+    states OAAF's authority decision, not that the action is permitted.
+    """
+
+    authority_verified: bool
+    subject: str
+    subject_profile: str
+    holder: str
+    requested_tool: str
+    requested_argument_names: list[str]
+    granted_tools: list[str]
+    delegation_depth: int
+    chain_length: int
+    expires_at: int
+
+
+def to_authority_context(chain: VerifiedChain, tool: str, args: dict) -> AuthorityContext:
+    """Build the canonical authority context from a verified authority (RFC-0006)."""
+    summary = summarize_authority(chain, tool, args)
+    return AuthorityContext(
+        authority_verified=True,
+        subject=summary.subject,
+        subject_profile=summary.subject_profile,
+        holder=summary.holder,
+        requested_tool=summary.requested_tool,
+        requested_argument_names=summary.requested_argument_names,
+        granted_tools=summary.granted_tools,
+        delegation_depth=summary.delegation_depth,
+        chain_length=summary.chain_length,
+        expires_at=summary.expires_at,
+    )

@@ -267,6 +267,30 @@ if (!result.ok) {
 // subject/action/resource, with context.oaaf added.
 ```
 
+## Existing PDP interoperability
+
+OAAF can sit **in front of** an existing policy engine (AuthZEN, OPA, Cedar, OpenFGA)
+rather than replacing it ([RFC-0006](../../rfcs/0006-pdp-interoperability.md),
+[docs/pdp-interoperability.md](../../docs/pdp-interoperability.md)). OAAF makes the
+authority decision; the PDP makes the org policy decision on top.
+
+`toAuthorityContext` turns a verified authority into the canonical, PDP-neutral
+**authority context** (`{ authorityVerified: true, subject, grantedTools, ... }`) —
+names, never values — which AuthZEN carries as `context.oaaf` and OPA/Cedar read as
+attributes. `authorityVerified: true` is OAAF's Decision 1, not a policy permit; the PDP
+still decides. For a runnable end-to-end demo against a stub PDP, see
+[examples/pdp-coexistence](../../examples/pdp-coexistence/) (`npm run demo:pdp`).
+
+```ts
+import { verifyAuthority, toAuthorityContext } from '@oaaf/sdk';
+
+const verified = await verifyAuthority({ tokens, trustAnchors, pop, tool, args });
+if (verified.ok) {
+  const oaaf = toAuthorityContext(verified.authority);
+  // hand `oaaf` to your PDP as context; it owns the policy decision.
+}
+```
+
 ## What this does not do
 
 - **No revocation.** AAT does not mitigate it and neither does OAAF. Authority is

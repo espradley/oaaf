@@ -140,3 +140,22 @@ export function explainDecision(
     ...(authority === undefined ? {} : { authority: summarizeAuthority(authority) }),
   };
 }
+
+/**
+ * The canonical authority context (RFC-0006): the verified-authority facts an
+ * external PDP consults when making the organization's policy decision. It is
+ * the {@link AuthoritySummary} plus a marker that these facts come from an
+ * authority OAAF verified. Names, never values.
+ *
+ * OAAF conveys this to the PDP; the PDP owns the policy decision. The presence of
+ * `authorityVerified: true` states OAAF's authority decision, not that the action
+ * is permitted.
+ */
+export interface AuthorityContext extends AuthoritySummary {
+  readonly authorityVerified: true;
+}
+
+/** Build the canonical authority context from a verified authority (RFC-0006). */
+export function toAuthorityContext(authority: VerifiedAuthority): AuthorityContext {
+  return { authorityVerified: true, ...summarizeAuthority(authority) };
+}

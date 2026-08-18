@@ -54,10 +54,10 @@ boundary is technical and binds everyone, including Edwin Digital
 | O4D         | Signed portable decision receipts                    | 🧊 Parked / non-blocking |
 | O4.5        | OSS governance readiness                             | ✅ Complete              |
 | O5A         | Distribution + TypeScript package readiness          | ✅ Complete              |
-| O5B         | Independent Python implementation                    | ⏸️ Next technical slice  |
-| O5C         | Revocation interoperability                          | ⏸️ Planned               |
-| O5D         | Identity / workload interoperability                 | ⏸️ Planned               |
-| O5E         | Existing PDP / authorization interoperability        | ⏸️ Planned               |
+| O5B         | Independent Python implementation                    | ✅ Complete              |
+| O5C         | Revocation interoperability                          | ✅ Complete              |
+| O5D         | Identity / workload interoperability                 | ✅ Complete              |
+| O5E         | Existing PDP / authorization interoperability        | ✅ Complete              |
 | O5F         | Outsider adoption journey                            | ⏸️ Planned               |
 | O6A         | Normative conformance specification                  | ⏸️ Planned               |
 | O6B         | Conformance vectors                                  | ⏸️ Planned               |
@@ -189,33 +189,46 @@ contribution can force reserved execution-control IP into OAAF.
 Not published: the `@oaaf` npm namespace remains a pending ownership step. The artifact is
 certified publish-ready under that name.
 
-### O5B — Independent Python implementation ⏸️ Next technical slice
+### O5B — Independent Python implementation ✅
 
-**Goal:** prove OAAF's normative behavior is implementation- and language-independent by
-implementing the published contracts independently in Python — not by mechanically porting
-TypeScript internals.
+A second implementation (`oaaf`, in `python/`) built from OAAF's published contracts and
+standards basis, not by porting TypeScript internals:
 
-Focus: authority verification/evaluation behavior, reason-code compatibility,
-`DecisionExplanation` compatibility, independent-implementation discipline, and the path to
-cross-language conformance (O6C). The contract a Python implementation matches is the
-authority decision, the reason codes, and the explanation shape — independent of TypeScript
-ergonomics.
+- independent verify / evaluate / PoP / explanation, its own JCS and Ed25519 stack
+- reproduces the same ALLOW/DENY, reason codes, stage, locators, and `AuthoritySummary`
+  semantics, with the same **names, never values** privacy properties
+- certified by shared cross-language parity vectors carrying real signed material verified
+  independently by both implementations, on Python 3.11 and 3.12 in CI
 
-### O5C — Revocation interoperability ⏸️
+### O5C — Revocation interoperability ✅
 
-**Goal:** make revocation production-credible while staying standards-aligned — without
-OAAF becoming an authorization server or a hosted revocation service.
+Revocation is production-credible without OAAF operating a revocation service. OAAF
+**consumes** revocation truth via a transport-neutral `StatusResolver` contract
+([RFC-0004](rfcs/0004-authority-status-revocation.md), Token Status List basis): every chain
+member is checked, fail-closed on unknown. OAAF defines the contract; it does not host the
+status infrastructure. Certified in both implementations.
 
-### O5D — Identity / workload interoperability ⏸️
+### O5D — Identity / workload interoperability ✅
 
-**Goal:** clear bindings/adapters for existing identity and workload-identity systems, so
-an adopter brings established identity (e.g. SPIFFE/WIMSE, OIDC) rather than an OAAF
-identity provider.
+An adopter brings established identity (SPIFFE/WIMSE, OIDC) rather than an OAAF identity
+provider ([RFC-0005](rfcs/0005-external-subject-identity-binding.md)). The proof is that four
+concepts stay separate and bound, not merged: subject identity (`sub`) ≠ authentication
+credential (external SVID/OIDC) ≠ proof-of-possession key (`cnf.jwk`) ≠ authority (grant). A
+transport-neutral `IdentityBindingVerifier` optionally confirms the subject↔holder binding,
+fail-closed. No new credential invented; certified in both implementations.
 
-### O5E — Existing PDP / authorization interoperability ⏸️
+### O5E — Existing PDP / authorization interoperability ✅
 
-**Goal:** OAAF coexists cleanly with AuthZEN-compatible and existing enterprise
-authorization infrastructure, rather than replacing it.
+An organization keeps its existing PDP (AuthZEN, OPA, Cedar, OpenFGA) and uses OAAF **in
+front of it** ([RFC-0006](rfcs/0006-pdp-interoperability.md)). Two decisions, two owners:
+OAAF verifies delegated authority (Decision 1, fails closed) and conveys the **verified
+facts** as the canonical, PDP-neutral **authority context** (`toAuthorityContext` /
+`to_authority_context`, names-never-values); the existing PDP makes the organization's policy
+decision (Decision 2). AuthZEN is the canonical seam (`context.oaaf`, unified across the MCP
+binding and the AuthZEN mapping); OPA/Cedar are documented adapters and OpenFGA a documented
+weaker fit — none a runtime dependency. Hard boundary held: **the PDP owns policy; OAAF owns
+verified authority.** Demonstrated by [`examples/pdp-coexistence`](examples/pdp-coexistence/)
+(including a valid-authority / org-policy-deny case) and available in both implementations.
 
 ### O5F — Outsider adoption journey ⏸️
 

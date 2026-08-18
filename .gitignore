@@ -25,3 +25,4 @@ __pycache__/
 python/dist/
 python/build/
 .venv/
+python/.venv*/

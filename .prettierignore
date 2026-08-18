@@ -2,3 +2,5 @@ dist/
 coverage/
 package-lock.json
 python/tests/vectors/
+**/.venv/
+python/.venv*/

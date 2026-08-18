@@ -9,8 +9,11 @@ adopted standards are.
 from .decide import verify_and_evaluate
 from .explanation import (
     AuthoritySummary,
+    AuthorityContext,
     DecisionExplanation,
     ReasonExplanation,
+    summarize_authority,
+    to_authority_context,
 )
 from .reasons import REASON_CODES, Denial
 from .status import revoked_set_resolver, StatusResolver, TokenStatus
@@ -24,6 +27,9 @@ __all__ = [
     "DecisionExplanation",
     "ReasonExplanation",
     "AuthoritySummary",
+    "AuthorityContext",
+    "summarize_authority",
+    "to_authority_context",
     "REASON_CODES",
     "Denial",
     "revoked_set_resolver",

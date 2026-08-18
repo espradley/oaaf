@@ -45,6 +45,23 @@ else:
         print(r.code, r.stage, r.tool, r.argument)
 ```
 
+## Existing PDP interoperability
+
+OAAF can sit in front of an existing policy engine rather than replacing it
+([RFC-0006](../rfcs/0006-pdp-interoperability.md)). `to_authority_context` turns a
+verified authority into the canonical, PDP-neutral authority context — names, never values
+— which an AuthZEN/OPA/Cedar PDP consumes as context. `authority_verified=True` is OAAF's
+authority decision, not a policy permit; the PDP still decides.
+
+```python
+from oaaf import verify_chain, to_authority_context
+
+chain, denials = verify_chain(tokens, trust_anchors, now)
+if chain is not None:
+    oaaf = to_authority_context(chain, tool, args)
+    # hand `oaaf` to your PDP as context; it owns the policy decision.
+```
+
 ## Implementation-independence promise
 
 This implementation is built from OAAF's published contracts and standards basis, not by

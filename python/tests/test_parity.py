@@ -154,3 +154,29 @@ def test_privacy_no_values_or_key_material():
         for token in i["tokens"]:
             assert token not in blob
         assert i["pop"] not in blob
+
+
+def test_authority_context_derives_from_verified_chain():
+    """RFC-0006: the canonical authority context is the authority summary plus a
+    verified marker, so a PDP consumes the same facts OAAF already publishes."""
+    from oaaf import verify_chain, summarize_authority, to_authority_context
+
+    allow = next(v for v in VECTORS if v["name"] == "allow")
+    i = allow["input"]
+    chain, denials = verify_chain(i["tokens"], i["trustAnchors"], i.get("now") or 0)
+    assert chain is not None and denials == []
+
+    tool, args = i["tool"], i.get("args", {})
+    summary = summarize_authority(chain, tool, args)
+    context = to_authority_context(chain, tool, args)
+
+    # The marker is OAAF's authority decision — not a policy permit.
+    assert context.authority_verified is True
+    # Every summary fact is conveyed unchanged; OAAF adds facts, never policy.
+    assert context.subject == summary.subject
+    assert context.holder == summary.holder
+    assert context.requested_tool == summary.requested_tool
+    assert context.granted_tools == summary.granted_tools
+    assert context.delegation_depth == summary.delegation_depth
+    assert context.chain_length == summary.chain_length
+    assert context.expires_at == summary.expires_at
