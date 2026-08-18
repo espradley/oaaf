@@ -273,7 +273,8 @@ if (!result.ok) {
   bounded by `exp` alone.
 - **No replay protection.** AAT makes stateful `jti` tracking a deployment
   responsibility.
-- **No MCP or A2A binding yet.** Those are the next phase.
+- **No signed decision receipts.** Portable receipts (O4D) are parked pending evolving
+  standards work and adopter demand.
 
 ## License
 

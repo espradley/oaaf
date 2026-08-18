@@ -1,377 +1,348 @@
 # Roadmap
 
-> **OAAF is an open interoperability toolkit for carrying, enforcing, and testing
-> delegated authority across agent and tool protocols.**
+> **OAAF is a vendor-neutral, standards-first, transport-neutral authority
+> interoperability layer.** It makes portable, delegable, verifiable authority work across
+> agent and tool protocols by profiling existing standards rather than defining a
+> competing wire format ([ADR-0003](docs/adr/0003-implement-existing-authority-standards.md)).
 
-OAAF implements and profiles existing authority standards rather than defining a
-competing wire format. The reasoning is in
-[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
+This file is the canonical program record. When it disagrees with an older document, this
+file is right and the older one is history.
 
-```text
-              EXISTING STANDARDS
- Identity        Delegation        Decisions        Evidence
-SPIFFE/etc.         AAT             AuthZEN          receipts
-    │                │                 │                │
-    └────────────────┴─────────────────┴────────────────┘
-                             │
-                             ▼
-                         OAAF
-                ┌─────────────────────┐
-                │ bindings            │
-                │ enforcement         │
-                │ adapters            │
-                │ explainability      │
-                │ conformance         │
-                └──────────┬──────────┘
-                           │
-                 ┌─────────┴─────────┐
-                 ▼                   ▼
-                MCP                 A2A
-                 │                   │
-                 ▼                   ▼
-               Tool                Agent
-```
+## What OAAF is
 
-Programs, not dates. This is a small project; committing to a calendar it cannot keep
-would be its own kind of dishonesty.
+- portable subject identity binding
+- scoped, narrowable authority
+- delegation lineage and provenance
+- resource and argument constraints
+- expiry
+- verification and evaluation
+- basic revocation interoperability (planned, O5C)
+- enforcement bindings (MCP, A2A)
+- explainability
+- conformance (planned, O6)
 
-Each program has an explicit exit condition — a program is not finished because time
-passed — and an **ecosystem evidence** section. That second part is deliberate. A
-toolkit nobody installs is not an open-source project, and each phase should leave
-behind something an outsider can point at: a package they installed, an integration
-they shipped, an issue they filed.
+## What OAAF is not
 
-## Phases
+Not an identity provider, authorization server, policy engine, credential vault, agent
+framework, orchestrator, workflow engine, or execution platform. Those are products built
+_on_ OAAF — including DigitalStack360. See [CHARTER.md](CHARTER.md).
 
-| Phase   | Goal                                                                  | Status             |
-| ------- | --------------------------------------------------------------------- | ------------------ |
-| O1      | OSS foundation + DigitalStack boundary                                | ✅ Closed          |
-| O1.5    | Standards and competitive review                                      | ✅ Closed          |
-| O1.6    | Standards-first repositioning + public framing                        | ✅ Closed          |
-| O2      | AAT verification + AuthZEN enforcement profile                        | ✅ Closed          |
-| O2.5    | Finding retracted; conformance closed; fail-closed principle recorded | ✅ Closed          |
-| O3A     | MCP / COAZ binding                                                    | ✅ Closed          |
-| O3B     | A2A binding                                                           | ⬅ Next             |
-| O3C     | Agent delegation demo                                                 | Planned            |
-| O4      | Evidence, explainability, developer tooling (O4A–C ✅; O4D parked)    | ✅ Active complete |
-| O4.5    | Open-source contribution + repository governance readiness            | Planned — gates O5 |
-| O5      | Public launch: stars, users, contributors, integrations               | Blocked by O4.5    |
-| O6      | Conformance suite + upstream standards participation                  | Planned            |
-| DS-OAAF | DigitalStack consumption + proprietary execution layer                | Separate           |
+## Reserved boundary
 
-## O1 — Foundation and boundary ✅
+OAAF does not become the home for DigitalStack's proprietary execution-control semantics —
+logical execution continuity, recovery/supersession, worker/workforce orchestration,
+scheduling, readiness, execution lifecycle automation, or launch/relaunch semantics. This
+boundary is technical and binds everyone, including Edwin Digital
+([ADR-0002](docs/adr/0002-reserved-execution-continuity-semantics.md),
+[GOVERNANCE.md](GOVERNANCE.md)).
 
-Establish the repository, architecture vocabulary, contribution model, and the hard
-product boundary before building anything, so that later work has something to drift
-against.
+---
 
-- Standalone open-source repository; neutral vocabulary; fast CI
-- [Charter](CHARTER.md): scope rule, litmus test, in/out of scope, reserved concepts
-- Dependency boundary, mechanically enforced in CI
-- Governance, security policy, contribution model, Apache 2.0, [RFC framework](rfcs/README.md)
-- [ADR-0001](docs/adr/0001-oaaf-digitalstack360-separation.md) — DigitalStack360 separation
-- [ADR-0002](docs/adr/0002-reserved-execution-continuity-semantics.md) — reserved execution-continuity semantics
+## Status at a glance
 
-**Ecosystem evidence created:** a repository an external developer can clone and
-validate with no vendor knowledge and no account — the precondition for every phase
-that follows.
+| Phase       | Goal                                                 | Status                   |
+| ----------- | ---------------------------------------------------- | ------------------------ |
+| O1–O1.6     | Foundation + standards-first repositioning           | ✅ Complete              |
+| O2          | AAT verification + AuthZEN enforcement core          | ✅ Complete              |
+| O3A         | MCP / COAZ binding                                   | ✅ Complete              |
+| O3B         | A2A binding                                          | ✅ Complete              |
+| O3C         | Cross-transport authority proof                      | ✅ Complete              |
+| O4 (audit)  | Explainability / evidence / tooling assessment       | ✅ Complete              |
+| O4A         | Structured, privacy-safe explanations                | ✅ Complete              |
+| O4B         | Cross-transport explanation equivalence              | ✅ Complete              |
+| O4C         | Local authority inspector                            | ✅ Complete              |
+| O4D         | Signed portable decision receipts                    | 🧊 Parked / non-blocking |
+| O4.5        | OSS governance readiness                             | ✅ Complete              |
+| O5A         | Distribution + TypeScript package readiness          | ✅ Complete              |
+| O5B         | Independent Python implementation                    | ⏸️ Next technical slice  |
+| O5C         | Revocation interoperability                          | ⏸️ Planned               |
+| O5D         | Identity / workload interoperability                 | ⏸️ Planned               |
+| O5E         | Existing PDP / authorization interoperability        | ⏸️ Planned               |
+| O5F         | Outsider adoption journey                            | ⏸️ Planned               |
+| O6A         | Normative conformance specification                  | ⏸️ Planned               |
+| O6B         | Conformance vectors                                  | ⏸️ Planned               |
+| O6C         | Cross-language conformance                           | ⏸️ Planned               |
+| O6D         | Binding / protocol conformance                       | ⏸️ Planned               |
+| O6E         | Security conformance                                 | ⏸️ Planned               |
+| O6F         | Upstream standards participation                     | ⏸️ Planned               |
+| O6G         | Competitive collision audit                          | ⏸️ Planned               |
+| O6H         | v1 compatibility / readiness contract                | ⏸️ Planned               |
+| **O6 exit** | **OAAF v1 technical foundation / freeze**            | 🎯                       |
+| O7A         | Integration target research                          | ⏸️ After O6 freeze       |
+| O7B         | OAAF-maintained reference bridges                    | ⏸️ After O6 freeze       |
+| O7C         | Maintainer validation                                | ⏸️ After O6 freeze       |
+| O7D         | Upstream integration PRs                             | ⏸️ After O6 freeze       |
+| O7E         | First external integrations                          | ⏸️ After O6 freeze       |
+| **O7 exit** | **OAAF demonstrated inside external OSS ecosystems** | 🎯                       |
 
-## O1.5 — Standards and competitive review ✅
+**Parallel tracks** (not part of the technical O-series): **A** — adoption/external
+validation; **F** — funding readiness; **DS-OAAF** — DigitalStack commercial integration.
+See [Parallel tracks](#parallel-tracks).
 
-Before writing a schema, establish whether a vendor-neutral mechanism already existed
-for attaching narrowable authority, provenance, constraints, and evidence to an
-agent-to-agent or agent-to-tool request.
+---
 
-It largely did. Classifying each candidate concept against existing work found nearly
-every primitive available to adopt or profile, and none requiring invention — while
-finding no running code connecting the pieces and no conformance suite.
+## O1–O1.6 — Foundation and standards-first repositioning ✅
 
-**Ecosystem evidence created:** none directly, and that was the point. The phase existed
-to avoid producing a redundant specification, which is the cheapest thing this project
-could have got wrong.
+Established OAAF as a standalone, vendor-neutral open-source project with a hard boundary
+against DigitalStack: the [charter](CHARTER.md) scope rule and litmus test, a
+dependency-boundary guard enforced in CI, neutral vocabulary, governance, and the
+[RFC](rfcs/README.md) and [ADR](docs/adr/README.md) processes. A standards review
+([ADR-0003](docs/adr/0003-implement-existing-authority-standards.md)) then repositioned
+OAAF from "define an authority protocol" to "implement and profile existing standards" —
+the decision the rest of the program is built on.
 
-## O1.6 — Standards implementation strategy ✅
+## O2 — AAT verification + AuthZEN enforcement core ✅
 
-Record the repositioning and realign the project around it.
-
-- [ADR-0003](docs/adr/0003-implement-existing-authority-standards.md) — implement and
-  profile existing standards rather than define a competing wire format
-- This roadmap
-- Realign public framing and `spec/0.1` from original protocol to profile
-
-_Exit condition:_ the repository describes what OAAF actually intends to build, with no
-document still claiming an original protocol.
-
-**Ecosystem evidence created:** credibility. A project whose stated purpose matches its
-artifacts is one an outside reviewer can evaluate honestly.
-
-## O2 — Working enforcement point ✅
-
-Verify a delegated authority chain, decide, and explain — using existing standards, with
-no new wire format.
-
-- AAT `-01` chain verification: signatures, temporal validity, delegation depth, parent
-  binding, capability narrowing, and the full constraint subsumption matrix
-- Proof-of-possession verification with RFC 8785 canonical argument binding
-- AuthZEN 1.0 request mapping and decision, frozen by
-  [RFC-0001](rfcs/0001-aat-authzen-enforcement-profile.md)
-- A reason code on every denial, and a human-readable explanation
-- Runnable quickstart: `npm run demo`
-
-A follow-up conformance review against the draft's full normative text corrected
-several gaps in the first implementation, including verifying the root against a
-configured trust anchor rather than against itself.
-
-**Ecosystem evidence created:** a package that does something real, and a quickstart
-that runs with no account or service.
+The authority kernel. Verifies a delegated authority chain as
+[Attenuating Authorization Tokens](https://datatracker.ietf.org/doc/draft-niyikiza-oauth-attenuating-agent-tokens/)
+(`-01`, pinned) — signatures, temporal validity, delegation depth, parent binding,
+capability and constraint narrowing, closed-world arguments, and proof of possession — and
+maps the result to an [AuthZEN 1.0](https://openid.net/specs/authorization-api-1_0.html)
+decision ([RFC-0001](rfcs/0001-aat-authzen-enforcement-profile.md)). Fails closed;
+trust anchors required ([ADR-0004](docs/adr/0004-fail-closed-configuration.md)).
 
 ## O3A — MCP / COAZ binding ✅
 
-**Goal: prove OAAF authority can be enforced at an MCP tool boundary using the current
-COAZ/AuthZEN model, without inventing an OAAF-specific authorization path where an
-upstream standard already exists.**
+OAAF authority enforced at an MCP tool boundary as a precondition before the COAZ/AuthZEN
+decision ([RFC-0002](rfcs/0002-mcp-coaz-binding.md)). The finding that shaped it: COAZ's
+information model is closed to `params` and `token`, so OAAF cannot be a COAZ input — it is
+a precondition the enforcement point applies before the PDP is called.
 
-Pinned: COAZ-MCP binding Draft 1 (2026-02-13), AuthZEN Authorization API 1.0 (Final),
-MCP 2026-07-28.
+## O3B — A2A binding ✅
 
-The central finding was architectural, not editorial: COAZ's information model is
-closed to two input variables, `params` and `token`, and an AAT chain is neither. OAAF
-cannot be a COAZ input — it is a precondition the enforcement point applies before a
-COAZ request is ever built, denying immediately and unconditionally on failure rather
-than surfacing a failed verification as a fact for policy to notice. Read against the
-obligations profile's raw normative text before deciding: obligations are strictly
-response-side (PDP→PEP) compliance instructions and do not model inbound evidence, so
-they were not used.
+OAAF authority carried through A2A's extension mechanism and enforced before consequential
+work ([RFC-0003](rfcs/0003-a2a-binding.md)). A2A 1.0.1 explicitly leaves authorization
+scope to an extension (§7.6.4); OAAF supplies it, reusing the O2 core verbatim rather than
+forking the authority model. Publishable [extension definition](docs/a2a-extension/oaaf-authority-v1.md).
 
-- [RFC-0002](rfcs/0002-mcp-coaz-binding.md) freezes the integration: COAZ's default
-  `tools/call` mapping is reused unmodified; OAAF contributes an additional MUST step in
-  COAZ-MCP's own PEP algorithm, plus an optional `context.oaaf` fact for policy.
-- RFC-0001 stays transport-neutral and unmodified; RFC-0002 does not reuse its
-  agent-as-subject mapping, because COAZ anchors `subject.id` to the validated
-  principal and places the agent in `context.agent`.
-- Seven cases proved end to end: valid mapped authority allows; missing capability
-  denies; argument mismatch denies; expired authority denies; untrusted root denies;
-  private-key `cnf.jwk` denies; a request whose COAZ-facing fields are entirely
-  well-formed still denies without valid OAAF authority.
+## O3C — Cross-transport authority proof ✅
 
-**Ecosystem evidence created:** a working integration with a standard actively being
-developed by the OpenID Foundation, and a documented architectural finding — that
-authority verification and request-mapping standards can compose without either
-redefining the other — that is itself useful to anyone else attempting the same
-composition.
+One authority chain and one proof of possession, enforced identically through both the MCP
+and A2A adapters, certified in CI. The authority is not owned by the transport. Runnable:
+`npm run demo:cross`.
 
-## O3B — A2A binding
+## O4 — Explainability, evidence, developer tooling
 
-**Goal: an A2A agent author can place scoped, delegated authority around a delegated
-task with only a few lines of integration code.**
+### O4 audit ✅
 
-- A2A binding published as a URI-identified A2A extension
-- Applies the same structural rule as O3A: A2A owns its own message semantics; OAAF
-  contributes authority verification and proof
+Established that the core already knew why each decision happened, but the adapters
+discarded the locator fields and `explain()` exposed argument values. Scoped the work into
+O4A–D. Full audit: [docs/O4-audit.md](docs/O4-audit.md).
 
-This is the second half of the seam the standards review identified — specifications
-that are individually sound, with nothing yet connecting them across the A2A transport.
+### O4A — Structured, privacy-safe explanations ✅
 
-_Exit condition:_ an independent developer protects an A2A task, exercises an allowed
-and a denied call, and understands the denial without reading the underlying
-specifications.
+One shared `DecisionExplanation` contract derived from the existing pipeline: reasons with
+their full locators (names, never values), a minimal authority summary, and both adapters
+carrying the same information. No authorization behavior changed.
 
-**Ecosystem evidence created:** a distribution path through the A2A ecosystem; a
-concrete external integration opportunity; a third-party use case specific enough to
-appear in someone else's release notes.
+### O4B — Cross-transport explanation equivalence ✅
 
-## O3C — Cross-transport delegation demo ✅
+Extended the O3C proof to the explanation: the same authority material yields an equivalent
+`DecisionExplanation` through both adapters, certified in CI
+([docs/explanation-equivalence.md](docs/explanation-equivalence.md)). The step 0 audit also
+removed a second, accidental explanation vocabulary before it became public.
 
-**Goal: one runnable proof that the same delegated authority chain is enforced identically
-through both the MCP and A2A adapters — that authority is not owned by the transport.**
+### O4C — Local authority inspector ✅
 
-Reduced to a proof-and-communication scope after O3B, since the per-transport delegation
-demos already existed. The `examples/cross-transport` demo mints one chain (Alice → Bob,
-narrowed to `repo.read`) and one proof of possession, feeds the identical material through
-`enforceOaafPrecondition` (MCP) and `enforceA2aAuthority` (A2A), and shows equal allow/deny
-outcomes down to the reason code. A CI test asserts the equivalence so a future change that
-made the transports diverge fails the build. No new core semantics; reserved-IP gate clean.
+A small, local, offline way for an outsider to inspect a decision and understand it,
+consuming the canonical pipeline rather than implementing authorization:
+`npm run inspect -- --example allow`. Privacy-safe by default; exit codes distinguish
+ALLOW / DENY / tool error. See [examples/inspector](examples/inspector/).
 
-_Exit condition:_ met — `npm run demo:cross` runs from a clean clone, both transports decide
-identically, and the README carries the shareable diagram.
+### O4D — Signed portable decision receipts 🧊 Parked / non-blocking
 
-**Ecosystem evidence created:** the first artifact that demonstrates OAAF's core claim —
-portable authority — actually crossing a transport boundary, not just being verified
-within one.
+**Parked, and explicitly not required for O4/O5/O6 progression.** The relevant
+signed-receipt standards work
+([draft-farley-acta-signed-receipts](https://datatracker.ietf.org/doc/draft-farley-acta-signed-receipts/))
+is still evolving, and there is no external evidence yet that a receipt format is needed.
+O4D may be revived by standards stabilization, adopter demand, or conformance/upstream
+evidence — not by speculative engineering. When built, it would profile an existing
+receipt standard, not invent an OAAF-specific format.
 
-## O4 — Explainability and evidence verification
+## O4.5 — OSS governance readiness ✅
 
-Only high-value developer experience. The test for inclusion is whether its absence
-costs a real user real time.
+Made OAAF credible for another project to depend on: an honest founder-led governance
+model, a working private security-reporting channel, a
+[versioning and compatibility policy](docs/versioning-and-compatibility.md), an
+[extension policy](docs/extensions.md), issue/PR templates, CODEOWNERS, and verified
+GitHub settings (private vulnerability reporting, branch protection, Dependabot). Vendor
+neutrality is explicit: an outside maintainer can contribute on equal footing, and no
+contribution can force reserved execution-control IP into OAAF.
 
-- Verify signed decision receipts, including offline
-- Explain a denial in terms of the authority actually presented
-- `oaaf evaluate`, `oaaf explain`, `oaaf inspect`
+---
 
-`oaaf doctor` is added only if users demonstrate a need.
+## O5 — Ecosystem and implementation readiness
 
-```text
-DENIED
+### O5A — Distribution and TypeScript package readiness ✅
 
-Subject
-  agent:developer
+`@oaaf/sdk` is genuinely consumable as an external package:
 
-Requested
-  github.merge_pull_request
+- publish-ready `@oaaf/sdk` with intentional public subpath exports (`.`, `/mcp`, `/a2a`,
+  `/authzen`, `/testing`)
+- Node 20 **and** 22 certified in CI
+- ESM-only, documented and justified
+- a downstream packed-artifact certification: pack → install into a throwaway project →
+  compile against the shipped declarations → run ALLOW/DENY/explanation and both bindings,
+  all via public paths
+- clean LICENSE / NOTICE / package contents; no test material or secrets shipped
 
-Authority
-  github.read
-  github.write
-  github.create_pull_request
+Not published: the `@oaaf` npm namespace remains a pending ownership step. The artifact is
+certified publish-ready under that name.
 
-Reason
-  capability_not_granted
-```
+### O5B — Independent Python implementation ⏸️ Next technical slice
 
-_Exit condition:_ a developer debugging an unexpected denial resolves it from tool
-output alone.
+**Goal:** prove OAAF's normative behavior is implementation- and language-independent by
+implementing the published contracts independently in Python — not by mechanically porting
+TypeScript internals.
 
-**Ecosystem evidence created:** lower adoption friction, and materially easier support
-and retention — most projects lose users at the first confusing failure, not at install.
+Focus: authority verification/evaluation behavior, reason-code compatibility,
+`DecisionExplanation` compatibility, independent-implementation discipline, and the path to
+cross-language conformance (O6C). The contract a Python implementation matches is the
+authority decision, the reason codes, and the explanation shape — independent of TypeScript
+ergonomics.
 
-## O4.5 — Open-source contribution and repository governance readiness
+### O5C — Revocation interoperability ⏸️
 
-**Hard gate. O5 does not begin until this phase is certified complete.** Reasoning in
-[ADR-0005](docs/adr/0005-governance-readiness-gate.md).
+**Goal:** make revocation production-credible while staying standards-aligned — without
+OAAF becoming an authorization server or a hosted revocation service.
 
-Verifies the mechanisms for receiving external contributors and reports actually work,
-rather than launching and discovering gaps live:
+### O5D — Identity / workload interoperability ⏸️
 
-- Security reporting channel confirmed working (tracked in the
-  [pre-launch checklist](docs/pre-launch-checklist.md))
-- RFC process exercised by, or credibly open to, a non-founder author
-- DCO sign-off, branch protections, and required CI checks verified against a real pull
-  request
-- Repository namespace and `@oaaf` npm scope decisions resolved
-- CODE_OF_CONDUCT.md's enforcement contact confirmed reachable
-- GOVERNANCE.md re-read against what O1 through O4 actually did, corrected if practice
-  has drifted from description
+**Goal:** clear bindings/adapters for existing identity and workload-identity systems, so
+an adopter brings established identity (e.g. SPIFFE/WIMSE, OIDC) rather than an OAAF
+identity provider.
 
-This gates process readiness, not protocol maturity — it does not require the
-conformance suite (O6) or a stable spec version.
+### O5E — Existing PDP / authorization interoperability ⏸️
 
-_Exit condition:_ every item above is verified, not merely documented, with an explicit
-note wherever a genuine external example was not yet available.
+**Goal:** OAAF coexists cleanly with AuthZEN-compatible and existing enterprise
+authorization infrastructure, rather than replacing it.
 
-**Ecosystem evidence created:** none directly — this phase spends effort to make sure
-the evidence O5 collects afterward is collected by processes already known to work.
+### O5F — Outsider adoption journey ⏸️
 
-## O5 — Public launch and ecosystem
+**Goal:** make the complete outsider path coherent — discovery → install → first
+verification → constrained authority → delegation → explanation/debugging → integration
+guidance. This is product and documentation readiness, distinct from A-series adoption
+metrics.
 
-A first-class program, not an afterthought. Implementation work that nobody adopts
-produces no ecosystem, and ecosystem evidence does not appear on its own.
+## O6 — Conformance, standards, and v1 readiness
 
-Tracked signals: GitHub stars · independent users · external issues and discussions ·
-external contributors · MCP integrations · agent-framework integrations · organizations
-evaluating OAAF · design collaborators · future collaboration-letter candidates
+### O6A — Normative conformance specification ⏸️
 
-```text
-GitHub visitor
-      ↓
-     Star
-      ↓
-   Try OAAF
-      ↓
- Actual usage
-      ↓
- Issue / feedback
-      ↓
- Integration
-      ↓
- Contribution
-      ↓
- Design collaboration
-```
+Define which behaviors an independent implementation MUST satisfy.
 
-Each stage converts far worse than the one before, which is why O2 through O4 come
-first: launching before the install-to-decision path is short wastes the only first
-impression available.
+### O6B — Conformance vectors ⏸️
 
-Operational prerequisites are tracked in the
-[pre-launch checklist](docs/pre-launch-checklist.md).
+Versioned, implementation-independent fixtures: positive, negative, and adversarial. Exact
+vector contents are not frozen here.
 
-_Exit condition:_ independent users exist who were not prompted by us, and at least one
-external integration we did not write.
+### O6C — Cross-language conformance ⏸️
 
-**Ecosystem evidence created:** stars, users, contributors, integrations, and
-collaboration relationships — the accumulated public record of a project other people
-actually use.
+Certify the TypeScript and Python implementations against the same normative vectors and
+expected outcomes.
 
-## O6 — Conformance and upstream participation
+### O6D — Binding / protocol conformance ⏸️
 
-The payoff phase for a standards-first project.
+Certify MCP/COAZ and A2A authority behavior, including the transport-neutral invariants.
 
-```bash
-npx oaaf conform ./my-agent
-```
+### O6E — Security conformance ⏸️
 
-```text
-OAAF Interop
-AAT delegation                  PASS
-Authority narrowing             PASS
-AuthZEN decision mapping        PASS
-MCP binding                     PASS
-A2A authority extension         PASS
-Evidence receipt verification   PASS
-6/6 compatible
-```
+Security-critical and adversarial cases — chain truncation, reordering, authority widening,
+malformed signatures, holder/recipient mismatch, PoP failures, expired/revoked authority,
+constraint boundaries, malformed input, unsupported required extensions, and privacy-safe
+explanation behavior. Kept high-level here; exact cases are not pre-frozen.
 
-- Conformance suite runnable against any implementation
-- Adversarial suite as a first-class artifact: narrowing violations, replay, forged
-  lineage, malformed input
-- Interoperability testing contributed upstream to the groups defining the underlying
-  standards, several of which actively solicit exactly this
-- Published threat model
-- A neutral `STANDARDS.md` describing what OAAF implements and why
+### O6F — Upstream standards participation ⏸️
 
-Participation here is contribution, not competition. Helping a standard succeed is a
-better position than asking anyone to choose between standards.
+Determine which findings and conventions to propose upstream, and which stay OAAF-specific
+implementation behavior.
 
-_Exit condition:_ a third party runs the conformance suite against their own
-implementation and gets a meaningful pass or fail — and at least one finding is
-contributed back upstream.
+### O6G — Competitive collision audit ⏸️
 
-**Ecosystem evidence created:** relationships with organizations participating in the
-relevant standards work; interoperability events; credibility with standards-literate
-reviewers, who are the quickest to dismiss a project that reinvents solved problems.
+A fresh, repo-level evaluation of the **then-current** closest projects and standards
+before v1 — deliberately not a hard-coded competitor list, because the landscape moves.
+It must answer objectively: what they do that OAAF does not; what OAAF does that they do
+not; where OAAF is complementary vs competitive; whether any OAAF behavior has been
+superseded by better upstream work; and whether OAAF still has a technically defensible
+reason to exist.
 
-## DS-OAAF — DigitalStack integration
+### O6H — v1 compatibility / readiness contract ⏸️
 
-A separate future track. **Not started, and not to be started yet.**
+Decide whether the technical foundation is ready to become OAAF v1 and freeze the
+compatibility guarantees adopters may rely on.
 
-DigitalStack360 may consume OAAF primitives. It retains, as proprietary: context, work
-intake, prioritization, scheduling, capacity, readiness, workforce orchestration,
-continuation and retry intelligence, recovery, execution-control state machines,
-commercial governance, analytics, cost, and managed execution.
+### O6 exit — OAAF v1 technical foundation / freeze 🎯
 
-The dependency direction is fixed and enforced in CI: DigitalStack360 may depend on
-OAAF; OAAF must never depend on DigitalStack360. See
-[ADR-0001](docs/adr/0001-oaaf-digitalstack360-separation.md).
+Normative behavior documented, independent implementations possible, conformance exists,
+standards positioning reassessed, compatibility promises explicit. This does **not** mean
+development stops. New core semantics after the freeze must be justified by external
+adoption evidence, interoperability defects, security findings, upstream standards changes,
+or conformance findings — not speculative engineering momentum.
 
-## Explicitly not on the roadmap
+## O7 — Ecosystem bridges
 
-Not "later" — out of scope by [charter](CHARTER.md), and belonging to products built on
-OAAF:
+Begins only **after** the O6 technical freeze. O7 proves ecosystem fit, not new authority
+semantics.
 
-workforce scheduling · queueing · prioritization · capacity management · project or
-organizational context · memory and RAG · task decomposition · agent planning ·
-workflow orchestration · provider and model routing · commercial approval workflows ·
-enterprise governance UI · cost management · billing · operational dashboards ·
-customer analytics · managed execution infrastructure
+### O7A — Integration target research ⏸️
 
-Separately, a set of execution-continuity concepts is
-[reserved pending IP review](CHARTER.md#reserved-concepts). Reserved is not the same as
-out of scope, but the practical effect today is the same: OAAF does not define them.
+Research and rank external OSS projects by architectural fit, ecosystem/adoption value,
+integration difficulty, maintainer receptiveness, and competitive overlap.
 
-Also not on the roadmap: an original authority wire format. See
-[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
+### O7B — OAAF-maintained reference bridges ⏸️
 
-## How this changes
+Build working integrations on the OAAF side first, using each external project's real
+public API where practical. The bridge adapts to the ecosystem; OAAF core does not mutate
+merely to accommodate each target.
 
-Roadmap changes do not require an RFC. Decisions about what OAAF implements, profiles,
-extends, or invents do.
+### O7C — Maintainer validation ⏸️
+
+Take working bridges to maintainers for technical review and validation.
+
+### O7D — Upstream integration PRs ⏸️
+
+Where a maintainer wants upstream support, contribute the smallest native-looking optional
+integration appropriate to their project.
+
+### O7E — First external integrations ⏸️
+
+Exit is evidence-based, not code-count-based. Current target, refinable as ecosystem
+conditions become clear:
+
+- ~5 working external reference bridges
+- 3 substantive maintainer conversations
+- 2 maintainers validating an integration approach
+- at least 1 upstream PR merged **or** 1 external project independently OAAF-conformant
+
+### O7 exit — OAAF demonstrated inside external OSS ecosystems 🎯
+
+---
+
+## Parallel tracks
+
+These run alongside the technical O-series and are not part of it.
+
+### Adoption — A-series
+
+External validation and adoption. Current objective (**A0.3**):
+
+- 10 substantive external technical conversations
+- 3 external people actually run OAAF
+- 1 external project seriously evaluates an integration
+
+Stars and impressions do not satisfy these criteria. A-series may proceed in parallel with
+technical work.
+
+### Funding — F-series
+
+Funding readiness. Kept separate from technical implementation; no funding-specific
+functionality belongs in OAAF core.
+
+### DS-OAAF — DigitalStack commercial integration
+
+A separate commercial track. DigitalStack360 may consume OAAF; OAAF never depends on it,
+and the reserved execution-control boundary above applies.
+
+## How this file changes
+
+Roadmap changes do not require an RFC. The protocol/normative decisions inside each phase
+do — see [rfcs/README.md](rfcs/README.md).

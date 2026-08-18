@@ -224,16 +224,16 @@ adopts or profiles it; the reasoning is in
 
 Honest accounting of where this stands:
 
-|                    |                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------- |
-| Standards profile  | AAT `-01` and AuthZEN 1.0, pinned. Mapping frozen by RFC-0001.                  |
-| TypeScript SDK     | Chain verification, proof of possession, decision, explanation. Not yet on npm. |
-| MCP / COAZ binding | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path.   |
-| A2A binding        | Shipped (O3B): OAAF authority as an A2A extension, verified before work.        |
-| Conformance suite  | Not started.                                                                    |
-| Security review    | None. No formal audit, no certification, no threat model published yet.         |
-| External adopters  | None yet.                                                                       |
-| Governance         | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                                |
+|                    |                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------- |
+| Standards profile  | AAT `-01` and AuthZEN 1.0, pinned. Mapping frozen by RFC-0001.                    |
+| TypeScript SDK     | Verify, decide, explain, MCP + A2A bindings. Publish-ready (O5A); not yet on npm. |
+| MCP / COAZ binding | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path.     |
+| A2A binding        | Shipped (O3B): OAAF authority as an A2A extension, verified before work.          |
+| Conformance suite  | Not started.                                                                      |
+| Security review    | None. No formal audit, no certification, no threat model published yet.           |
+| External adopters  | None yet.                                                                         |
+| Governance         | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                                  |
 
 If you are evaluating OAAF for production use: it is too early. If you are interested
 in shaping how these standards fit together before that calcifies, this is the useful
