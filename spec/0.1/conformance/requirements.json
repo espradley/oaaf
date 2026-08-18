@@ -1,0 +1,593 @@
+{
+  "specVersion": "0.1",
+  "status": "draft-pre-v1",
+  "note": "Canonical, machine-checkable requirement catalog for OAAF conformance. This file is the traceability spine (O6A). It is NOT the v1 conformance suite; O6H owns the v1 freeze. Statements are observable behaviors, not implementation algorithms. `keyword` uses BCP 14 (RFC 2119/8174). `source` cites the standard/RFC/ADR a requirement derives from \u2014 never a reference-implementation file.",
+  "classes": ["Core", "Status", "Identity", "MCP", "A2A", "PDP"],
+  "classPrefixes": {
+    "Core": "CORE",
+    "Status": "STATUS",
+    "Identity": "IDENT",
+    "MCP": "MCP",
+    "A2A": "A2A",
+    "PDP": "PDP"
+  },
+  "mandatoryClass": "Core",
+  "requirements": [
+    {
+      "id": "CORE-TRUST-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001", "ADR-0004"],
+      "statement": "Verification MUST require an explicit trust-anchor set. Its absence is a configuration error, never a permissive default, and there MUST NOT be a mode that returns an authorization decision without one."
+    },
+    {
+      "id": "CORE-TRUST-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "The root token MUST be verified against a configured trust anchor, not against its own cnf.jwk. A self-signed root that matches no anchor MUST be rejected."
+    },
+    {
+      "id": "CORE-CRYPTO-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "Every token's signature MUST be cryptographically verified before any authority it asserts is used; an invalid signature on any chain member MUST deny."
+    },
+    {
+      "id": "CORE-CRYPTO-002",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "An unsecured token (alg \"none\") MUST NOT be accepted, and a token MUST be verified only under a signature algorithm the pinned AAT profile permits; algorithm substitution MUST be rejected."
+    },
+    {
+      "id": "CORE-CRYPTO-003",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-7638", "RFC-0001"],
+      "statement": "A derived token's iss MUST equal the JWK Thumbprint URI of its parent's verified cnf.jwk; a mismatch MUST deny."
+    },
+    {
+      "id": "CORE-CRYPTO-004",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "A cnf.jwk MUST NOT contain private key material; a confirmation key carrying a private component MUST be rejected."
+    },
+    {
+      "id": "CORE-CRYPTO-005",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-8785", "AAT-01"],
+      "statement": "The proof-of-possession argument binding MUST be computed over the RFC 8785 (JCS) canonicalization of the argument map, so independent implementations bind identical bytes."
+    },
+    {
+      "id": "CORE-CHAIN-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "The chain MUST be verified in root-to-leaf order with each member linked to its parent; a reordered or relinked chain MUST deny."
+    },
+    {
+      "id": "CORE-CHAIN-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "An empty chain MUST deny."
+    },
+    {
+      "id": "CORE-CHAIN-003",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A derived token's par_hash MUST match its parent, and a root token MUST NOT carry par_hash; either violation MUST deny."
+    },
+    {
+      "id": "CORE-DELEG-001",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "A derived token MUST NOT raise del_max_depth above its parent's value; the ceiling is monotonic down the chain."
+    },
+    {
+      "id": "CORE-DELEG-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A token whose delegation depth exceeds the effective ceiling MUST deny."
+    },
+    {
+      "id": "CORE-NARROW-001",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "A verifier MUST reject a delegation that grants authority (a tool) absent from its parent. Authority may only narrow across a delegation, never widen."
+    },
+    {
+      "id": "CORE-NARROW-002",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A derived constraint on a tool MUST NOT expand the parent's constraint; a derived clause MUST admit only a subset of the parent's permitted invocations."
+    },
+    {
+      "id": "CORE-NARROW-003",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "For a constrained tool under a closed-world key set, a derived token MUST name exactly the same argument keys as its parent; adding or dropping a key MUST deny."
+    },
+    {
+      "id": "CORE-NARROW-004",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "An unrecognized constraint type, or a subsumption pair the profile does not permit, MUST deny (fail closed) rather than be treated as satisfied."
+    },
+    {
+      "id": "CORE-CONSTR-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "A constrained argument is required: a request that omits an argument the leaf authority constrains MUST deny."
+    },
+    {
+      "id": "CORE-CONSTR-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A request whose argument value violates the leaf authority's constraint on that argument MUST deny."
+    },
+    {
+      "id": "CORE-CONSTR-003",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A requested tool not permitted by the verified leaf authority MUST deny."
+    },
+    {
+      "id": "CORE-CONSTR-004",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A request carrying an argument the leaf authority does not permit for the tool MUST deny."
+    },
+    {
+      "id": "CORE-TIME-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A token that is expired at the evaluation instant MUST deny; expiry applies to every member of the chain."
+    },
+    {
+      "id": "CORE-TIME-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A token that is not yet valid at the evaluation instant MUST deny."
+    },
+    {
+      "id": "CORE-TIME-003",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01"],
+      "statement": "A derived token's validity window MUST NOT exceed its parent's; a later expiry or an earlier issuance than the parent MUST deny."
+    },
+    {
+      "id": "CORE-POP-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "Enforcement MUST verify proof of possession, binding the presentation to the verified leaf holder's key and to the exact requested argument map."
+    },
+    {
+      "id": "CORE-POP-002",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "There MUST NOT be an option that disables proof-of-possession verification while still presenting the result as an authorization decision."
+    },
+    {
+      "id": "CORE-POP-003",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["AAT-01", "RFC-0001"],
+      "statement": "A proof of possession whose key does not correspond to the verified leaf holder, or that does not match the presented tool and arguments, MUST deny."
+    },
+    {
+      "id": "CORE-POP-004",
+      "class": "Core",
+      "keyword": "MAY",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "A chain-only inspection operation MAY exist, but it MUST NOT emit an authorization decision and MUST be documented as not constituting enforcement."
+    },
+    {
+      "id": "CORE-SUBJ-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0005", "RFC-0001"],
+      "statement": "The canonical subject MUST be the leaf token's sub when it is a valid URI, and otherwise the leaf holder's JWK Thumbprint URI."
+    },
+    {
+      "id": "CORE-SUBJ-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0005"],
+      "statement": "The holder identity (the cnf.jwk thumbprint) MUST remain distinct from, and available alongside, the canonical subject."
+    },
+    {
+      "id": "CORE-DEC-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001", "ADR-0004"],
+      "statement": "The decision MUST be DENY whenever verification fails for any reason. This is the umbrella fail-closed rule."
+    },
+    {
+      "id": "CORE-DEC-002",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["ADR-0004", "CHARTER"],
+      "statement": "Unknown, malformed, or unverifiable required authority MUST NOT degrade into ALLOW."
+    },
+    {
+      "id": "CORE-DEC-003",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": false,
+      "source": ["spec/0.1"],
+      "statement": "An implementation that encounters an unrecognized spec or profile version MUST refuse the exchange rather than guess at its meaning."
+    },
+    {
+      "id": "CORE-DEC-004",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0003", "O3C"],
+      "statement": "Where the same authority material is accepted through more than one supported binding, the canonical authority decision MUST NOT change because of the transport."
+    },
+    {
+      "id": "CORE-EXPL-001",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0001", "O4A"],
+      "statement": "A decision MUST be expressible as an outcome of ALLOW or DENY, and a DENY MUST carry at least one stable reason code."
+    },
+    {
+      "id": "CORE-EXPL-002",
+      "class": "Core",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "For a check named by a normative reason code (see classification), a denial produced by that check MUST report that code. Finer or coarser diagnostic codes MAY additionally be used but MUST NOT replace the normative code for that check."
+    },
+    {
+      "id": "CORE-EXPL-003",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0001"],
+      "statement": "An explanation MUST NOT include key material, raw token bytes, signatures, proof-of-possession material, or argument values the caller did not already supply."
+    },
+    {
+      "id": "CORE-EXPL-004",
+      "class": "Core",
+      "keyword": "MAY",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["O4A", "O4B"],
+      "statement": "An implementation MAY provide additional diagnostic fields (locators, stage labels, human-readable messages) without breaking conformance. Human-readable message wording is not normative."
+    },
+    {
+      "id": "CORE-NEUTRAL-001",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["CHARTER", "O3C"],
+      "statement": "Core conformance MUST NOT depend on MCP, A2A, or any particular transport binding."
+    },
+    {
+      "id": "CORE-NEUTRAL-002",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["RFC-0005", "CHARTER"],
+      "statement": "Core conformance MUST NOT require any particular identity provider (e.g. SPIFFE, WIMSE, OIDC)."
+    },
+    {
+      "id": "CORE-NEUTRAL-003",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["RFC-0006", "CHARTER"],
+      "statement": "Core conformance MUST NOT require any particular policy decision point or an OAAF-hosted authorization service."
+    },
+    {
+      "id": "CORE-NEUTRAL-004",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["RFC-0004", "CHARTER"],
+      "statement": "Core conformance MUST NOT require an OAAF-hosted revocation or status service."
+    },
+    {
+      "id": "CORE-NEUTRAL-005",
+      "class": "Core",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["O5B"],
+      "statement": "A conformant implementation MUST NOT be required to share a language, library, internal API, object model, source structure, or package name with any reference implementation."
+    },
+    {
+      "id": "STATUS-001",
+      "class": "Status",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0004"],
+      "statement": "When a status resolver is configured, every token in the chain MUST be checked for revocation."
+    },
+    {
+      "id": "STATUS-002",
+      "class": "Status",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0004"],
+      "statement": "If any chain member resolves to revoked, the decision MUST deny."
+    },
+    {
+      "id": "STATUS-003",
+      "class": "Status",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0004", "ADR-0004"],
+      "statement": "If any chain member resolves to unknown, the decision MUST deny (fail closed), unless the deployment has explicitly opted into a documented allow-unknown mode that MUST NOT be the default."
+    },
+    {
+      "id": "STATUS-004",
+      "class": "Status",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0004", "AAT-01"],
+      "statement": "A revoked ancestor MUST invalidate every chain that contains it, even when the leaf itself is active."
+    },
+    {
+      "id": "STATUS-005",
+      "class": "Status",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0004"],
+      "statement": "A resolver backed by a bounded-freshness status artifact MUST treat an artifact past its freshness as unknown, not as its last-known contents."
+    },
+    {
+      "id": "STATUS-006",
+      "class": "Status",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0004"],
+      "statement": "Absent a configured resolver, verification MUST remain expiry-only and fully offline; status checking MUST NOT be silently assumed."
+    },
+    {
+      "id": "IDENT-001",
+      "class": "Identity",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0005"],
+      "statement": "When an identity-binding verifier is configured and reports mismatch for the subject and holder, the decision MUST deny."
+    },
+    {
+      "id": "IDENT-002",
+      "class": "Identity",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0005", "ADR-0004"],
+      "statement": "When a required identity binding is unavailable, the decision MUST deny (fail closed), unless the deployment has opted into a documented weaker mode."
+    },
+    {
+      "id": "IDENT-003",
+      "class": "Identity",
+      "keyword": "MUST",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0005"],
+      "statement": "Absent a configured verifier, the authority issuer's signed sub assertion is trusted; identity binding MUST NOT be silently assumed to have been externally verified."
+    },
+    {
+      "id": "IDENT-004",
+      "class": "Identity",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0005"],
+      "statement": "An OIDC subject MUST be composed with its issuer into a collision-safe URI; a bare sub MUST NOT be used alone across issuers."
+    },
+    {
+      "id": "IDENT-005",
+      "class": "Identity",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": false,
+      "source": ["RFC-0005"],
+      "statement": "A syntactically valid identity URI MUST NOT by itself be treated as cross-domain trust; trust anchors and the binding verifier remain the arbiters."
+    },
+    {
+      "id": "MCP-001",
+      "class": "MCP",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0002"],
+      "statement": "OAAF authority MUST be enforced as a precondition before the COAZ AuthZEN request is constructed; on any OAAF denial the PEP MUST refuse immediately and MUST NOT proceed to the PDP."
+    },
+    {
+      "id": "MCP-002",
+      "class": "MCP",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0002"],
+      "statement": "OAAF MUST NOT redefine COAZ/MCP request semantics (subject, action, resource); it contributes only an additional precondition and an optional context member."
+    },
+    {
+      "id": "MCP-003",
+      "class": "MCP",
+      "keyword": "MAY",
+      "security_invariant": false,
+      "testable": true,
+      "source": ["RFC-0002", "RFC-0006"],
+      "statement": "On success the PEP MAY add a context.oaaf member carrying the canonical authority context."
+    },
+    {
+      "id": "A2A-001",
+      "class": "A2A",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0003"],
+      "statement": "A skill gated by OAAF MUST declare the OAAF extension required; if the extension was not activated, the agent MUST refuse the operation and MUST NOT perform it."
+    },
+    {
+      "id": "A2A-002",
+      "class": "A2A",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0003"],
+      "statement": "Before any consequential operation on a gated skill, the agent MUST verify OAAF authority; a request lacking verifiable authority material MUST deny."
+    },
+    {
+      "id": "A2A-003",
+      "class": "A2A",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0003"],
+      "statement": "When the proof of possession carries an aat_aud, it MUST equal the recipient agent's stable A2A identity; a mismatch MUST deny."
+    },
+    {
+      "id": "A2A-004",
+      "class": "A2A",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0003"],
+      "statement": "The proof-of-possession holder and the AAT leaf holder MUST correspond. The A2A-authenticated caller identity and the AAT holder MAY differ unless the deployment requires them equal."
+    },
+    {
+      "id": "PDP-001",
+      "class": "PDP",
+      "keyword": "MUST NOT",
+      "security_invariant": true,
+      "testable": false,
+      "source": ["RFC-0006"],
+      "statement": "OAAF conveys verified authority facts to the policy decision point; it MUST NOT make the organization's policy decision. OAAF decides whether delegated authority is valid; the PDP decides whether policy permits the action."
+    },
+    {
+      "id": "PDP-002",
+      "class": "PDP",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0006"],
+      "statement": "The authority context MUST be derived only from a verified authority; its authorityVerified marker states OAAF's authority decision, not that the action is permitted."
+    },
+    {
+      "id": "PDP-003",
+      "class": "PDP",
+      "keyword": "MUST NOT",
+      "security_invariant": false,
+      "testable": false,
+      "source": ["RFC-0006"],
+      "statement": "The PDP profile MUST NOT require a particular policy engine; AuthZEN context is the canonical carrier and other engines are documented adapters."
+    },
+    {
+      "id": "PDP-004",
+      "class": "PDP",
+      "keyword": "MUST",
+      "security_invariant": true,
+      "testable": true,
+      "source": ["RFC-0006", "RFC-0001"],
+      "statement": "The authority context MUST carry names, never values, matching the privacy rule of the explanation."
+    }
+  ]
+}

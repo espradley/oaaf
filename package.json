@@ -20,7 +20,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:boundary": "node scripts/check-dependency-boundary.mjs",
-    "check": "npm run check:boundary && npm run check:telemetry && npm run check:governance && npm run format:check && npm run typecheck && npm run test",
+    "check": "npm run check:boundary && npm run check:telemetry && npm run check:conformance && npm run check:governance && npm run format:check && npm run typecheck && npm run test",
     "clean": "tsc --build --clean",
     "demo": "npm run build && node examples/quickstart/index.js",
     "demo:mcp": "npm run build && node examples/mcp-tool-guard/index.js",
@@ -31,7 +31,8 @@
     "check:package": "node scripts/check-downstream.mjs",
     "gen:vectors": "npm run build && node scripts/gen-vectors.mjs",
     "demo:pdp": "npm run build && node examples/pdp-coexistence/index.js",
-    "check:telemetry": "node scripts/check-no-telemetry.mjs"
+    "check:telemetry": "node scripts/check-no-telemetry.mjs",
+    "check:conformance": "node scripts/check-conformance-spec.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

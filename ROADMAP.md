@@ -59,7 +59,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O5D         | Identity / workload interoperability                 | ✅ Complete              |
 | O5E         | Existing PDP / authorization interoperability        | ✅ Complete              |
 | O5F         | Outsider adoption journey                            | ✅ Engineering-ready¹    |
-| O6A         | Normative conformance specification                  | ⏸️ Planned               |
+| O6A         | Normative conformance specification                  | ✅ Complete              |
 | O6B         | Conformance vectors                                  | ⏸️ Planned               |
 | O6C         | Cross-language conformance                           | ⏸️ Planned               |
 | O6D         | Binding / protocol conformance                       | ⏸️ Planned               |
@@ -262,9 +262,32 @@ self-certifiable.
 
 ## O6 — Conformance, standards, and v1 readiness
 
-### O6A — Normative conformance specification ⏸️
+### O6A — Normative conformance specification ✅
 
-Define which behaviors an independent implementation MUST satisfy.
+Defines what "OAAF-conformant" means for an **independent** implementation — derived from
+adopted standards, the RFCs, public contracts, certified invariants, and security
+requirements, **not** from "behaves like the TypeScript implementation." The reference impls
+are evidence, not the definition. Lives in
+[spec/0.1/conformance/](spec/0.1/conformance/README.md), pre-v1 (O6H owns the v1 freeze).
+
+- **Conformance classes:** one mandatory **Core** plus five optional profiles — **Status**,
+  **Identity**, **MCP**, **A2A**, **PDP**. Delegation, attenuation, and proof of possession
+  are inside Core (the thesis), not certification-bingo add-ons.
+- **64 requirements** with stable IDs (`CORE-NARROW-001`, `STATUS-003`, …) as the traceability
+  spine; 44 are security invariants for O6E. Canonical machine-readable catalog in
+  [`requirements.json`](spec/0.1/conformance/requirements.json), guarded by
+  `npm run check:conformance` (unique IDs, known classes, no dangling or orphan references).
+- **U/O/B/R/E/X classification** separates upstream-normative, OAAF-normative, binding,
+  reference-only, experimental, and out-of-scope behavior; reason codes (19 normative vs ~26
+  reference-only diagnostics), stages (reference-only), and explanation fields are each
+  classified. Experimental upstream work (Token Status List, WIMSE) is isolated to optional
+  profiles so it cannot become a mandatory v1 requirement.
+- **Traceability:** all 18 shared vectors mapped to requirements (no orphans), with a
+  27-requirement O6B gap list — including the notable gap that the central no-widening thesis
+  (`CORE-NARROW-001`) has no dedicated static vector yet.
+- **Self-verifiable claim format** (`OAAF Core 0.1 conformant · Profiles: …`); no certification
+  authority, badge, or registry. Reserved-IP assessment: **PASS** — conformance covers
+  authority, not execution control.
 
 ### O6B — Conformance vectors ⏸️
 

@@ -5,9 +5,10 @@
 
 ## Contents
 
-| Document                           | Status                                       |
-| ---------------------------------- | -------------------------------------------- |
-| [architecture.md](architecture.md) | Draft — actors, enforcement point, lifecycle |
+| Document                              | Status                                                         |
+| ------------------------------------- | -------------------------------------------------------------- |
+| [architecture.md](architecture.md)    | Draft — actors, enforcement point, lifecycle                   |
+| [conformance/](conformance/README.md) | Draft (pre-v1) — the normative conformance specification (O6A) |
 
 ## Not yet written
 
@@ -21,7 +22,8 @@ the reasoning is recorded while changing course is still cheap:
 - deterministic evaluation and the decision shape (RFC-0004)
 - delegation and narrowing rules (RFC-0005)
 - `audit-event.schema.json` — portable evidence
-- conformance requirements
+
+The conformance requirements now live in [`conformance/`](conformance/README.md) (O6A).
 
 ## Versioning
 
