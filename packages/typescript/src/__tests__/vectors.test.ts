@@ -8,6 +8,7 @@ import { verifyAndEvaluate, verifyAuthority } from '../decide.js';
 import { toExplanation } from '../explain.js';
 import { enforceA2aAuthority, explainA2aResult } from '../a2a/binding.js';
 import type { DecisionExplanation } from '../explanation.js';
+import { revokedSetResolver } from '../status.js';
 
 /**
  * The reference side of the cross-language parity gate (O5B). The same shared
@@ -47,7 +48,13 @@ async function evaluateVector(input: Record<string, unknown>): Promise<DecisionE
     args?: Record<string, unknown>;
     now?: number;
     recipient?: string;
+    revokedJti?: string[];
+    unknownJti?: string[];
   };
+  const statusResolver =
+    i.revokedJti !== undefined || i.unknownJti !== undefined
+      ? revokedSetResolver(i.revokedJti ?? [], i.unknownJti ?? [])
+      : undefined;
   // The recipient case exercises the A2A binding path (aat_aud binding).
   if (i.recipient !== undefined) {
     const a2a = await enforceA2aAuthority({
@@ -64,25 +71,21 @@ async function evaluateVector(input: Record<string, unknown>): Promise<DecisionE
       recipient: i.recipient,
       requireRecipientBinding: true,
       ...(i.now === undefined ? {} : { now: i.now }),
+      ...(statusResolver === undefined ? {} : { statusResolver }),
     });
     return explainA2aResult(a2a);
   }
-  const decision = await verifyAndEvaluate({
+  const common = {
     tokens: i.tokens,
     trustAnchors: i.trustAnchors,
     pop: i.pop,
     tool: i.tool,
     args: i.args ?? {},
     ...(i.now === undefined ? {} : { now: i.now }),
-  });
-  const v = await verifyAuthority({
-    tokens: i.tokens,
-    trustAnchors: i.trustAnchors,
-    pop: i.pop,
-    tool: i.tool,
-    args: i.args ?? {},
-    ...(i.now === undefined ? {} : { now: i.now }),
-  });
+    ...(statusResolver === undefined ? {} : { statusResolver }),
+  };
+  const decision = await verifyAndEvaluate(common);
+  const v = await verifyAuthority(common);
   return toExplanation(decision, v.ok ? v.authority : undefined);
 }
 

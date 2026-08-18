@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from oaaf import verify_and_evaluate
+from oaaf import verify_and_evaluate, revoked_set_resolver
 
 VECTORS = json.loads((Path(__file__).parent / "vectors" / "vectors.json").read_text())["vectors"]
 
@@ -79,6 +79,11 @@ def expected_normalized(expected: dict) -> dict:
 @pytest.mark.parametrize("vector", VECTORS, ids=[v["name"] for v in VECTORS])
 def test_python_matches_reference(vector):
     i = vector["input"]
+    resolver = (
+        revoked_set_resolver(i.get("revokedJti", []), i.get("unknownJti", []))
+        if ("revokedJti" in i or "unknownJti" in i)
+        else None
+    )
     result = verify_and_evaluate(
         tokens=i["tokens"],
         trust_anchors=i["trustAnchors"],
@@ -88,6 +93,7 @@ def test_python_matches_reference(vector):
         now=i.get("now"),
         recipient=i.get("recipient"),
         require_recipient_binding="recipient" in i,
+        status_resolver=resolver,
     )
     assert normalize(result) == expected_normalized(vector["expected"])
 
@@ -104,6 +110,10 @@ def test_all_required_cases_present():
         "deny_invalid_signature",
         "deny_chain_reordered",
         "deny_recipient_mismatch",
+        "status_allow_active",
+        "status_deny_leaf_revoked",
+        "status_deny_ancestor_revoked",
+        "status_deny_unavailable",
     }
     assert required.issubset(names)
 
@@ -112,10 +122,15 @@ def test_privacy_no_values_or_key_material():
     # A vector whose argument value is a recognizable string must not appear in output.
     for vector in VECTORS:
         i = vector["input"]
+        resolver = (
+            revoked_set_resolver(i.get("revokedJti", []), i.get("unknownJti", []))
+            if ("revokedJti" in i or "unknownJti" in i) else None
+        )
         result = verify_and_evaluate(
             tokens=i["tokens"], trust_anchors=i["trustAnchors"], pop=i["pop"],
             tool=i["tool"], args=i.get("args", {}), now=i.get("now"),
             recipient=i.get("recipient"), require_recipient_binding="recipient" in i,
+            status_resolver=resolver,
         )
         blob = json.dumps(normalize(result))
         # No JWS-shaped material, no private-key markers.

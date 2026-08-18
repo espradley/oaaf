@@ -19,6 +19,7 @@ from .explanation import (
 )
 from .pop import pop_audience, verify_pop
 from .reasons import Denial, denial
+from .status import StatusResolver
 from .verify import VerifiedChain, verify_chain
 
 
@@ -67,6 +68,8 @@ def verify_and_evaluate(
     now: Optional[int] = None,
     recipient: Optional[str] = None,
     require_recipient_binding: bool = False,
+    status_resolver: Optional[StatusResolver] = None,
+    allow_unknown_status: bool = False,
 ) -> DecisionExplanation:
     """Full enforcement, returning the canonical explanation. Fails closed."""
     import time
@@ -77,6 +80,21 @@ def verify_and_evaluate(
     chain, chain_denials = verify_chain(tokens, trust_anchors, now)
     if chain is None:
         return DecisionExplanation(decision="DENY", reasons=explain_reasons(chain_denials))
+
+    # Revocation / status (RFC-0004): check every chain member; fail closed on unknown.
+    if status_resolver is not None:
+        for i, token in enumerate(chain.tokens):
+            status = status_resolver(token["jti"], token["iss"], now)
+            if status == "revoked":
+                return DecisionExplanation(
+                    decision="DENY",
+                    reasons=explain_reasons([denial("authority_revoked", "status", "Authority has been revoked.", token_index=i)]),
+                )
+            if status == "unknown" and not allow_unknown_status:
+                return DecisionExplanation(
+                    decision="DENY",
+                    reasons=explain_reasons([denial("status_unavailable", "status", "Required revocation status could not be established.", token_index=i)]),
+                )
 
     pop_denials = verify_pop(pop, chain, tool, args, now)
     if pop_denials:

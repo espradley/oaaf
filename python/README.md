@@ -33,6 +33,11 @@ result = verify_and_evaluate(
     now=1_780_000_001,        # optional; defaults to current time
 )
 
+# Optional revocation (RFC-0004): pass a status resolver; every chain member is
+# checked, fail-closed on unknown. Without one, verification is expiry-only.
+from oaaf import revoked_set_resolver
+# verify_and_evaluate(..., status_resolver=revoked_set_resolver({"revoked-jti"}))
+
 if result.decision == "ALLOW":
     ...  # result.authority is an AuthoritySummary
 else:

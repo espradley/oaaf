@@ -13,6 +13,7 @@ from .explanation import (
     ReasonExplanation,
 )
 from .reasons import REASON_CODES, Denial
+from .status import revoked_set_resolver, StatusResolver, TokenStatus
 from .verify import VerifiedChain, verify_chain
 
 __all__ = [
@@ -24,5 +25,8 @@ __all__ = [
     "AuthoritySummary",
     "REASON_CODES",
     "Denial",
+    "revoked_set_resolver",
+    "StatusResolver",
+    "TokenStatus",
 ]
 __version__ = "0.1.0"

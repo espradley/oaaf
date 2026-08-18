@@ -73,6 +73,10 @@ export const REASON_CODES = [
   'pop_stale',
   'pop_recipient_mismatch',
 
+  // Revocation / status (RFC-0004)
+  'authority_revoked',
+  'status_unavailable',
+
   // A2A binding (RFC-0003)
   'extension_not_activated',
   'authority_material_missing',
@@ -82,7 +86,7 @@ export const REASON_CODES = [
 export type ReasonCode = (typeof REASON_CODES)[number];
 
 /** Stage of verification that produced a denial. */
-export type VerificationStage = 'chain' | 'leaf' | 'pop' | 'evaluation' | 'a2a';
+export type VerificationStage = 'chain' | 'leaf' | 'pop' | 'evaluation' | 'a2a' | 'status';
 
 /** A single denial, tied to the check that produced it. */
 export interface Denial {

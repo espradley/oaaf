@@ -24,6 +24,7 @@
 import { evaluate, verifyAuthority, type VerifiedAuthority } from '../decide.js';
 import type { ToolArguments } from '../aat/claims.js';
 import type { Denial } from '../reasons.js';
+import type { StatusResolver } from '../status.js';
 import {
   explainDecision,
   explainReasons,
@@ -98,6 +99,9 @@ export interface OaafPreconditionInput {
   tool: string;
   args: ToolArguments;
   now?: number;
+  /** Revocation/status resolver (RFC-0004); transport-neutral, same as the core. */
+  statusResolver?: StatusResolver;
+  allowUnknownStatus?: boolean;
 }
 
 export type OaafPrecondition =
@@ -126,6 +130,10 @@ export async function enforceOaafPrecondition(
     tool: input.tool,
     args: input.args,
     ...(input.now === undefined ? {} : { now: input.now }),
+    ...(input.statusResolver === undefined ? {} : { statusResolver: input.statusResolver }),
+    ...(input.allowUnknownStatus === undefined
+      ? {}
+      : { allowUnknownStatus: input.allowUnknownStatus }),
   });
 
   if (!verification.ok) {

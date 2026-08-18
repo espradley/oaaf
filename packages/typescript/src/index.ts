@@ -85,6 +85,8 @@ export type {
 } from './authzen/types.js';
 
 export { explain, renderExplanation, toExplanation } from './explain.js';
+export { revokedSetResolver } from './status.js';
+export type { StatusResolver, TokenStatus } from './status.js';
 export { explainDecision, explainReasons, summarizeAuthority } from './explanation.js';
 export type { AuthoritySummary, DecisionExplanation, ReasonExplanation } from './explanation.js';
 

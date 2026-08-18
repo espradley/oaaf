@@ -22,6 +22,7 @@ import { verifyDelegationChain, type VerifiedDelegationChain } from './aat/verif
 import { toAccessEvaluationRequest, toAccessEvaluationResponse } from './authzen/map.js';
 import type { AccessEvaluationRequest, AccessEvaluationResponse } from './authzen/types.js';
 import { denial, type Denial } from './reasons.js';
+import type { StatusResolver } from './status.js';
 
 /** Authority that has passed every AAT check, including proof of possession. */
 export interface VerifiedAuthority {
@@ -43,6 +44,15 @@ export interface VerifyAuthorityInput {
   tool: string;
   args?: ToolArguments;
   now?: number;
+  /**
+   * Optional revocation/status resolver (RFC-0004). When provided, every token
+   * in the chain is checked; a revoked token denies with `authority_revoked`
+   * and an unknown status denies with `status_unavailable` (fail closed), unless
+   * `allowUnknownStatus` is set. When absent, verification is expiry-only.
+   */
+  statusResolver?: StatusResolver;
+  /** Proceed when a status is unknown rather than denying. Weakens the guarantee. */
+  allowUnknownStatus?: boolean;
 }
 
 export type VerifyAuthorityResult =
@@ -66,11 +76,41 @@ export interface Decision {
 export async function verifyAuthority(input: VerifyAuthorityInput): Promise<VerifyAuthorityResult> {
   const args = input.args ?? {};
 
+  const now = input.now ?? Math.floor(Date.now() / 1000);
   const chainResult = await verifyDelegationChain(input.tokens, {
     trustAnchors: input.trustAnchors,
-    ...(input.now === undefined ? {} : { now: input.now }),
+    now,
   });
   if (!chainResult.ok) return { ok: false, denials: chainResult.denials };
+
+  // Revocation / status (RFC-0004): check every token in the chain, so a revoked
+  // ancestor invalidates its descendants. Fail closed on unknown by default.
+  if (input.statusResolver !== undefined) {
+    for (const [i, token] of chainResult.chain.tokens.entries()) {
+      const status = await input.statusResolver(token.payload.jti, token.payload.iss, now);
+      if (status === 'revoked') {
+        return {
+          ok: false,
+          denials: [
+            denial('authority_revoked', 'status', 'Authority has been revoked.', { tokenIndex: i }),
+          ],
+        };
+      }
+      if (status === 'unknown' && input.allowUnknownStatus !== true) {
+        return {
+          ok: false,
+          denials: [
+            denial(
+              'status_unavailable',
+              'status',
+              'Required revocation status could not be established.',
+              { tokenIndex: i },
+            ),
+          ],
+        };
+      }
+    }
+  }
 
   const popResult = await verifyProofOfPossession(
     input.pop,

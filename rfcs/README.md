@@ -69,11 +69,12 @@ Acceptance means the design is agreed. It is not a promise of an implementation 
 
 ## Index
 
-| RFC                                             | Title                              | Class     | Status   |
-| ----------------------------------------------- | ---------------------------------- | --------- | -------- |
-| [0001](0001-aat-authzen-enforcement-profile.md) | AAT to AuthZEN Enforcement Profile | `PROFILE` | Accepted |
-| [0002](0002-mcp-coaz-binding.md)                | MCP / COAZ Binding                 | `PROFILE` | Accepted |
-| [0003](0003-a2a-binding.md)                     | A2A Binding                        | `EXTEND`  | Accepted |
+| RFC                                             | Title                                   | Class     | Status                  |
+| ----------------------------------------------- | --------------------------------------- | --------- | ----------------------- |
+| [0001](0001-aat-authzen-enforcement-profile.md) | AAT to AuthZEN Enforcement Profile      | `PROFILE` | Accepted                |
+| [0002](0002-mcp-coaz-binding.md)                | MCP / COAZ Binding                      | `PROFILE` | Accepted                |
+| [0003](0003-a2a-binding.md)                     | A2A Binding                             | `EXTEND`  | Accepted                |
+| [0004](0004-authority-status-revocation.md)     | Authority Status and Revocation Profile | `PROFILE` | Accepted (experimental) |
 
 ## Anticipated RFCs
 

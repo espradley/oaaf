@@ -16,6 +16,7 @@ import {
   verifyAndEvaluate,
   verifyAuthority,
   toExplanation,
+  revokedSetResolver,
 } from '../packages/typescript/dist/index.js';
 import { enforceA2aAuthority, explainA2aResult } from '../packages/typescript/dist/a2a/binding.js';
 import {
@@ -319,6 +320,115 @@ function record(name, input, expected, note) {
     input,
     explainA2aResult(a2a),
     'PoP aat_aud bound to a different recipient',
+  );
+}
+
+// --- Revocation / status vectors (RFC-0004) ---
+async function statusExpected(input, revoked, unknown) {
+  const resolver = revokedSetResolver(revoked, unknown);
+  const withResolver = { ...input, statusResolver: resolver };
+  const decision = await verifyAndEvaluate(withResolver);
+  const v = await verifyAuthority(withResolver);
+  return toExplanation(decision, v.ok ? v.authority : undefined);
+}
+
+{
+  const c = await chain({ rootTools: { 'repo.read': {} }, leafTools: { 'repo.read': {} } });
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    revokedJti: [],
+    unknownJti: [],
+  };
+  record('status_allow_active', input, await statusExpected(input, [], []), 'no token revoked');
+}
+{
+  const c = await chain({ rootTools: { 'repo.read': {} }, leafTools: { 'repo.read': {} } });
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    revokedJti: ['derived'],
+    unknownJti: [],
+  };
+  record(
+    'status_deny_leaf_revoked',
+    input,
+    await statusExpected(input, ['derived'], []),
+    'leaf jti revoked',
+  );
+}
+{
+  const c = await chain({ rootTools: { 'repo.read': {} }, leafTools: { 'repo.read': {} } });
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    revokedJti: ['root'],
+    unknownJti: [],
+  };
+  record(
+    'status_deny_ancestor_revoked',
+    input,
+    await statusExpected(input, ['root'], []),
+    'revoked ancestor cascades to descendants',
+  );
+}
+{
+  const c = await chain({ rootTools: { 'repo.read': {} }, leafTools: { 'repo.read': {} } });
+  const pop = await mintPop({
+    leafKey: c.bob,
+    leafJti: 'derived',
+    tool: 'repo.read',
+    args: {},
+    issuedAt: NOW,
+  });
+  const input = {
+    tokens: c.tokens,
+    trustAnchors: c.trustAnchors,
+    pop,
+    tool: 'repo.read',
+    args: {},
+    now: NOW + 1,
+    revokedJti: [],
+    unknownJti: ['derived'],
+  };
+  record(
+    'status_deny_unavailable',
+    input,
+    await statusExpected(input, [], ['derived']),
+    'required status unknown, fail closed',
   );
 }
 

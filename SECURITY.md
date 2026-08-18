@@ -53,7 +53,7 @@ refused, or that leaks what the explanation surface is meant to withhold:
 - **chain validation bypass** — accepting a truncated, reordered, or mis-linked chain
 - **proof-of-possession bypass** — acting without the holder's key, or replaying a proof
 - **recipient / holder confusion** — authority accepted by or for the wrong party
-- **revocation bypass** — once revocation exists (O5C), authority surviving revocation
+- **revocation bypass** — revoked authority surviving a configured status resolver, or a resolver failure treated as active ([revocation](docs/revocation.md))
 - **malformed-input authorization bypass** — a verifier that fails _open_ on malformed,
   ambiguous, or unverifiable input instead of denying
 - **explanation / privacy leak** — an explanation exposing argument values, token bytes,
