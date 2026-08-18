@@ -25,6 +25,13 @@ protecting nobody. The structure should grow when there are people to govern.
 Anyone may open an RFC. Maintainer status is not required to propose a change, and it
 is explicitly not required to argue that something is out of scope.
 
+A normative RFC is expected to work through a fixed set of questions — problem, standards
+research, alternatives, security, interoperability, compatibility, reserved-IP, and
+test/conformance implications — before a maintainer records a disposition. The
+[RFC template](rfcs/0000-template.md) carries that checklist. An **RFC** freezes a
+normative or architectural contract; an **ADR** records an implementation or project
+decision; an ordinary **pull request** is non-normative maintenance.
+
 ## Scope discipline
 
 The most common way a project like this fails is not one bad decision. It is
@@ -44,14 +51,17 @@ single person on a short timeline.
 
 Vulnerability reports follow [SECURITY.md](SECURITY.md).
 
-## Versioning and compatibility
+## Releases and versioning
 
-- The specification and the SDKs are versioned separately. Several SDK releases may
-  target one spec version.
-- Packages follow semantic versioning. Pre-1.0, breaking changes may occur in minor
-  releases and are called out in release notes.
-- A spec version, once tagged, is not silently edited. Corrections that change meaning
-  produce a new version.
+Today, the maintainer cuts releases. There is no automated release pipeline yet; a
+release is a reviewed, tested commit, tagged, with the package published manually once the
+`@oaaf` npm scope exists (tracked in the [pre-launch checklist](docs/pre-launch-checklist.md)).
+
+How versions move — package vs contract vs binding, and what counts as patch/minor/major
+— is defined in [versioning-and-compatibility.md](docs/versioning-and-compatibility.md).
+The short version: several package releases may target one contract version; a tagged
+contract version is not silently edited; and compatibility-sensitive behavior is changed
+deliberately, documented, and tested even pre-v1.
 
 ## Contributor licensing
 
@@ -73,6 +83,38 @@ namespace. Moving them to an organization is a branding and governance decision 
 made deliberately, and is tracked in the
 [pre-launch checklist](docs/pre-launch-checklist.md). It does not block the first
 release.
+
+## Project identity and "OAAF-conformant"
+
+OAAF is an Edwin Digital LLC open-source effort, and Edwin Digital is the initial
+trademark steward for the name. That stewardship exists to prevent one thing: an
+incompatible implementation implying it is _official_ or _OAAF-maintained_ when it is not.
+
+It is explicitly **not** meant to prevent independent implementations. The intended
+end-state is that anyone can build a conformant implementation and describe it as
+**"OAAF-conformant"** (once the O6 conformance suite exists to define that), without
+implying it is the official one. "Works with OAAF" and "OAAF-conformant" are open to
+anyone; "the official OAAF implementation" is not a claim a third party should make.
+
+Any formal trademark registration or legal step is out of scope here and would be a
+separate decision with counsel. This section states intent, not a legal filing.
+
+## Technical governance is vendor-neutral
+
+Edwin Digital maintains OAAF, but the technical decision rules above do not privilege
+Edwin Digital's commercial interests. A maintainer from another company can contribute,
+open RFCs, and argue scope on equal footing — the litmus test in
+[CHARTER.md](CHARTER.md) is the arbiter, not any vendor's roadmap.
+
+The one hard boundary is technical, not commercial: the
+[reserved execution-control concepts](docs/adr/0002-reserved-execution-continuity-semantics.md)
+stay out of OAAF. That is a scope boundary that applies to _everyone_, including Edwin
+Digital — it is not a mechanism for Edwin Digital to veto contributions it simply dislikes.
+A maintainer may reject a contribution for being out of charter scope, insecure, or
+untested; "it competes with our product" is not a valid reason and the governance does not
+provide for it.
+
+Extensions and bindings follow the [extension policy](docs/extensions.md).
 
 ## A future steering group
 

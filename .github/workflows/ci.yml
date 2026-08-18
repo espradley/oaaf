@@ -33,6 +33,9 @@ jobs:
       - name: Dependency boundary
         run: npm run check:boundary
 
+      - name: Governance files
+        run: npm run check:governance
+
       - name: Format
         run: npm run format:check
 

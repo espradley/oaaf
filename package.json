@@ -20,13 +20,14 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:boundary": "node scripts/check-dependency-boundary.mjs",
-    "check": "npm run check:boundary && npm run format:check && npm run typecheck && npm run test",
+    "check": "npm run check:boundary && npm run check:governance && npm run format:check && npm run typecheck && npm run test",
     "clean": "tsc --build --clean",
     "demo": "npm run build && node examples/quickstart/index.js",
     "demo:mcp": "npm run build && node examples/mcp-tool-guard/index.js",
     "demo:a2a": "npm run build && node examples/a2a-delegation/index.js",
     "demo:cross": "npm run build && node examples/cross-transport/index.js",
-    "inspect": "npm run build && node examples/inspector/inspect.js"
+    "inspect": "npm run build && node examples/inspector/inspect.js",
+    "check:governance": "node scripts/check-governance.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

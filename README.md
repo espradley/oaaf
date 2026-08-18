@@ -239,6 +239,15 @@ If you are evaluating OAAF for production use: it is too early. If you are inter
 in shaping how these standards fit together before that calcifies, this is the useful
 moment.
 
+## Governance and policies
+
+OAAF is maintained by Edwin Digital LLC, founder-led today and designed to evolve. How
+decisions are made, how normative changes go through RFCs, how versions and compatibility
+work, and how to report a vulnerability are written down:
+[GOVERNANCE](GOVERNANCE.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) ·
+[versioning & compatibility](docs/versioning-and-compatibility.md) ·
+[extensions](docs/extensions.md).
+
 ## Contributing
 
 Design critique is worth more than code right now, particularly from people who have

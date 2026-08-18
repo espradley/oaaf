@@ -1,0 +1,15 @@
+# Keep dependencies and CI actions current. Grouped and monthly to keep noise low on a
+# small project; security updates are not gated by the schedule.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      dev-dependencies:
+        patterns: ['*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

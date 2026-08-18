@@ -44,6 +44,17 @@ The proposal itself. Include:
 
 Show a worked example. Abstract schemas hide ambiguity that examples expose.
 
+## Standards basis
+
+Which existing standard this adopts, profiles, or extends, and at exactly which pinned
+revision. If it invents rather than adopts, justify why no existing standard suffices —
+`INVENT` is the classification that must argue for itself.
+
+## Interoperability
+
+What an independent implementation must do to interoperate. Whether this affects the
+eventual conformance contract. Whether MCP and A2A remain equivalent where that matters.
+
 ## Security considerations
 
 Required — OAAF enforces authority.
@@ -68,6 +79,22 @@ costs.
 ## Unresolved questions
 
 What is deliberately left open, and what would settle it.
+
+## Reserved-IP assessment
+
+Confirm this introduces none of the [reserved execution-control concepts](../docs/adr/0002-reserved-execution-continuity-semantics.md)
+— continuity, supersession, recovery, fencing, scheduling, worker selection, and the like.
+State it explicitly; "n/a" is not an answer for a normative change.
+
+## Tests and conformance
+
+What new invariant is certified, and how. Whether new conformance vectors are needed
+(O6). A normative change without a test that pins the new behavior is not done.
+
+## Disposition
+
+Recorded by a maintainer at decision time: `Accepted` / `Rejected` / `Superseded`, with a
+one-line reason. Left blank by the proposer.
 
 ## Prior art
 

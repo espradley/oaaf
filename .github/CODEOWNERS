@@ -1,0 +1,19 @@
+# Review ownership. One maintainer today; this file marks where extra review scrutiny is
+# expected as maintainership grows (see GOVERNANCE.md). Security-sensitive paths are
+# listed explicitly so a future multi-maintainer setup already knows where two-approval
+# review should apply.
+
+*                                   @espradley
+
+# Security-sensitive: cryptography, verification, delegation, subsumption, PoP, bindings.
+/packages/typescript/src/aat/       @espradley
+/packages/typescript/src/decide.ts  @espradley
+/packages/typescript/src/mcp/       @espradley
+/packages/typescript/src/a2a/       @espradley
+
+# Governance and normative contracts.
+/rfcs/                              @espradley
+/docs/adr/                          @espradley
+/CHARTER.md                         @espradley
+/GOVERNANCE.md                      @espradley
+/SECURITY.md                        @espradley

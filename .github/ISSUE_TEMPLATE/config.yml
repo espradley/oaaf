@@ -1,0 +1,7 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/espradley/oaaf/security/advisories/new
+    about: >-
+      Do NOT open a public issue for a vulnerability. Report it privately here.
+      See SECURITY.md for what to include and what is in scope.

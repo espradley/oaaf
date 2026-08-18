@@ -7,18 +7,12 @@ A working list, not a governance document. Items are removed once done.
 
 ## Before public promotion
 
-### Verify GitHub private vulnerability reporting is enabled
+### GitHub security settings — done
 
-[SECURITY.md](../SECURITY.md) and [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) both
-direct reporters to `https://github.com/espradley/oaaf/security/advisories/new`. That
-URL returns 404 unless private vulnerability reporting is switched on under
-Settings → Code security → Private vulnerability reporting.
-
-A security policy whose only reporting channel is broken is worse than no policy: it
-converts a private report into a public issue.
-
-Deliberately not solved by inventing an email address — a published security contact
-that bounces has the same failure mode.
+Private vulnerability reporting, secret scanning, Dependabot alerts and security updates,
+and branch protection on `main` are enabled and verified. The
+[repository settings](repository-settings.md) doc records the verified state and the
+remaining manual actions (npm scope, required review once a second maintainer exists).
 
 ### Confirm CI passes on GitHub Actions
 

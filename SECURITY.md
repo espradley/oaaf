@@ -12,10 +12,9 @@ Report privately by opening a
 [security advisory](https://github.com/espradley/oaaf/security/advisories/new) on this
 repository. That channel is visible only to maintainers.
 
-If that link does not work, the repository setting enabling it has not been switched on
-yet — this is [tracked](docs/pre-launch-checklist.md). Please open an issue saying
-only that you have a security report to make, with no details, and a maintainer will
-arrange a private channel.
+Private vulnerability reporting is enabled on this repository, so that link works. If for
+any reason it does not, open an issue saying only that you have a security report to make
+— with no details — and a maintainer will arrange a private channel.
 
 Useful reports usually include:
 
@@ -46,21 +45,28 @@ otherwise, and publish an advisory when a fix ships.
 ## Scope
 
 **In scope** — anything that causes an action to be permitted when it should be
-refused, or that undermines the integrity of the audit trail:
+refused, or that leaks what the explanation surface is meant to withhold:
 
-- forging, tampering with, or replaying an authority grant
-- delegation that widens rather than narrows authority
-- bypassing revocation, expiry, or supersession
-- causing a verifier to fail _open_ on malformed, ambiguous, or unverifiable input
-- forging, suppressing, or repudiating audit evidence
-- confusion between spec versions or between distinct grants
-- flaws in the specification itself, not only in the code
+- **signature verification bypass** — accepting a forged, tampered, or unsigned token
+- **scope widening** — an action permitted beyond the authority actually granted
+- **delegation attenuation failure** — a child grant broader than its parent
+- **chain validation bypass** — accepting a truncated, reordered, or mis-linked chain
+- **proof-of-possession bypass** — acting without the holder's key, or replaying a proof
+- **recipient / holder confusion** — authority accepted by or for the wrong party
+- **revocation bypass** — once revocation exists (O5C), authority surviving revocation
+- **malformed-input authorization bypass** — a verifier that fails _open_ on malformed,
+  ambiguous, or unverifiable input instead of denying
+- **explanation / privacy leak** — an explanation exposing argument values, token bytes,
+  signatures, proof-of-possession material, or keys
+- **conformance defect** — behavior that lets two implementations disagree about a
+  security-relevant decision
+- flaws in an RFC or the specification itself, not only in the code
 
 **Out of scope for now**, because they do not yet exist: hosted infrastructure, the
 reference authority service, and production deployment configurations.
 
 Also out of scope: an agent behaving badly _within_ the authority it was correctly
-granted. OAAF's job is to enforce the boundary of a grant, not to make the grant wise.
+granted, and portable signed receipts, which OAAF does not yet produce. OAAF's job is to enforce the boundary of a grant, not to make the grant wise.
 An over-broad grant that permits exactly what it says is a policy problem, not a
 vulnerability — though if OAAF makes over-broad grants the path of least resistance,
 that _is_ worth reporting as a design flaw.
@@ -72,7 +78,8 @@ itself a hazard:
 
 - OAAF has **not** been independently audited.
 - It holds **no** security certification of any kind.
-- The specification is a **draft** and the implementation is a skeleton.
+- The profile and its bindings are **early** and still moving; several adopted standards
+  are themselves drafts, pinned by revision.
 - No part of this project should be relied upon as a production security control
   today.
 
