@@ -170,6 +170,11 @@ enforce the invariant the draft relies on.
 
 ## Security considerations
 
+- **Trust anchors are required.** Verification MUST require an explicit trust-anchor
+  set; absence is a configuration error, not a warning condition. A root token is a
+  claim, not a trust root, and verifying it against its own `cnf.jwk` would establish
+  only internal self-consistency. There MUST NOT be a mode that returns an authorization
+  decision without one. See [ADR-0004](../docs/adr/0004-fail-closed-configuration.md).
 - **Fails closed.** Any verification failure, unrecognized constraint type, or
   unpermitted subsumption pair produces a deny.
 - **No unverified material reaches the decision.** Subject identity is taken from the

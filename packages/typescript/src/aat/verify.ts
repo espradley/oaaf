@@ -71,9 +71,14 @@ export interface VerifyChainOptions {
   /**
    * Public keys trusted as root issuers.
    *
-   * Required. A root token is a claim, not a trust root: without an anchor set
-   * anyone can mint a self-signed root and the chain proves nothing. The draft
-   * verifies the root "against a key in trust_anchors", and so does this.
+   * Required, and deliberately so. A root token is a claim, not a trust root:
+   * verifying it against its own `cnf.jwk` would establish only that the chain
+   * is internally self-consistent, not that it terminates in an issuer anyone
+   * trusts. Anyone could then mint a self-signed root granting themselves
+   * anything.
+   *
+   * There is no permissive mode and no default anchor set. Absence is a
+   * configuration error, not a warning condition — see ADR-0004.
    */
   trustAnchors: readonly Record<string, unknown>[];
   /** Seconds since epoch. Injectable so temporal behaviour is testable. */

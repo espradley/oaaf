@@ -121,6 +121,22 @@ compromised, or simply wrong. The enforcement point must never rely on agent
 self-restraint, and must fail closed — unverifiable, expired, revoked, or malformed
 authority denies the action.
 
+## Fail-closed configuration
+
+OAAF APIs fail closed when omitting configuration would silently weaken the authority
+guarantee. Security-critical configuration is represented in the type or API contract
+wherever practical, rather than deferred to a runtime warning or a permissive default.
+
+The first application is trust anchors: verification requires an explicit trust-anchor
+set, and their absence is a configuration error rather than a warning condition. Without
+one, a verifier establishes only that a chain is internally self-consistent — not that it
+terminates in an issuer anyone trusts. Those are different guarantees, and only the
+second is worth having.
+
+The same reasoning governs proof of possession, which cannot be disabled while still
+returning a decision. See
+[ADR-0004](docs/adr/0004-fail-closed-configuration.md).
+
 ## Reserved concepts
 
 Distinct from the out-of-scope list above. The concepts below are not rejected on

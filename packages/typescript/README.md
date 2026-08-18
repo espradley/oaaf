@@ -90,10 +90,18 @@ of either standard.
 
 ## Trust anchors
 
-`trustAnchors` is required. A root token is a claim, not a trust root: without an
-anchor set, anyone can mint a self-signed root and the chain proves nothing about who
-granted the authority. The draft verifies the root against a configured trust anchor,
-and so does this.
+`trustAnchors` is required, and there is no way to omit it.
+
+A root token is a claim, not a trust root. Verified against its own `cnf.jwk`, a chain
+establishes only that it is internally self-consistent — anyone could mint a self-signed
+root granting themselves anything and it would verify. With an anchor set, verification
+establishes that the chain terminates in an issuer you explicitly trust. Those are
+different guarantees, and only the second is worth having.
+
+So there is no permissive mode, no default anchor set, and no flag to skip the check.
+Omission is a compile error; an empty set is denied with `untrusted_root`. This is the
+same reasoning that makes proof of possession non-optional — see
+[ADR-0004](../../docs/adr/0004-fail-closed-configuration.md).
 
 ## What this does not do
 
