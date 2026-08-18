@@ -53,7 +53,7 @@ they shipped, an issue they filed.
 | O3A     | MCP / COAZ binding                                                    | ✅ Closed          |
 | O3B     | A2A binding                                                           | ⬅ Next             |
 | O3C     | Agent delegation demo                                                 | Planned            |
-| O4      | Evidence, explainability, developer tooling (O4A, O4B ✅)             | Planned            |
+| O4      | Evidence, explainability, developer tooling (O4A–C ✅; O4D parked)    | ✅ Active complete |
 | O4.5    | Open-source contribution + repository governance readiness            | Planned — gates O5 |
 | O5      | Public launch: stars, users, contributors, integrations               | Blocked by O4.5    |
 | O6      | Conformance suite + upstream standards participation                  | Planned            |

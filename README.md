@@ -168,6 +168,17 @@ The SDK verifies an AAT `-01` delegation chain, maps the request into an AuthZEN
 decision, and explains any denial. See [`@oaaf/sdk`](packages/typescript/README.md) and
 the [quickstart](examples/quickstart/index.js).
 
+**Inspect a decision locally** — see an ALLOW and two DENYs, and why, with no integration
+code:
+
+```bash
+npm run inspect -- --example allow
+npm run inspect -- --example deny-argument
+```
+
+The [authority inspector](examples/inspector/) is local, offline, and privacy-safe by
+default (names, never values).
+
 ## The standards underneath
 
 The primitives for this mostly exist already. Identity, attenuating delegation,

@@ -1,0 +1,12 @@
+{
+  "name": "@oaaf/example-inspector",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node inspect.js"
+  },
+  "dependencies": {
+    "@oaaf/sdk": "*"
+  }
+}
