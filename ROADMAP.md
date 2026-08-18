@@ -43,19 +43,21 @@ they shipped, an issue they filed.
 
 ## Phases
 
-| Phase   | Goal                                                    | Status    |
-| ------- | ------------------------------------------------------- | --------- |
-| O1      | OSS foundation + DigitalStack boundary                  | ✅ Closed |
-| O1.5    | Standards and competitive review                        | ✅ Closed |
-| O1.6    | Standards-first repositioning + public framing          | ✅ Closed |
-| O2      | AAT verification + AuthZEN enforcement profile          | ✅ Closed |
-| O3A     | MCP / COAZ binding                                      | ⬅ Next    |
-| O3B     | A2A binding                                             | Planned   |
-| O3C     | Agent delegation demo                                   | Planned   |
-| O4      | Evidence, explainability, developer tooling             | Planned   |
-| O5      | Public launch: stars, users, contributors, integrations | Planned   |
-| O6      | Conformance suite + upstream standards participation    | Planned   |
-| DS-OAAF | DigitalStack consumption + proprietary execution layer  | Separate  |
+| Phase   | Goal                                                                  | Status             |
+| ------- | --------------------------------------------------------------------- | ------------------ |
+| O1      | OSS foundation + DigitalStack boundary                                | ✅ Closed          |
+| O1.5    | Standards and competitive review                                      | ✅ Closed          |
+| O1.6    | Standards-first repositioning + public framing                        | ✅ Closed          |
+| O2      | AAT verification + AuthZEN enforcement profile                        | ✅ Closed          |
+| O2.5    | Finding retracted; conformance closed; fail-closed principle recorded | ✅ Closed          |
+| O3A     | MCP / COAZ binding                                                    | ✅ Closed          |
+| O3B     | A2A binding                                                           | ⬅ Next             |
+| O3C     | Agent delegation demo                                                 | Planned            |
+| O4      | Evidence, explainability, developer tooling                           | Planned            |
+| O4.5    | Open-source contribution + repository governance readiness            | Planned — gates O5 |
+| O5      | Public launch: stars, users, contributors, integrations               | Blocked by O4.5    |
+| O6      | Conformance suite + upstream standards participation                  | Planned            |
+| DS-OAAF | DigitalStack consumption + proprietary execution layer                | Separate           |
 
 ## O1 — Foundation and boundary ✅
 
@@ -123,25 +125,73 @@ configured trust anchor rather than against itself.
 **Ecosystem evidence created:** a package that does something real, and a quickstart
 that runs with no account or service.
 
-## O3 — MCP and A2A bindings
+## O3A — MCP / COAZ binding ✅
 
-**Goal: an MCP server maintainer or A2A agent author can place scoped, delegated
-authority around a tool or a task with only a few lines of integration code.**
+**Goal: prove OAAF authority can be enforced at an MCP tool boundary using the current
+COAZ/AuthZEN model, without inventing an OAAF-specific authorization path where an
+upstream standard already exists.**
 
-- MCP binding, aligned with the AuthZEN MCP tool-authorization profile
+Pinned: COAZ-MCP binding Draft 1 (2026-02-13), AuthZEN Authorization API 1.0 (Final),
+MCP 2026-07-28.
+
+The central finding was architectural, not editorial: COAZ's information model is
+closed to two input variables, `params` and `token`, and an AAT chain is neither. OAAF
+cannot be a COAZ input — it is a precondition the enforcement point applies before a
+COAZ request is ever built, denying immediately and unconditionally on failure rather
+than surfacing a failed verification as a fact for policy to notice. Read against the
+obligations profile's raw normative text before deciding: obligations are strictly
+response-side (PDP→PEP) compliance instructions and do not model inbound evidence, so
+they were not used.
+
+- [RFC-0002](rfcs/0002-mcp-coaz-binding.md) freezes the integration: COAZ's default
+  `tools/call` mapping is reused unmodified; OAAF contributes an additional MUST step in
+  COAZ-MCP's own PEP algorithm, plus an optional `context.oaaf` fact for policy.
+- RFC-0001 stays transport-neutral and unmodified; RFC-0002 does not reuse its
+  agent-as-subject mapping, because COAZ anchors `subject.id` to the validated
+  principal and places the agent in `context.agent`.
+- Seven cases proved end to end: valid mapped authority allows; missing capability
+  denies; argument mismatch denies; expired authority denies; untrusted root denies;
+  private-key `cnf.jwk` denies; a request whose COAZ-facing fields are entirely
+  well-formed still denies without valid OAAF authority.
+
+**Ecosystem evidence created:** a working integration with a standard actively being
+developed by the OpenID Foundation, and a documented architectural finding — that
+authority verification and request-mapping standards can compose without either
+redefining the other — that is itself useful to anyone else attempting the same
+composition.
+
+## O3B — A2A binding
+
+**Goal: an A2A agent author can place scoped, delegated authority around a delegated
+task with only a few lines of integration code.**
+
 - A2A binding published as a URI-identified A2A extension
-- A delegation demo crossing an agent boundary: narrowed authority, verified downstream
+- Applies the same structural rule as O3A: A2A owns its own message semantics; OAAF
+  contributes authority verification and proof
 
-This is the seam the standards review identified — specifications that are individually
-sound, with nothing connecting them across both transports.
+This is the second half of the seam the standards review identified — specifications
+that are individually sound, with nothing yet connecting them across the A2A transport.
 
-_Exit condition:_ an independent developer protects a tool on each transport, exercises
-an allowed and a denied call, and understands the denial without reading the underlying
+_Exit condition:_ an independent developer protects an A2A task, exercises an allowed
+and a denied call, and understands the denial without reading the underlying
 specifications.
 
-**Ecosystem evidence created:** a distribution path through the MCP and A2A ecosystems;
-a concrete external integration opportunity; a third-party use case specific enough to
+**Ecosystem evidence created:** a distribution path through the A2A ecosystem; a
+concrete external integration opportunity; a third-party use case specific enough to
 appear in someone else's release notes.
+
+## O3C — Agent delegation demo
+
+**Goal: a single demo crossing an agent boundary on each transport — narrowed authority
+issued to one agent, delegated to a second, and verified downstream — showing the same
+OAAF verification layer working under both the MCP and A2A bindings.**
+
+_Exit condition:_ the demo runs with no account or service, on both transports, from one
+shared authority chain.
+
+**Ecosystem evidence created:** the first artifact that demonstrates OAAF's core claim —
+portable authority — actually crossing a transport boundary, not just being verified
+within one.
 
 ## O4 — Explainability and evidence verification
 
@@ -177,6 +227,33 @@ output alone.
 
 **Ecosystem evidence created:** lower adoption friction, and materially easier support
 and retention — most projects lose users at the first confusing failure, not at install.
+
+## O4.5 — Open-source contribution and repository governance readiness
+
+**Hard gate. O5 does not begin until this phase is certified complete.** Reasoning in
+[ADR-0005](docs/adr/0005-governance-readiness-gate.md).
+
+Verifies the mechanisms for receiving external contributors and reports actually work,
+rather than launching and discovering gaps live:
+
+- Security reporting channel confirmed working (tracked in the
+  [pre-launch checklist](docs/pre-launch-checklist.md))
+- RFC process exercised by, or credibly open to, a non-founder author
+- DCO sign-off, branch protections, and required CI checks verified against a real pull
+  request
+- Repository namespace and `@oaaf` npm scope decisions resolved
+- CODE_OF_CONDUCT.md's enforcement contact confirmed reachable
+- GOVERNANCE.md re-read against what O1 through O4 actually did, corrected if practice
+  has drifted from description
+
+This gates process readiness, not protocol maturity — it does not require the
+conformance suite (O6) or a stable spec version.
+
+_Exit condition:_ every item above is verified, not merely documented, with an explicit
+note wherever a genuine external example was not yet available.
+
+**Ecosystem evidence created:** none directly — this phase spends effort to make sure
+the evidence O5 collects afterward is collected by processes already known to work.
 
 ## O5 — Public launch and ecosystem
 

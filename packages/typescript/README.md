@@ -103,6 +103,39 @@ Omission is a compile error; an empty set is denied with `untrusted_root`. This 
 same reasoning that makes proof of possession non-optional — see
 [ADR-0004](../../docs/adr/0004-fail-closed-configuration.md).
 
+## MCP / COAZ
+
+`@oaaf/sdk` also implements [RFC-0002](../../rfcs/0002-mcp-coaz-binding.md): an
+integration with COAZ, OpenID's MCP tool-authorization binding for AuthZEN.
+
+COAZ owns the MCP-to-authorization-request mapping; OAAF does not redefine it.
+`enforceOaafPrecondition` is inserted as an additional step in COAZ-MCP's own PEP
+algorithm, applied _before_ a COAZ request is constructed. On failure it returns a
+JSON-RPC error and the request is never built; on success it returns the verified
+authority and a `context.oaaf` fragment the caller may merge into COAZ's request.
+
+```ts
+import { enforceAndMapToCoaz } from '@oaaf/sdk';
+
+const result = await enforceAndMapToCoaz({
+  tokens,
+  trustAnchors,
+  pop,
+  tool: 'read_file',
+  args: { path: '/data/q3.pdf' },
+  principal, // COAZ's own input: $token.sub
+  agent, // COAZ's own input: $token.?client_id
+});
+
+if (!result.ok) {
+  // JSON-RPC error, per COAZ-MCP — no AuthZEN request was ever built.
+  return result.error;
+}
+
+// result.request is COAZ's default tools/call mapping, unmodified in
+// subject/action/resource, with context.oaaf added.
+```
+
 ## What this does not do
 
 - **No revocation.** AAT does not mitigate it and neither does OAAF. Authority is

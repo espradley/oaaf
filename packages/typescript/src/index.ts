@@ -86,6 +86,26 @@ export type {
 
 export { explain } from './explain.js';
 
+/**
+ * MCP / COAZ integration — RFC-0002. COAZ owns the request mapping; these
+ * exports are the OAAF precondition step and, for demonstration, COAZ's own
+ * unmodified default `tools/call` mapping.
+ */
+export {
+  buildCoazToolCallRequest,
+  enforceAndMapToCoaz,
+  enforceOaafPrecondition,
+  COAZ_ACTION_NAME,
+  COAZ_RESOURCE_TYPE,
+  JSONRPC_AUTHORIZATION_DENIED,
+} from './mcp/coaz.js';
+export type {
+  CoazToolCallRequest,
+  JsonRpcError,
+  OaafPrecondition,
+  OaafPreconditionInput,
+} from './mcp/coaz.js';
+
 export { denial, REASON_CODES } from './reasons.js';
 export type { Denial, ReasonCode, VerificationStage } from './reasons.js';
 

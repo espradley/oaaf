@@ -14,6 +14,10 @@
     "./testing": {
       "types": "./dist/testing/mint.d.ts",
       "default": "./dist/testing/mint.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/coaz.d.ts",
+      "default": "./dist/mcp/coaz.js"
     }
   },
   "files": [

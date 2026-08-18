@@ -72,6 +72,7 @@ Acceptance means the design is agreed. It is not a promise of an implementation 
 | RFC                                             | Title                              | Class     | Status   |
 | ----------------------------------------------- | ---------------------------------- | --------- | -------- |
 | [0001](0001-aat-authzen-enforcement-profile.md) | AAT to AuthZEN Enforcement Profile | `PROFILE` | Accepted |
+| [0002](0002-mcp-coaz-binding.md)                | MCP / COAZ Binding                 | `PROFILE` | Accepted |
 
 ## Anticipated RFCs
 
