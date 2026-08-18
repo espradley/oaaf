@@ -69,7 +69,9 @@ Acceptance means the design is agreed. It is not a promise of an implementation 
 
 ## Index
 
-No RFCs have been accepted yet.
+| RFC                                             | Title                              | Class     | Status   |
+| ----------------------------------------------- | ---------------------------------- | --------- | -------- |
+| [0001](0001-aat-authzen-enforcement-profile.md) | AAT to AuthZEN Enforcement Profile | `PROFILE` | Accepted |
 
 ## Anticipated RFCs
 

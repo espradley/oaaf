@@ -2,34 +2,98 @@
 
 TypeScript SDK for the [Open Agent Authority Framework](https://github.com/espradley/oaaf).
 
-> **Status: skeleton.** This package intentionally contains almost no code. It exists
-> to establish the build, type, and test architecture. It is not published to npm yet.
+Verify a delegated authority chain, decide whether a requested tool call is permitted,
+and explain the answer.
 
-## Why it is empty
+> **Status: early.** Not published to npm yet. OAAF implements an Internet-Draft that
+> may change — see [Standards](#standards).
 
-OAAF adopts existing standards for authority, delegation, decisions, and evidence
-rather than defining its own — see
-[ADR-0003](../../docs/adr/0003-implement-existing-authority-standards.md). Which
-standards, at which revisions, is still being settled through the
-[RFC process](../../rfcs/README.md).
+## Install
 
-Shipping types before that is settled would bake in the wrong shapes, and a published
-type is much harder to change than a proposal. The verification and decision surface
-arrives with the first enforcement point; see the [roadmap](../../ROADMAP.md).
-
-## What exists today
-
-```ts
-import { OAAF_SPEC_VERSION, isSupportedSpecVersion } from '@oaaf/sdk';
-
-OAAF_SPEC_VERSION; // '0.1'
-
-isSupportedSpecVersion('0.1'); // true
-isSupportedSpecVersion('0.2'); // false — refuse rather than guess
+```bash
+npm install @oaaf/sdk
 ```
 
-Spec versions are independent of this package's version: several SDK releases may
-target one spec version.
+## Use
+
+```ts
+import { verifyAndEvaluate, explain } from '@oaaf/sdk';
+
+const decision = await verifyAndEvaluate({
+  tokens, // AAT delegation chain, root first
+  pop, // proof-of-possession JWT
+  tool: 'read_file',
+  args: { path: '/data/q4.pdf' },
+});
+
+if (!decision.allowed) {
+  console.log(explain(decision));
+}
+```
+
+```text
+DENIED
+
+Requested
+  read_file
+    path = "/data/q4.pdf"
+
+Chain
+  root → hop 1
+
+Leaf permits
+  read_file (constrained: path)
+
+Reason
+  argument_constraint_violated
+    Argument "path" does not satisfy the constraint on "read_file".
+    at tool read_file, argument path
+```
+
+The full runnable version is in
+[`examples/quickstart`](../../examples/quickstart/index.js) — `npm run demo`.
+
+## API
+
+| Export                  | Purpose                                                                       |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| `verifyAuthority`       | Full verification, including proof of possession. The enforcement entry point |
+| `evaluate`              | Decide, given verified authority                                              |
+| `verifyAndEvaluate`     | Convenience composition of the two                                            |
+| `explain`               | Render a decision for a human                                                 |
+| `verifyDelegationChain` | **Chain only.** Inspection, testing, and conformance work — _not_ enforcement |
+
+`verifyDelegationChain` performs no proof-of-possession check and produces no decision.
+There is deliberately no option to disable proof of possession while still returning a
+decision: a verifier that can be configured to skip it will eventually be configured
+that way in production, and would then claim conformance it does not have.
+
+## Standards
+
+OAAF defines no wire format. It implements:
+
+| Concern           | Standard                                           |
+| ----------------- | -------------------------------------------------- |
+| Delegation chain  | `draft-niyikiza-oauth-attenuating-agent-tokens-01` |
+| Decision contract | OpenID AuthZEN Authorization API 1.0               |
+| Argument binding  | RFC 8785 JSON Canonicalization                     |
+| Holder identity   | RFC 9278 JWK Thumbprint URI                        |
+
+AAT support is **pinned to revision -01**, not to "latest". AAT is an individual
+Internet-Draft with no working group; it may change, lapse, or be replaced, and OAAF's
+behaviour is tied to that revision until deliberately upgraded.
+
+The mapping between AAT and AuthZEN is an OAAF profile, frozen by
+[RFC-0001](../../rfcs/0001-aat-authzen-enforcement-profile.md). It is not a requirement
+of either standard.
+
+## What this does not do
+
+- **No revocation.** AAT does not mitigate it and neither does OAAF. Authority is
+  bounded by `exp` alone.
+- **No replay protection.** AAT makes stateful `jti` tracking a deployment
+  responsibility.
+- **No MCP or A2A binding yet.** Those are the next phase.
 
 ## License
 

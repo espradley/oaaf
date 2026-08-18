@@ -43,17 +43,19 @@ they shipped, an issue they filed.
 
 ## Phases
 
-| Phase   | Goal                                                         | Status      |
-| ------- | ------------------------------------------------------------ | ----------- |
-| O1      | OSS foundation + DigitalStack boundary                       | ✅ Closed   |
-| O1.5    | Standards and competitive review                             | ✅ Complete |
-| O1.6    | ADR-0003 + standards implementation strategy                 | ⬅ Current   |
-| O2      | Working enforcement point using existing authority standards | Planned     |
-| O3      | MCP + A2A bindings and delegation demo                       | Planned     |
-| O4      | Explainability + evidence verification                       | Planned     |
-| O5      | Public launch, stars, users, integrations, contributors      | Planned     |
-| O6      | Conformance suite + upstream standards participation         | Planned     |
-| DS-OAAF | DigitalStack integration and proprietary continuity layer    | Separate    |
+| Phase   | Goal                                                    | Status    |
+| ------- | ------------------------------------------------------- | --------- |
+| O1      | OSS foundation + DigitalStack boundary                  | ✅ Closed |
+| O1.5    | Standards and competitive review                        | ✅ Closed |
+| O1.6    | Standards-first repositioning + public framing          | ✅ Closed |
+| O2      | AAT verification + AuthZEN enforcement profile          | ✅ Closed |
+| O3A     | MCP / COAZ binding                                      | ⬅ Next    |
+| O3B     | A2A binding                                             | Planned   |
+| O3C     | Agent delegation demo                                   | Planned   |
+| O4      | Evidence, explainability, developer tooling             | Planned   |
+| O5      | Public launch: stars, users, contributors, integrations | Planned   |
+| O6      | Conformance suite + upstream standards participation    | Planned   |
+| DS-OAAF | DigitalStack consumption + proprietary execution layer  | Separate  |
 
 ## O1 — Foundation and boundary ✅
 
@@ -86,7 +88,7 @@ finding no running code connecting the pieces and no conformance suite.
 to avoid producing a redundant specification, which is the cheapest thing this project
 could have got wrong.
 
-## O1.6 — Standards implementation strategy ⬅ current
+## O1.6 — Standards implementation strategy ✅
 
 Record the repositioning and realign the project around it.
 
@@ -101,30 +103,27 @@ document still claiming an original protocol.
 **Ecosystem evidence created:** credibility. A project whose stated purpose matches its
 artifacts is one an outside reviewer can evaluate honestly.
 
-## O2 — Working enforcement point
+## O2 — Working enforcement point ✅
 
-**Goal: an external TypeScript developer can enforce delegated authority locally, using
-existing standards, in under ten minutes.**
+Verify a delegated authority chain, decide, and explain — using existing standards, with
+no new wire format.
 
-Scope:
+- AAT `-01` chain verification: signatures, temporal validity, delegation depth, parent
+  binding, capability narrowing, and the full constraint subsumption matrix
+- Proof-of-possession verification with RFC 8785 canonical argument binding
+- AuthZEN 1.0 request mapping and decision, frozen by
+  [RFC-0001](rfcs/0001-aat-authzen-enforcement-profile.md)
+- A reason code on every denial, and a human-readable explanation
+- Runnable quickstart: `npm run demo`
 
-- Verify a presented attenuating-token delegation chain, including narrowing invariants
-- Produce an AuthZEN-shaped authorization decision
-- Return a denial reason a developer can act on
-- Deterministic local evaluation
+Three under-specifications in AAT -01 surfaced while implementing, one of them
+exploitable: a derived token could raise `del_max_depth` and escape the root's
+delegation ceiling. All three are handled by failing closed and are recorded in RFC-0001
+for upstream reporting.
 
-No new wire format. Where OAAF must express something the standards do not, the order
-is adopt, profile, extend, invent — and inventing requires a written argument.
-
-The path must require **no** account, database, hosted service, API key, cloud
-infrastructure, or DigitalStack.
-
-_Exit condition:_ a developer who has never seen this repository verifies a delegation
-chain and gets a correct deny with an understandable reason, without reading any
-specification.
-
-**Ecosystem evidence created:** an installable package; a runnable quickstart; the first
-point at which independent users can exist at all.
+**Ecosystem evidence created:** a package that does something real; a quickstart that
+runs with no account or service; and substantive feedback to send to a draft author —
+the first genuine upstream contact this project has had to offer.
 
 ## O3 — MCP and A2A bindings
 

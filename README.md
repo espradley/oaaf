@@ -171,24 +171,29 @@ npm run check
 `npm run check` runs the dependency boundary guard, the format check, the typecheck,
 and the test suite.
 
-The SDK is currently a skeleton. The next milestone is verifying a delegated authority
-token, mapping the requested action into an AuthZEN-compatible decision, and returning
-a result a developer can act on — locally, with no service. See the
-[roadmap](ROADMAP.md).
+To see authority actually enforced — a delegated agent refused a path it gave up:
+
+```bash
+npm run demo
+```
+
+The SDK verifies an AAT `-01` delegation chain, maps the request into an AuthZEN 1.0
+decision, and explains any denial. See [`@oaaf/sdk`](packages/typescript/README.md) and
+the [quickstart](examples/quickstart/index.js).
 
 ## Project maturity
 
 Honest accounting of where this stands:
 
-|                    |                                                                         |
-| ------------------ | ----------------------------------------------------------------------- |
-| Standards profile  | Direction set; specific revisions not yet pinned.                       |
-| TypeScript SDK     | Skeleton only. Not yet published to npm.                                |
-| MCP / A2A bindings | Not started.                                                            |
-| Conformance suite  | Not started.                                                            |
-| Security review    | None. No formal audit, no certification, no threat model published yet. |
-| External adopters  | None yet.                                                               |
-| Governance         | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                        |
+|                    |                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------- |
+| Standards profile  | AAT `-01` and AuthZEN 1.0, pinned. Mapping frozen by RFC-0001.                  |
+| TypeScript SDK     | Chain verification, proof of possession, decision, explanation. Not yet on npm. |
+| MCP / A2A bindings | Not started — next phase.                                                       |
+| Conformance suite  | Not started.                                                                    |
+| Security review    | None. No formal audit, no certification, no threat model published yet.         |
+| External adopters  | None yet.                                                                       |
+| Governance         | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                                |
 
 If you are evaluating OAAF for production use: it is too early. If you are interested
 in shaping how these standards fit together before that calcifies, this is the useful

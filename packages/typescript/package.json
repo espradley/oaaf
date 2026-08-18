@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/mint.d.ts",
+      "default": "./dist/testing/mint.js"
     }
   },
   "files": [
@@ -29,5 +33,9 @@
   },
   "scripts": {
     "build": "tsc --build"
+  },
+  "dependencies": {
+    "canonicalize": "^4.0.0",
+    "jose": "^6.2.9"
   }
 }

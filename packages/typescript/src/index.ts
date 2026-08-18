@@ -1,42 +1,107 @@
 /**
- * `@oaaf/sdk` — TypeScript SDK for the Open Agent Authority Framework.
+ * `@oaaf/sdk` — verify delegated authority, decide, and explain.
  *
- * This package is intentionally almost empty.
+ * OAAF implements and profiles existing standards rather than defining its own
+ * wire format:
  *
- * OAAF adopts existing standards for authority, delegation, decisions, and
- * evidence rather than defining its own. Which standards, at which revisions,
- * is still being settled through the RFC process, so no types for them are
- * published here yet — shipping the wrong shapes is much harder to undo than
- * leaving them unwritten.
+ *   - Delegation chains follow `draft-niyikiza-oauth-attenuating-agent-tokens-01`.
+ *     Support is pinned to that revision, not to "latest".
+ *   - Decisions follow the OpenID AuthZEN Authorization API 1.0.
+ *   - The mapping between them is frozen by RFC-0001.
  *
- * What exists today is the build, type, and test architecture, plus the
- * profile version this SDK targets. The verification and decision surface
- * arrives with the first enforcement point.
+ * Typical use:
  *
- * See `docs/adr/0003-implement-existing-authority-standards.md` for the
- * decision, `rfcs/README.md` for the RFC process, and
- * `spec/0.1/architecture.md` for the architectural model.
+ * ```ts
+ * const decision = await verifyAndEvaluate({ tokens, pop, tool, args });
+ * if (!decision.allowed) console.log(explain(decision));
+ * ```
+ *
+ * What this does not do: revocation and replay protection are outside AAT -01
+ * and outside OAAF. Authority is bounded by `exp` alone.
  */
+
+export { AAT_DRAFT_REVISION, AAT_AUTHORIZATION_DETAIL_TYPE } from './aat/claims.js';
+export type {
+  AatAuthorizationDetail,
+  AatPayload,
+  Cnf,
+  PopPayload,
+  ToolArguments,
+  ToolConstraints,
+} from './aat/claims.js';
+
+export { isConstraint, isPermittedPair, satisfies, subsumes } from './aat/constraints.js';
+export type {
+  AllConstraint,
+  AnyConstraint,
+  Constraint,
+  ConstraintType,
+  ContainsConstraint,
+  ExactConstraint,
+  NotOneOfConstraint,
+  OneOfConstraint,
+  RangeConstraint,
+  SubsetConstraint,
+  WildcardConstraint,
+} from './aat/constraints.js';
+
+/**
+ * Chain-only verification, for inspection, testing, and conformance work.
+ *
+ * **This is not enforcement.** It performs no proof-of-possession check and
+ * produces no authorization decision. Use `verifyAuthority` or
+ * `verifyAndEvaluate` to enforce.
+ */
+export { verifyDelegationChain, MAX_CHAIN_LENGTH, MAX_IAT_SKEW_SECONDS } from './aat/verify.js';
+export type {
+  ChainResult,
+  VerifiedDelegationChain,
+  VerifiedToken,
+  VerifyChainOptions,
+} from './aat/verify.js';
+
+export { verifyProofOfPossession } from './aat/pop.js';
+
+export { evaluate, verifyAndEvaluate, verifyAuthority } from './decide.js';
+export type {
+  Decision,
+  VerifiedAuthority,
+  VerifyAuthorityInput,
+  VerifyAuthorityResult,
+} from './decide.js';
+
+export {
+  OAAF_RESOURCE_TYPE,
+  OAAF_SUBJECT_TYPE,
+  toAccessEvaluationRequest,
+  toAccessEvaluationResponse,
+} from './authzen/map.js';
+export type {
+  AccessEvaluationRequest,
+  AccessEvaluationResponse,
+  AuthZenAction,
+  AuthZenResource,
+  AuthZenSubject,
+} from './authzen/types.js';
+
+export { explain } from './explain.js';
+
+export { denial, REASON_CODES } from './reasons.js';
+export type { Denial, ReasonCode, VerificationStage } from './reasons.js';
 
 /** Specification versions this SDK understands. */
 export type SpecVersion = '0.1';
 
-/**
- * The OAAF specification version this SDK targets.
- *
- * Spec versions are independent of the SDK's own package version: several SDK
- * releases may target one spec version.
- */
+/** The OAAF profile version this SDK targets. */
 export const OAAF_SPEC_VERSION = '0.1' satisfies SpecVersion;
 
 const SUPPORTED_SPEC_VERSIONS: readonly string[] = [OAAF_SPEC_VERSION];
 
 /**
- * Narrow an arbitrary string to a spec version this SDK supports.
+ * Narrow an arbitrary string to a profile version this SDK supports.
  *
- * Callers reading a version off the wire should treat an unsupported version as
- * a reason to refuse the exchange rather than to guess at its meaning — OAAF
- * fails closed.
+ * An unsupported version is a reason to refuse the exchange rather than to
+ * guess at its meaning — OAAF fails closed.
  */
 export function isSupportedSpecVersion(value: string): value is SpecVersion {
   return SUPPORTED_SPEC_VERSIONS.includes(value);
