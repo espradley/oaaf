@@ -80,6 +80,9 @@ describe('RFC-0002 seven cases', () => {
     expect(result.error.code).toBe(JSONRPC_AUTHORIZATION_DENIED);
     const reasons = result.error.data?.['reasons'] as Array<{ code: string }>;
     expect(reasons.map((r) => r.code)).toContain('tool_not_authorized');
+    // MCP-001: on an OAAF denial the PEP refuses BEFORE the PDP — no AuthZEN request
+    // is constructed. The failure branch carries an error and never a request.
+    expect('request' in result).toBe(false);
   });
 
   it('3. resource/argument mismatch denies', async () => {

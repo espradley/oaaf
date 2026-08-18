@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { verifyAndEvaluate, verifyAuthority } from '../decide.js';
 import { toExplanation } from '../explain.js';
 import { enforceA2aAuthority, explainA2aResult } from '../a2a/binding.js';
+import { enforceOaafPrecondition, explainMcpResult } from '../mcp/coaz.js';
 import type { DecisionExplanation } from '../explanation.js';
 import { revokedSetResolver } from '../status.js';
 import { boundSubjectsVerifier } from '../identity.js';
@@ -47,6 +48,7 @@ interface Vector {
   profile: string;
   expected_decision: 'allow' | 'deny';
   expected_normative_reason: string | null;
+  expected_authority_verified?: boolean;
   input: VectorInput;
   notes: string;
   reference: DecisionExplanation;
@@ -79,6 +81,20 @@ async function runVector(v: Vector): Promise<DecisionExplanation> {
     i.bound_subjects !== undefined || i.unavailable_subjects !== undefined
       ? boundSubjectsVerifier(i.bound_subjects ?? [], i.unavailable_subjects ?? [])
       : undefined;
+
+  if (v.profile === 'MCP') {
+    const res = await enforceOaafPrecondition({
+      tokens: i.tokens,
+      trustAnchors: i.trust_anchors,
+      pop: i.pop,
+      tool: i.tool,
+      args: i.args ?? {},
+      ...(now === undefined ? {} : { now }),
+      ...(statusResolver === undefined ? {} : { statusResolver }),
+      ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
+    });
+    return explainMcpResult(res);
+  }
 
   if (v.profile === 'A2A') {
     const activated = i.a2a_extension_activated === false ? [] : [A2A_EXT];
@@ -121,6 +137,11 @@ describe('portable conformance corpus (reference side)', () => {
       expect(result.decision).toBe(v.expected_decision === 'allow' ? 'ALLOW' : 'DENY');
       const primaryReason = result.reasons[0]?.code ?? null;
       expect(primaryReason).toBe(v.expected_normative_reason);
+
+      // PDP: authorityVerified reflects the OAAF authority decision, not a permit.
+      if (v.expected_authority_verified !== undefined) {
+        expect(result.decision === 'ALLOW').toBe(v.expected_authority_verified);
+      }
 
       // Advisory regression: the reference's full explanation is stable.
       expect(normalize(result)).toEqual(normalize(v.reference));

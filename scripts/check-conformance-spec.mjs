@@ -140,6 +140,38 @@ async function main() {
       if (!ids.has(rid)) errors.push(`${where}: references unknown requirement "${rid}"`);
       covered.set(rid, (covered.get(rid) ?? 0) + 1);
     }
+    if (
+      v.expected_authority_verified !== undefined &&
+      typeof v.expected_authority_verified !== 'boolean'
+    ) {
+      errors.push(`${where}: expected_authority_verified must be a boolean`);
+    }
+  }
+
+  // Transport equivalence (CORE-DEC-004): every vector in an equivalence group must
+  // agree on the normative outcome, and a group must span at least two profiles (else
+  // it proves no equivalence).
+  const groups = new Map();
+  for (const v of corpus.vectors ?? []) {
+    if (!v.equivalence_group) continue;
+    if (!groups.has(v.equivalence_group)) groups.set(v.equivalence_group, []);
+    groups.get(v.equivalence_group).push(v);
+  }
+  for (const [group, members] of groups) {
+    const outcomes = new Set(
+      members.map((m) => `${m.expected_decision}/${m.expected_normative_reason ?? '-'}`),
+    );
+    if (outcomes.size > 1) {
+      errors.push(
+        `equivalence group "${group}" disagrees on outcome: ${[...outcomes].join(' vs ')}`,
+      );
+    }
+    const profiles = new Set(members.map((m) => m.profile));
+    if (profiles.size < 2) {
+      errors.push(
+        `equivalence group "${group}" spans only one profile (${[...profiles]}) — proves no transport equivalence`,
+      );
+    }
   }
 
   // North star: every Core security-invariant requirement that can be a static

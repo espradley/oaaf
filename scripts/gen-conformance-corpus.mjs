@@ -26,6 +26,9 @@ import {
   toExplanation,
   revokedSetResolver,
   boundSubjectsVerifier,
+  enforceOaafPrecondition,
+  explainMcpResult,
+  toAuthorityContext,
 } from '../packages/typescript/dist/index.js';
 import { enforceA2aAuthority, explainA2aResult } from '../packages/typescript/dist/a2a/binding.js';
 import {
@@ -70,7 +73,17 @@ const vectors = [];
  * is the declared normative reason (null for allow); generation fails if it does
  * not match the reference.
  */
-function record({ id, requirements, profile, notes, input, explanation, wantReason }) {
+function record({
+  id,
+  requirements,
+  profile,
+  notes,
+  input,
+  explanation,
+  wantReason,
+  equivalenceGroup,
+  authorityVerified,
+}) {
   const decision = explanation.decision.toLowerCase(); // 'allow' | 'deny'
   const actualReason = explanation.reasons[0]?.code ?? null;
   if (decision === 'deny' && wantReason !== undefined && actualReason !== wantReason) {
@@ -84,6 +97,8 @@ function record({ id, requirements, profile, notes, input, explanation, wantReas
     profile,
     expected_decision: decision,
     expected_normative_reason: decision === 'deny' ? actualReason : null,
+    ...(equivalenceGroup ? { equivalence_group: equivalenceGroup } : {}),
+    ...(authorityVerified === undefined ? {} : { expected_authority_verified: authorityVerified }),
     input,
     notes,
     reference: explanation,
@@ -187,7 +202,7 @@ async function core({ id, requirements, notes, input: inp, wantReason }) {
   });
   await core({
     id: 'core-narrow-widening-tool',
-    requirements: ['CORE-NARROW-001'],
+    requirements: ['CORE-NARROW-001', 'CORE-EXPL-002'],
     notes:
       'The central thesis. A derived token grants repo.delete, a tool absent from its parent. A verifier MUST reject a delegation that grants authority absent from its parent.',
     input: input(c, await pop(c.bob, 'repo.delete', {}), 'repo.delete', {}),
@@ -631,7 +646,7 @@ async function core({ id, requirements, notes, input: inp, wantReason }) {
   });
   await core({
     id: 'core-constr-tool-not-authorized',
-    requirements: ['CORE-CONSTR-003'],
+    requirements: ['CORE-CONSTR-003', 'CORE-EXPL-001'],
     notes:
       'The request asks for a tool the verified leaf authority does not hold (held by the root, not delegated).',
     input: input(c, await pop(c.bob, 'repo.merge', {}), 'repo.merge', {}),
@@ -675,6 +690,7 @@ async function core({ id, requirements, notes, input: inp, wantReason }) {
       'CORE-CONSTR-003',
       'CORE-SUBJ-001',
       'CORE-DEC-001',
+      'CORE-EXPL-001',
     ],
     notes:
       'A valid delegated authority narrowed from {read,merge} to {read}, exercised correctly. ALLOW.',
@@ -911,6 +927,192 @@ async function a2aResult(
     explanation: explainA2aResult(res),
   });
 }
+
+// ============================================================================
+// Transport equivalence (CORE-DEC-004) + MCP profile
+// ============================================================================
+// The SAME authority material, presented through the core path, the MCP/COAZ
+// precondition, and the A2A binding, must reach the same normative authority
+// outcome. Each equivalence group emits one Core, one MCP, and one A2A vector over
+// an identical input; the guard checks the group agrees, and the runner proves an
+// implementation reproduces it across the bindings it claims.
+
+async function mcpExplanation(inp) {
+  const res = await enforceOaafPrecondition({
+    tokens: inp.tokens,
+    trustAnchors: inp.trust_anchors,
+    pop: inp.pop,
+    tool: inp.tool,
+    args: inp.args ?? {},
+    now: inp.now,
+  });
+  return explainMcpResult(res);
+}
+
+async function a2aExplanation(inp) {
+  const res = await enforceA2aAuthority({
+    message: { metadata: { [A2A_CHAIN]: inp.tokens, [A2A_POP]: inp.pop } },
+    activatedExtensionUris: [A2A_EXT],
+    trustAnchors: inp.trust_anchors,
+    skillId: inp.tool,
+    args: inp.args ?? {},
+    recipient: inp.recipient ?? RECIPIENT,
+    requireRecipientBinding: true,
+    now: inp.now,
+  });
+  return explainA2aResult(res);
+}
+
+async function equivalenceGroup({ group, requirements, notes, build }) {
+  // build() -> { c, tool, args, popArgs } ; the pop carries aat_aud=RECIPIENT so the
+  // A2A recipient check passes on allow (core/MCP ignore aat_aud).
+  const { c, tool, args, popArgs } = await build();
+  const p = await pop(c.bob, tool, popArgs ?? args, { aat_aud: RECIPIENT });
+  const inp = input(c, p, tool, args, {
+    recipient: RECIPIENT,
+    a2a_extension_activated: true,
+    a2a_authority_material_present: true,
+  });
+
+  const coreExp = await coreExplanation(coreCall(inp));
+  const mcpExp = await mcpExplanation(inp);
+  const a2aExp = await a2aExplanation(inp);
+
+  // The authority-level outcome must be identical across all three bindings.
+  const key = (e) => `${e.decision}/${e.reasons[0]?.code ?? '-'}`;
+  if (key(coreExp) !== key(mcpExp) || key(coreExp) !== key(a2aExp)) {
+    throw new Error(
+      `equivalence ${group}: bindings disagree — core=${key(coreExp)} mcp=${key(mcpExp)} a2a=${key(a2aExp)}`,
+    );
+  }
+
+  const uniq = (xs) => [...new Set(xs)];
+  const eqReq = uniq([...requirements, 'CORE-DEC-004']);
+  record({
+    id: `${group}-core`,
+    requirements: eqReq,
+    profile: 'Core',
+    notes: `${notes} (core path)`,
+    input: inp,
+    explanation: coreExp,
+    equivalenceGroup: group,
+  });
+  record({
+    id: `${group}-mcp`,
+    requirements: uniq([...eqReq, 'MCP-001']),
+    profile: 'MCP',
+    notes: `${notes} (MCP/COAZ precondition)`,
+    input: inp,
+    explanation: mcpExp,
+    equivalenceGroup: group,
+  });
+  record({
+    id: `${group}-a2a`,
+    requirements: uniq([...eqReq, 'A2A-002']),
+    profile: 'A2A',
+    notes: `${notes} (A2A binding)`,
+    input: inp,
+    explanation: a2aExp,
+    equivalenceGroup: group,
+  });
+}
+
+await equivalenceGroup({
+  group: 'equiv-allow',
+  requirements: [],
+  notes: 'A valid delegated authority allows identically across bindings',
+  build: async () => ({
+    c: await chain({
+      rootTools: { 'repo.read': {}, 'repo.merge': {} },
+      leafTools: { 'repo.read': {} },
+    }),
+    tool: 'repo.read',
+    args: { path: 'src/' },
+  }),
+});
+await equivalenceGroup({
+  group: 'equiv-widening',
+  requirements: [],
+  notes: 'An authority-widening chain denies identically across bindings',
+  build: async () => ({
+    c: await chain({
+      rootTools: { 'repo.read': {} },
+      leafTools: { 'repo.read': {}, 'repo.delete': {} },
+    }),
+    tool: 'repo.delete',
+    args: {},
+  }),
+});
+await equivalenceGroup({
+  group: 'equiv-expired',
+  requirements: [],
+  notes: 'An expired authority denies identically across bindings',
+  build: async () => {
+    const c = await chain({
+      rootTools: { 'repo.read': {} },
+      leafTools: { 'repo.read': {} },
+      rootOver: { issuedAt: NOW - HOUR * 4, expiresAt: NOW - HOUR * 2 },
+    });
+    return { c, tool: 'repo.read', args: {} };
+  },
+});
+
+// ============================================================================
+// Profile: PDP (RFC-0006)
+// ============================================================================
+// OAAF validates authority and hands the verified facts to the organization's PDP.
+// authorityVerified reflects OAAF's authority decision — NOT a policy permit. These
+// vectors certify that OAAF produces a correct authority context; that a valid
+// authority can still be org-denied on policy (PDP-001) is the org's decision, not
+// OAAF's, and is certified by inspection + the pdp-coexistence example.
+
+async function pdpVec({ id, requirements, notes, build, wantDecision }) {
+  const { c, tool, args, popArgs } = await build();
+  const p = await pop(c.bob, tool, popArgs ?? args);
+  const inp = input(c, p, tool, args);
+  const exp = await coreExplanation(coreCall(inp));
+  const verified = exp.decision === 'ALLOW';
+  record({
+    id,
+    requirements,
+    profile: 'PDP',
+    notes,
+    input: inp,
+    explanation: exp,
+    authorityVerified: verified,
+    wantReason: wantDecision === 'deny' ? undefined : null,
+  });
+}
+
+{
+  const secret = 'q3-forecast-value-7b21';
+  await pdpVec({
+    id: 'pdp-allow-authority-context-verified',
+    requirements: ['PDP-002', 'PDP-004'],
+    notes: `Valid authority: OAAF allows and produces an authority context with authorityVerified=true, carrying argument names (e.g. "path") but never the value ("${secret}").`,
+    build: async () => ({
+      c: await chain({ rootTools: { 'repo.read': {} }, leafTools: { 'repo.read': {} } }),
+      tool: 'repo.read',
+      args: { path: secret },
+    }),
+    wantDecision: 'allow',
+  });
+}
+await pdpVec({
+  id: 'pdp-deny-no-authority-context',
+  requirements: ['PDP-002'],
+  notes:
+    'Invalid (widening) authority: OAAF denies and authorityVerified is false — no verified facts are handed to the PDP.',
+  build: async () => ({
+    c: await chain({
+      rootTools: { 'repo.read': {} },
+      leafTools: { 'repo.read': {}, 'repo.delete': {} },
+    }),
+    tool: 'repo.delete',
+    args: {},
+  }),
+  wantDecision: 'deny',
+});
 
 // ============================================================================
 // Serialize

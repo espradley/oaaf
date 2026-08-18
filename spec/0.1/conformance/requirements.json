@@ -255,7 +255,8 @@
       "security_invariant": false,
       "testable": true,
       "source": ["RFC-0001"],
-      "statement": "A chain-only inspection operation MAY exist, but it MUST NOT emit an authorization decision and MUST be documented as not constituting enforcement."
+      "statement": "A chain-only inspection operation MAY exist, but it MUST NOT emit an authorization decision and MUST be documented as not constituting enforcement.",
+      "portable_vector": false
     },
     {
       "id": "CORE-SUBJ-001",
@@ -442,7 +443,8 @@
       "security_invariant": true,
       "testable": true,
       "source": ["RFC-0004"],
-      "statement": "A resolver backed by a bounded-freshness status artifact MUST treat an artifact past its freshness as unknown, not as its last-known contents."
+      "statement": "A resolver backed by a bounded-freshness status artifact MUST treat an artifact past its freshness as unknown, not as its last-known contents.",
+      "portable_vector": false
     },
     {
       "id": "STATUS-006",
@@ -487,7 +489,8 @@
       "security_invariant": true,
       "testable": true,
       "source": ["RFC-0005"],
-      "statement": "An OIDC subject MUST be composed with its issuer into a collision-safe URI; a bare sub MUST NOT be used alone across issuers."
+      "statement": "An OIDC subject MUST be composed with its issuer into a collision-safe URI; a bare sub MUST NOT be used alone across issuers.",
+      "portable_vector": false
     },
     {
       "id": "IDENT-005",
@@ -514,7 +517,8 @@
       "security_invariant": false,
       "testable": true,
       "source": ["RFC-0002"],
-      "statement": "OAAF MUST NOT redefine COAZ/MCP request semantics (subject, action, resource); it contributes only an additional precondition and an optional context member."
+      "statement": "OAAF MUST NOT redefine COAZ/MCP request semantics (subject, action, resource); it contributes only an additional precondition and an optional context member.",
+      "portable_vector": false
     },
     {
       "id": "MCP-003",
@@ -523,7 +527,8 @@
       "security_invariant": false,
       "testable": true,
       "source": ["RFC-0002", "RFC-0006"],
-      "statement": "On success the PEP MAY add a context.oaaf member carrying the canonical authority context."
+      "statement": "On success the PEP MAY add a context.oaaf member carrying the canonical authority context.",
+      "portable_vector": false
     },
     {
       "id": "A2A-001",
@@ -559,7 +564,8 @@
       "security_invariant": true,
       "testable": true,
       "source": ["RFC-0003"],
-      "statement": "The proof-of-possession holder and the AAT leaf holder MUST correspond. The A2A-authenticated caller identity and the AAT holder MAY differ unless the deployment requires them equal."
+      "statement": "The proof-of-possession holder and the AAT leaf holder MUST correspond. The A2A-authenticated caller identity and the AAT holder MAY differ unless the deployment requires them equal.",
+      "portable_vector": false
     },
     {
       "id": "PDP-001",

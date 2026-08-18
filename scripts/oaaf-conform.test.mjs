@@ -29,13 +29,36 @@ for await (const line of rl) {
   if (m.type === 'hello') say({ type: 'hello', profiles: ${JSON.stringify(profiles)} });
   else if (m.type === 'evaluate') {
     const v = byId.get(m.vector_id);
-    say({ type: 'result', vector_id: m.vector_id, decision: v.expected_decision, reason: v.expected_normative_reason });
+    const out = { type: 'result', vector_id: m.vector_id, decision: v.expected_decision, reason: v.expected_normative_reason };
+    if (v.expected_authority_verified !== undefined) out.authority_verified = v.expected_authority_verified;
+    say(out);
   } else if (m.type === 'bye') break;
 }
 `;
 }
 
 /** A mock adapter that always answers allow (wrong for deny vectors). */
+/** Correct decision/reason but flips authority_verified — must fail PDP vectors. */
+const pdpLiarAdapter = `
+import readline from 'node:readline';
+import { readFileSync } from 'node:fs';
+const corpus = JSON.parse(readFileSync(${JSON.stringify(corpus)}, 'utf8'));
+const byId = new Map(corpus.vectors.map((v) => [v.vector_id, v]));
+const say = (o) => process.stdout.write(JSON.stringify(o) + '\\n');
+const rl = readline.createInterface({ input: process.stdin });
+for await (const line of rl) {
+  if (!line.trim()) continue;
+  const m = JSON.parse(line);
+  if (m.type === 'hello') say({ type: 'hello', profiles: ['Core', 'PDP'] });
+  else if (m.type === 'evaluate') {
+    const v = byId.get(m.vector_id);
+    const out = { type: 'result', vector_id: m.vector_id, decision: v.expected_decision, reason: v.expected_normative_reason };
+    if (v.expected_authority_verified !== undefined) out.authority_verified = !v.expected_authority_verified;
+    say(out);
+  } else if (m.type === 'bye') break;
+}
+`;
+
 const brokenAdapter = `
 import readline from 'node:readline';
 const say = (o) => process.stdout.write(JSON.stringify(o) + '\\n');
@@ -57,6 +80,7 @@ beforeAll(() => {
   );
   writeFileSync(path.join(dir, 'core-only.mjs'), conformantAdapter(['Core']));
   writeFileSync(path.join(dir, 'broken.mjs'), brokenAdapter);
+  writeFileSync(path.join(dir, 'pdp-liar.mjs'), pdpLiarAdapter);
 });
 
 async function conform(adapterFile, extra = []) {
@@ -100,6 +124,13 @@ describe('oaaf conform runner', () => {
     expect(good.stdout).toContain('starring the project');
     const bad = await conform('broken.mjs', ['--profile', 'Core']);
     expect(bad.stdout).not.toContain('starring the project');
+  });
+
+  it('fails a PDP adapter that misreports authority_verified', async () => {
+    const { code, stdout } = await conform('pdp-liar.mjs', ['--profile', 'PDP']);
+    expect(code).toBe(1);
+    expect(stdout).toContain('NOT CONFORMANT');
+    expect(stdout).toContain('pdp-allow-authority-context-verified');
   });
 
   it('--json output is pristine: no promo, nudge, or prose', async () => {

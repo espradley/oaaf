@@ -163,14 +163,22 @@ async function main() {
       v.expected_decision === 'allow'
         ? true
         : (res?.reason ?? null) === v.expected_normative_reason;
+    // PDP vectors: the adapter reports whether OAAF verified the authority (not a permit).
+    const authorityVerifiedOk =
+      v.expected_authority_verified === undefined
+        ? true
+        : (res?.authority_verified ?? null) === v.expected_authority_verified;
     // Privacy vectors: if the adapter returns its serialized output, no arg value may appear.
     let privacyOk = true;
-    if (v.requirements.includes('CORE-EXPL-003') && typeof res?.output === 'string') {
+    if (
+      (v.requirements.includes('CORE-EXPL-003') || v.requirements.includes('PDP-004')) &&
+      typeof res?.output === 'string'
+    ) {
       privacyOk = Object.values(v.input.args ?? {}).every(
         (val) => !res.output.includes(String(val)),
       );
     }
-    if (decisionOk && reasonOk && privacyOk) {
+    if (decisionOk && reasonOk && privacyOk && authorityVerifiedOk) {
       passed++;
     } else {
       failures.push({
@@ -178,6 +186,11 @@ async function main() {
         requirements: v.requirements,
         expected: { decision: v.expected_decision, reason: v.expected_normative_reason },
         actual: { decision: res?.decision ?? null, reason: res?.reason ?? null },
+        ...(authorityVerifiedOk
+          ? {}
+          : {
+              authority_verified: `expected ${v.expected_authority_verified}, got ${res?.authority_verified ?? null}`,
+            }),
         ...(privacyOk ? {} : { privacy: 'argument value leaked into decision output' }),
       });
     }

@@ -25,7 +25,7 @@ CORPUS = json.loads(
     (Path(__file__).resolve().parents[2] / "spec" / "0.1" / "conformance" / "vectors" / "corpus.json").read_text()
 )
 # Profiles this implementation claims. A2A is deliberately absent.
-SUPPORTED_PROFILES = {"Core", "Status", "Identity"}
+SUPPORTED_PROFILES = {"Core", "Status", "Identity", "PDP"}
 VECTORS = [v for v in CORPUS["vectors"] if v["profile"] in SUPPORTED_PROFILES]
 
 
@@ -63,6 +63,10 @@ def test_python_satisfies_portable_contract(vector):
     # normative reason (first reason for a deny; none for an allow)
     primary = result.reasons[0].code if result.reasons else None
     assert primary == vector["expected_normative_reason"]
+
+    # PDP: authorityVerified reflects OAAF's authority decision, not a policy permit
+    if "expected_authority_verified" in vector:
+        assert (result.decision == "ALLOW") == vector["expected_authority_verified"]
 
     # subject/holder canonicalization is normative (CORE-SUBJ) — check on allow
     if vector["expected_decision"] == "allow" and vector["reference"].get("authority"):

@@ -107,8 +107,13 @@ object per line, strict request/response. The adapter writes only protocol messa
    ```
    - `decision` — `"allow"` or `"deny"`.
    - `reason` — the normative reason code for a deny; `null` for an allow.
-   - `output` — optional. If provided for a privacy vector (`CORE-EXPL-003`), the runner
-     additionally checks that no argument value from the input appears in it.
+   - `authority_verified` — for a **PDP**-profile vector, whether OAAF verified the authority.
+     `true` on a valid authority, `false` otherwise. It states OAAF's authority decision, **not**
+     a policy permit — a downstream PDP may still deny on policy. The runner compares it to the
+     vector's `expected_authority_verified` when present.
+   - `output` — optional. If provided for a privacy vector (`CORE-EXPL-003`) or a PDP context
+     vector (`PDP-004`), the runner additionally checks that no argument value from the input
+     appears in it (names, never values).
 
 3. **Bye.** Runner → adapter: `{"type":"bye"}`; the adapter exits.
 
@@ -122,6 +127,20 @@ Only the **portable normative contract**: `decision`, and for a deny the
 `expected_normative_reason`. Reason granularity beyond the normative set, stage labels,
 locators, and message wording are **not** compared (see [classification.md](classification.md)) —
 an independent implementation is free to differ on them.
+
+### Transport equivalence and PDP
+
+Some vectors share an `equivalence_group`: the same authority input presented through the
+Core, MCP, and A2A bindings. They must reach the same normative outcome — that is CORE-DEC-004,
+and the corpus guard rejects a group that disagrees. A runner run that includes multiple
+bindings therefore demonstrates transport equivalence as a side effect of passing.
+
+PDP-profile vectors carry `expected_authority_verified`: the adapter reports whether OAAF
+validated the authority, and (on a valid authority) may return the authority context as
+`output` so the runner can confirm it carries names, never values. A valid authority yielding
+`authority_verified: true` is OAAF's decision; the organization's PDP may still legitimately
+deny on policy — that boundary (PDP-001) is OAAF's not making the policy call, certified by
+inspection and the pdp-coexistence example.
 
 ## Machine output (`--json`)
 

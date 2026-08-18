@@ -62,7 +62,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O6A         | Normative conformance specification                  | ✅ Complete              |
 | O6B         | Portable conformance vectors                         | ✅ Complete              |
 | O6C         | Cross-language conformance runner + parity           | ✅ Complete              |
-| O6D         | Binding / protocol conformance                       | ⏸️ Planned               |
+| O6D         | Binding/profile conformance + transport equivalence  | ✅ Complete              |
 | O6E         | Security conformance                                 | ⏸️ Planned               |
 | O6F         | Upstream standards participation                     | ⏸️ Planned               |
 | O6G         | Competitive collision audit                          | ⏸️ Planned               |
@@ -339,9 +339,32 @@ runner requires no OAAF SDK inside the adapter** — the load-bearing O6C constr
   corpus hash** — the parity statement, now executed by the runner rather than a test harness.
 - Exit codes 0/1/2 (conformant / not / runner error); `npm run conform`.
 
-### O6D — Binding / protocol conformance ⏸️
+### O6D — Binding/profile conformance + transport equivalence ✅
 
-Certify MCP/COAZ and A2A authority behavior, including the transport-neutral invariants.
+Proves two invariants the binding profiles rest on, exercising the normative boundary — not
+simulating full MCP servers, A2A agents, or policy engines.
+
+- **Transport equivalence (CORE-DEC-004):** the same authority material, presented through the
+  core path, the MCP/COAZ precondition, and the A2A binding, reaches the **same normative
+  outcome**. Certified by `equivalence_group` corpus vectors (allow, widening-deny,
+  expired-deny), each spanning Core+MCP+A2A, and enforced by `check:conformance` (a group that
+  disagrees or spans one profile fails the guard). Generation self-validates that the three
+  bindings agree before writing a group.
+- **PDP invariant (RFC-0006):** a valid authority yields `authorityVerified: true` (OAAF's
+  authority decision), but the organization's PDP may still legitimately DENY on policy — OAAF
+  validates authority; it does not own policy. PDP vectors carry `expected_authority_verified`
+  and (on allow) the authority context, which the runner checks carries names, never values
+  (PDP-004). The "org may deny a valid authority" boundary (PDP-001) is certified by inspection
+  and the pdp-coexistence example. MCP-001's refuse-before-the-PDP (no AuthZEN request built on
+  denial) has an explicit reference assertion.
+- **Corpus + protocol grew** to 51 vectors (Core 34, A2A 6, Status 4, MCP 3, Identity 3, PDP 2);
+  the adapter protocol gained an optional `authority_verified`. Reference adapters: TypeScript
+  now claims all six profiles (51/51); Python claims Core+Status+Identity+**PDP** (42/42) and
+  still declines MCP/A2A — the profile model holding across a fifth profile.
+- **Coverage** ([traceability.md](spec/0.1/conformance/traceability.md)): 46 requirements
+  vector-covered, 17 design-only, **1 open gap** (`CORE-CONSTR-004`, a non-security nicety that
+  denies as `token_malformed` in the closed-world model) — a corpus-growth candidate, not a
+  blocker.
 
 ### O6E — Security conformance ⏸️
 

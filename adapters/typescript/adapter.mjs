@@ -29,6 +29,9 @@ const {
   toExplanation,
   revokedSetResolver,
   boundSubjectsVerifier,
+  enforceOaafPrecondition,
+  explainMcpResult,
+  toAuthorityContext,
 } = await import(path.join(dist, 'index.js'));
 const { enforceA2aAuthority, explainA2aResult } = await import(
   path.join(dist, 'a2a', 'binding.js')
@@ -37,7 +40,7 @@ const { enforceA2aAuthority, explainA2aResult } = await import(
 const A2A_CHAIN = 'https://oaaf.dev/a2a/authority/v1/chain';
 const A2A_POP = 'https://oaaf.dev/a2a/authority/v1/pop';
 const A2A_EXT = 'https://oaaf.dev/a2a/authority/v1';
-const PROFILES = ['Core', 'Status', 'Identity', 'A2A'];
+const PROFILES = ['Core', 'Status', 'Identity', 'A2A', 'MCP', 'PDP'];
 
 function say(obj) {
   process.stdout.write(JSON.stringify(obj) + '\n');
@@ -54,6 +57,55 @@ async function evaluate(v) {
     i.bound_subjects !== undefined || i.unavailable_subjects !== undefined
       ? boundSubjectsVerifier(i.bound_subjects ?? [], i.unavailable_subjects ?? [])
       : undefined;
+
+  // MCP/COAZ: the OAAF precondition. Same authority outcome as core, wrapped as a
+  // JSON-RPC error on denial; explainMcpResult strips the envelope.
+  if (v.profile === 'MCP') {
+    const res = await enforceOaafPrecondition({
+      tokens: i.tokens,
+      trustAnchors: i.trust_anchors,
+      pop: i.pop,
+      tool: i.tool,
+      args: i.args ?? {},
+      ...(now === undefined ? {} : { now }),
+      ...(statusResolver === undefined ? {} : { statusResolver }),
+      ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
+    });
+    const exp = explainMcpResult(res);
+    return {
+      type: 'result',
+      vector_id: v.vector_id,
+      decision: exp.decision.toLowerCase(),
+      reason: exp.reasons[0]?.code ?? null,
+    };
+  }
+
+  // PDP: OAAF validates authority and (on allow) produces the authority context. The
+  // authorityVerified marker reflects OAAF's authority decision, not a policy permit.
+  if (v.profile === 'PDP') {
+    const common = {
+      tokens: i.tokens,
+      trustAnchors: i.trust_anchors,
+      pop: i.pop,
+      tool: i.tool,
+      args: i.args ?? {},
+      ...(now === undefined ? {} : { now }),
+      ...(statusResolver === undefined ? {} : { statusResolver }),
+      ...(identityBindingVerifier === undefined ? {} : { identityBindingVerifier }),
+    };
+    const decision = await verifyAndEvaluate(common);
+    const auth = await verifyAuthority(common);
+    const exp = toExplanation(decision, auth.ok ? auth.authority : undefined);
+    const verified = exp.decision === 'ALLOW' && auth.ok;
+    return {
+      type: 'result',
+      vector_id: v.vector_id,
+      decision: exp.decision.toLowerCase(),
+      reason: exp.reasons[0]?.code ?? null,
+      authority_verified: verified,
+      output: verified ? JSON.stringify(toAuthorityContext(auth.authority)) : undefined,
+    };
+  }
 
   let explanation;
   if (v.profile === 'A2A') {

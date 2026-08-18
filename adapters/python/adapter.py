@@ -14,9 +14,17 @@ requires no OAAF code.
 import json
 import sys
 
-from oaaf import verify_and_evaluate, revoked_set_resolver, bound_subjects_verifier
+import dataclasses
 
-PROFILES = ["Core", "Status", "Identity"]
+from oaaf import (
+    verify_and_evaluate,
+    verify_chain,
+    to_authority_context,
+    revoked_set_resolver,
+    bound_subjects_verifier,
+)
+
+PROFILES = ["Core", "Status", "Identity", "PDP"]
 
 
 def say(obj):
@@ -46,6 +54,25 @@ def evaluate(v):
         status_resolver=status_resolver,
         identity_binding_verifier=identity,
     )
+
+    # PDP profile: OAAF validates authority and (on allow) produces the authority
+    # context. authority_verified reflects the authority decision, not a policy permit.
+    if v["profile"] == "PDP":
+        verified = result.decision == "ALLOW"
+        ctx_output = None
+        if verified:
+            chain, _ = verify_chain(i["tokens"], i["trust_anchors"], i.get("now") or 0)
+            ctx = to_authority_context(chain, i["tool"], i.get("args", {}))
+            ctx_output = json.dumps(dataclasses.asdict(ctx))
+        return {
+            "type": "result",
+            "vector_id": v["vector_id"],
+            "decision": result.decision.lower(),
+            "reason": result.reasons[0].code if result.reasons else None,
+            "authority_verified": verified,
+            "output": ctx_output,
+        }
+
     output = json.dumps(
         {
             "decision": result.decision,
