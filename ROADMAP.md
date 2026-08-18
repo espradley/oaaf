@@ -66,7 +66,7 @@ boundary is technical and binds everyone, including Edwin Digital
 | O6C         | Cross-language conformance runner + parity           | ✅ Complete              |
 | O6D         | Binding/profile conformance + transport equivalence  | ✅ Complete              |
 | O6E         | Security / adversarial certification                 | ✅ Complete              |
-| O6F         | Upstream standards participation                     | ⏸️ Planned               |
+| O6F         | Standards reconciliation + v1 dependency readiness   | ✅ Complete              |
 | O6G         | Competitive collision audit                          | ⏸️ Planned               |
 | O6H         | v1 compatibility / readiness contract                | ⏸️ Planned               |
 | **O6 exit** | **OAAF v1 technical foundation / freeze**            | 🎯                       |
@@ -407,10 +407,32 @@ internals — [spec/0.1/conformance/security.md](spec/0.1/conformance/security.m
 - **Reserved space stayed out:** per ADR-0002, the phase attacked the published authority system
   only — no continuity/supersession/recovery/fencing, and no "freshness" as execution control.
 
-### O6F — Upstream standards participation ⏸️
+### O6F — Standards reconciliation + v1 dependency readiness ✅
 
-Determine which findings and conventions to propose upstream, and which stay OAAF-specific
-implementation behavior.
+A fresh primary-source audit (Aug 2026) of every external dependency, classifying each for a v1
+freeze — [spec/0.1/conformance/standards-readiness.md](spec/0.1/conformance/standards-readiness.md).
+Nothing was auto-upgraded: normative behavior is compared before any change.
+
+- **Four-outcome classification.** STABLE: AuthZEN Authorization API **1.0 Final** (not subject to
+  revision), A2A 1.0.1, SPIFFE, and all JOSE/JWT/JCS/thumbprint RFCs. PINNED: AAT `-01` and COAZ.
+  EXPERIMENTAL: WIMSE `-03` and Token Status List `-21`. **REPLACE/RECONCILE: none** — every
+  movement since OAAF pinned is a stabilization, not a break (AuthZEN → Final, A2A extension
+  shipped, COAZ → AuthZEN WG Draft, Status List → RFC Editor Queue).
+- **AAT is the one real risk** and there is **no `-02`**, so no upgrade is forced; the pin holds,
+  and any future revision triggers an explicit attenuation/PoP/claim/subsumption compatibility
+  analysis before adoption (a new profile version, not a silent bump).
+- **Profile-decision reconciliation:** no conflicts and no obsolete workarounds — OAAF is not
+  carrying historical patches for ambiguities upstream has since resolved. Two forward
+  opportunities noted (Status List → RFC, COAZ → WG Draft), neither forcing a v1 change.
+- **v1-readiness test — "if every draft vanished tomorrow":** the verification _semantics_ survive
+  completely (they live in OAAF's requirement catalog, corpus, and security cert, not the AAT
+  text), and the decision/crypto/identity layers rest on stable standards. The one gap is that the
+  AAT `-01` token _wire format_ is pinned by reference + fixtures rather than a standalone OAAF
+  document. **Recommendation for O6G/O6H:** add a profiled AAT-`-01` claim-shape appendix so Core
+  is implementable from OAAF's archive alone — not a blocker, but a materially stronger v1 footing.
+
+(This absorbed the "upstream participation" framing into a concrete dependency-readiness audit;
+what to propose upstream is a lighter follow-up, not a freeze prerequisite.)
 
 ### O6G — Competitive collision audit ⏸️
 
