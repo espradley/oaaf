@@ -6,7 +6,12 @@
     "declaration": false,
     "declarationMap": false,
     "sourceMap": false,
-    "types": ["vitest/globals"]
+    "types": [
+      "vitest/globals",
+      "node"
+    ]
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }
