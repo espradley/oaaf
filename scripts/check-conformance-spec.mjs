@@ -94,10 +94,16 @@ async function main() {
   const { errors, ids } = validateCatalog(catalog);
   const referenced = new Set();
 
+  // A token is a requirement reference only if it carries a declared class prefix. This keeps
+  // lookalikes in prose (SHA-256, RFC-9278, base64url) from being read as requirement IDs.
+  const knownPrefixes = new Set(Object.values(catalog.classPrefixes ?? {}));
+  const isRequirementRef = (token) => knownPrefixes.has(token.split('-')[0]);
+
   for await (const file of markdownFiles(path.join(REPO_ROOT, SPEC_DIR))) {
     const text = await readFile(file, 'utf8');
     const rel = path.relative(REPO_ROOT, file);
     for (const token of text.match(ID_PATTERN) ?? []) {
+      if (!isRequirementRef(token)) continue;
       referenced.add(token);
       if (!ids.has(token)) errors.push(`${rel}: references unknown requirement id "${token}"`);
     }
@@ -183,7 +189,9 @@ async function main() {
   } catch {
     errors.push('security.md is missing (O6E security certification)');
   }
-  const securityRefs = new Set(securityText.match(ID_PATTERN) ?? []);
+  const securityRefs = new Set(
+    (securityText.match(ID_PATTERN) ?? []).filter((t) => knownPrefixes.has(t.split('-')[0])),
+  );
   for (const r of catalog.requirements ?? []) {
     if (r.security_invariant === true && !securityRefs.has(r.id)) {
       errors.push(`security invariant ${r.id} has no adversarial evidence recorded in security.md`);

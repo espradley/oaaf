@@ -1,0 +1,252 @@
+{
+  "note": "Frozen reason-code classification for OAAF Core 1.0 (O6G). core-normative and profile-normative codes are the v1 interoperability contract: a conformant implementation MUST emit the listed code for the check it names. diagnostic codes are implementation-specific granularity that MAY vary. Renaming or removing a normative code is a breaking (2.0) change; adding one is a 1.x change. The set below MUST match the implementation reason-code list exactly (enforced by check:conformance).",
+  "spec_version": "0.1",
+  "target_version": "1.0",
+  "counts": {
+    "core_normative": 19,
+    "profile_normative": 8,
+    "diagnostic": 26,
+    "total": 53
+  },
+  "codes": [
+    {
+      "code": "chain_empty",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "chain_too_long",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "chain_cycle_detected",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "token_malformed",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "token_too_large",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "authorization_details_invalid",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "par_hash_present_on_root",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "par_hash_missing",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "invalid_signature",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "algorithm_not_permitted",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "untrusted_root",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "private_key_material",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "issuer_thumbprint_mismatch",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "par_hash_mismatch",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "holder_key_invalid",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "expired",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "not_yet_valid",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "expiry_exceeds_parent",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "issued_before_parent",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "expiry_not_after_issuance",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "lifetime_exceeded",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "delegation_depth_invalid",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "delegation_depth_exceeded",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "delegation_ceiling_raised",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "delegation_ceiling_invalid",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "depth_exceeds_own_ceiling",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "chain_length_mismatch",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "root_depth_invalid",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "tool_not_delegated",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "constraint_expansion",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "constraint_type_unrecognized",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "constraint_type_not_permitted",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "argument_key_set_mismatch",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "constraint_too_deep",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "tool_not_authorized",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "argument_not_permitted",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "argument_missing",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "argument_constraint_violated",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "pop_missing",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "pop_malformed",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "pop_signature_invalid",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "pop_token_mismatch",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "pop_tool_mismatch",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "pop_binding_mismatch",
+      "tier": "core-normative",
+      "profile": "Core"
+    },
+    {
+      "code": "pop_stale",
+      "tier": "diagnostic"
+    },
+    {
+      "code": "pop_recipient_mismatch",
+      "tier": "profile-normative",
+      "profile": "A2A"
+    },
+    {
+      "code": "authority_revoked",
+      "tier": "profile-normative",
+      "profile": "Status"
+    },
+    {
+      "code": "status_unavailable",
+      "tier": "profile-normative",
+      "profile": "Status"
+    },
+    {
+      "code": "subject_identity_mismatch",
+      "tier": "profile-normative",
+      "profile": "Identity"
+    },
+    {
+      "code": "identity_binding_unavailable",
+      "tier": "profile-normative",
+      "profile": "Identity"
+    },
+    {
+      "code": "extension_not_activated",
+      "tier": "profile-normative",
+      "profile": "A2A"
+    },
+    {
+      "code": "authority_material_missing",
+      "tier": "profile-normative",
+      "profile": "A2A"
+    },
+    {
+      "code": "caller_holder_mismatch",
+      "tier": "profile-normative",
+      "profile": "A2A"
+    }
+  ]
+}

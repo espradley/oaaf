@@ -109,6 +109,10 @@ OAAF exposes is classified as one of:
 
 ## Reason-code classification
 
+> Frozen for v1 in [reason-codes.json](reason-codes.json) (O6G): 19 core-normative, 8
+> profile-normative, 26 diagnostic. That machine-readable file is the contract; the prose below
+> explains it.
+
 There are 53 reason codes. Interoperability does **not** require an implementation to
 reproduce all 53 internal distinctions; it requires a DENY with a code that names the failed
 check for the checks that are normative. Codes are classified so O6H can freeze a minimal set

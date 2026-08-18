@@ -30,6 +30,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_CORPUS = path.join(REPO_ROOT, 'spec', '0.1', 'conformance', 'vectors', 'corpus.json');
+const MANIFEST_PATH = path.join(REPO_ROOT, 'spec', '0.1', 'conformance', 'manifest.json');
 const RUNNER_VERSION = '0.1';
 const KNOWN_PROFILES = ['Core', 'Status', 'Identity', 'MCP', 'A2A', 'PDP'];
 const REPO_URL = 'https://github.com/espradley/oaaf';
@@ -118,6 +119,17 @@ async function main() {
   const corpusBytes = readFileSync(args.corpus);
   const corpus = JSON.parse(corpusBytes.toString('utf8'));
   const corpusHash = createHash('sha256').update(corpusBytes).digest('hex');
+  let manifest = null;
+  try {
+    const manifestBytes = readFileSync(MANIFEST_PATH);
+    manifest = {
+      sha256: createHash('sha256').update(manifestBytes).digest('hex'),
+      oaaf_version: JSON.parse(manifestBytes.toString('utf8')).oaaf_version,
+      status: JSON.parse(manifestBytes.toString('utf8')).status,
+    };
+  } catch {
+    manifest = null; // manifest is optional; a bare corpus still runs
+  }
 
   const adapter = new Adapter(args.adapter);
   const hello = await adapter
@@ -201,6 +213,7 @@ async function main() {
   const report = {
     runner: RUNNER_VERSION,
     corpus: { version: corpus.corpus_version, sha256: corpusHash },
+    ...(manifest ? { manifest } : {}),
     profiles_requested: targetProfiles,
     profiles_claimed: claimed,
     profiles_unclaimed: unclaimed,
@@ -225,6 +238,11 @@ function printHuman(r) {
   const out = [];
   out.push(`OAAF ${r.profiles_requested.join(' + ')} ${r.corpus.version}`);
   out.push(`Corpus ${r.corpus.version} (sha256:${r.corpus.sha256.slice(0, 12)}…)`);
+  if (r.manifest) {
+    out.push(
+      `Manifest ${r.manifest.oaaf_version} ${r.manifest.status} (sha256:${r.manifest.sha256.slice(0, 12)}…)`,
+    );
+  }
   out.push(`${r.applicable} applicable vectors`);
   out.push(`${r.passed} passed`);
   out.push(`${r.failed} failed`);

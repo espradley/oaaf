@@ -40,43 +40,43 @@ boundary is technical and binds everyone, including Edwin Digital
 
 ## Status at a glance
 
-| Phase       | Goal                                                 | Status                   |
-| ----------- | ---------------------------------------------------- | ------------------------ |
-| O1–O1.6     | Foundation + standards-first repositioning           | ✅ Complete              |
-| O2          | AAT verification + AuthZEN enforcement core          | ✅ Complete              |
-| O3A         | MCP / COAZ binding                                   | ✅ Complete              |
-| O3B         | A2A binding                                          | ✅ Complete              |
-| O3C         | Cross-transport authority proof                      | ✅ Complete              |
-| O4 (audit)  | Explainability / evidence / tooling assessment       | ✅ Complete              |
-| O4A         | Structured, privacy-safe explanations                | ✅ Complete              |
-| O4B         | Cross-transport explanation equivalence              | ✅ Complete              |
-| O4C         | Local authority inspector                            | ✅ Complete              |
-| O4D         | Signed portable decision receipts                    | 🧊 Parked / non-blocking |
-| O4.5        | OSS governance readiness                             | ✅ Complete              |
-| O5A         | Distribution + TypeScript package readiness          | ✅ Complete              |
-| O5B         | Independent Python implementation                    | ✅ Complete              |
-| O5C         | Revocation interoperability                          | ✅ Complete              |
-| O5D         | Identity / workload interoperability                 | ✅ Complete              |
-| O5E         | Existing PDP / authorization interoperability        | ✅ Complete              |
-| O5F         | Outsider adoption journey                            | ✅ Engineering-ready¹    |
-| O5F-DIST    | Public npm + PyPI distribution                       | ✅ Complete              |
-| O5F-EXT     | Independent outsider completes the journey           | ⬜ External evidence     |
-| O6A         | Normative conformance specification                  | ✅ Complete              |
-| O6B         | Portable conformance vectors                         | ✅ Complete              |
-| O6C         | Cross-language conformance runner + parity           | ✅ Complete              |
-| O6D         | Binding/profile conformance + transport equivalence  | ✅ Complete              |
-| O6E         | Security / adversarial certification                 | ✅ Complete              |
-| O6F         | Standards reconciliation + v1 dependency readiness   | ✅ Complete              |
-| O6G         | Competitive collision audit                          | ⏸️ Planned               |
-| O6H         | v1 compatibility / readiness contract                | ⏸️ Planned               |
-| **O6 exit** | **OAAF v1 technical foundation / freeze**            | 🎯                       |
-| REL-1       | Trusted Publishing / OIDC for npm + PyPI             | ⏸️ Future                |
-| O7A         | Integration target research                          | ⏸️ After O6 freeze       |
-| O7B         | OAAF-maintained reference bridges                    | ⏸️ After O6 freeze       |
-| O7C         | Maintainer validation                                | ⏸️ After O6 freeze       |
-| O7D         | Upstream integration PRs                             | ⏸️ After O6 freeze       |
-| O7E         | First external integrations                          | ⏸️ After O6 freeze       |
-| **O7 exit** | **OAAF demonstrated inside external OSS ecosystems** | 🎯                       |
+| Phase       | Goal                                                   | Status                   |
+| ----------- | ------------------------------------------------------ | ------------------------ |
+| O1–O1.6     | Foundation + standards-first repositioning             | ✅ Complete              |
+| O2          | AAT verification + AuthZEN enforcement core            | ✅ Complete              |
+| O3A         | MCP / COAZ binding                                     | ✅ Complete              |
+| O3B         | A2A binding                                            | ✅ Complete              |
+| O3C         | Cross-transport authority proof                        | ✅ Complete              |
+| O4 (audit)  | Explainability / evidence / tooling assessment         | ✅ Complete              |
+| O4A         | Structured, privacy-safe explanations                  | ✅ Complete              |
+| O4B         | Cross-transport explanation equivalence                | ✅ Complete              |
+| O4C         | Local authority inspector                              | ✅ Complete              |
+| O4D         | Signed portable decision receipts                      | 🧊 Parked / non-blocking |
+| O4.5        | OSS governance readiness                               | ✅ Complete              |
+| O5A         | Distribution + TypeScript package readiness            | ✅ Complete              |
+| O5B         | Independent Python implementation                      | ✅ Complete              |
+| O5C         | Revocation interoperability                            | ✅ Complete              |
+| O5D         | Identity / workload interoperability                   | ✅ Complete              |
+| O5E         | Existing PDP / authorization interoperability          | ✅ Complete              |
+| O5F         | Outsider adoption journey                              | ✅ Engineering-ready¹    |
+| O5F-DIST    | Public npm + PyPI distribution                         | ✅ Complete              |
+| O5F-EXT     | Independent outsider completes the journey             | ⬜ External evidence     |
+| O6A         | Normative conformance specification                    | ✅ Complete              |
+| O6B         | Portable conformance vectors                           | ✅ Complete              |
+| O6C         | Cross-language conformance runner + parity             | ✅ Complete              |
+| O6D         | Binding/profile conformance + transport equivalence    | ✅ Complete              |
+| O6E         | Security / adversarial certification                   | ✅ Complete              |
+| O6F         | Standards reconciliation + v1 dependency readiness     | ✅ Complete              |
+| O6G         | Compatibility contract + permanent v1 freeze artifacts | ✅ Complete              |
+| O6H         | v1 compatibility / readiness contract                  | ⏸️ Planned               |
+| **O6 exit** | **OAAF v1 technical foundation / freeze**              | 🎯                       |
+| REL-1       | Trusted Publishing / OIDC for npm + PyPI               | ⏸️ Future                |
+| O7A         | Integration target research                            | ⏸️ After O6 freeze       |
+| O7B         | OAAF-maintained reference bridges                      | ⏸️ After O6 freeze       |
+| O7C         | Maintainer validation                                  | ⏸️ After O6 freeze       |
+| O7D         | Upstream integration PRs                               | ⏸️ After O6 freeze       |
+| O7E         | First external integrations                            | ⏸️ After O6 freeze       |
+| **O7 exit** | **OAAF demonstrated inside external OSS ecosystems**   | 🎯                       |
 
 **Parallel tracks** (not part of the technical O-series): **A** — adoption/external
 validation; **F** — funding readiness; **DS-OAAF** — DigitalStack commercial integration.
@@ -434,14 +434,41 @@ Nothing was auto-upgraded: normative behavior is compared before any change.
 (This absorbed the "upstream participation" framing into a concrete dependency-readiness audit;
 what to propose upstream is a lighter follow-up, not a freeze prerequisite.)
 
-### O6G — Competitive collision audit ⏸️
+### O6G — Compatibility contract + permanent v1 freeze artifacts ✅
 
-A fresh, repo-level evaluation of the **then-current** closest projects and standards
-before v1 — deliberately not a hard-coded competitor list, because the landscape moves.
-It must answer objectively: what they do that OAAF does not; what OAAF does that they do
-not; where OAAF is complementary vs competitive; whether any OAAF behavior has been
-superseded by better upstream work; and whether OAAF still has a technically defensible
-reason to exist.
+Freezes the five surfaces that make "OAAF Core 1.0" mean something permanent, and produces the
+machine-readable artifact set that defines it.
+
+1. **Wire compatibility.** [aat-profile.md](spec/0.1/conformance/aat-profile.md) — the AAT-`-01`
+   Core compatibility profile: required claims, claim relationships, the constraint grammar, PoP
+   requirements, and the corpus as permanent fixtures. It **profiles** the pinned revision (AAT
+   defines the mechanism; OAAF freezes the Core subset), never republishes AAT — closing the O6F
+   self-containment gap.
+2. **Normative reason codes.** [reason-codes.json](spec/0.1/conformance/reason-codes.json) — the
+   19 core-normative + 8 profile-normative codes are the v1 contract; the other 26 are
+   implementation-specific diagnostics. `check:manifest` fails if this set drifts from the
+   implementation's reason list.
+3. **Conformance claim syntax.** Frozen in [compatibility.md](spec/0.1/conformance/compatibility.md),
+   preserving self-declared / not-certified, and now pinning the corpus + manifest hashes so a
+   claim is reproducible.
+4. **Compatibility policy.** 1.x (backward-compatible additions) vs 2.0 (breaking), with the
+   draft-backed nuance made explicit: an AAT `-02` profile ships as a **new** Core version and
+   never silently redefines Core 1.0.
+5. **Contract vs SDK API.** The normative interoperability contract, `@oaaf/sdk`, and `oaaf`
+   version **independently** — SDK semver is decoupled from the conformance contract.
+
+**Freeze manifest** — [manifest.json](spec/0.1/conformance/manifest.json): the definitive OAAF 1.0
+artifact set (requirements, corpus, reason-codes, AAT profile) each with a sha256, profiles with
+versions, and the pinned standard revisions. Status is **release-candidate** until O6H stamps the
+freeze. The [runner](spec/0.1/conformance/runner.md) now reports the manifest + corpus hashes in
+its evidence, and `check:manifest` guards against drift.
+
+**Exit condition met:** with these permanent artifacts plus the stable standards they reference
+(AuthZEN 1.0 Final, JOSE/JWT/JCS/JWK-Thumbprint RFCs, SPIFFE), an independent developer can
+implement OAAF Core 1.0 from OAAF's archive alone — no expired draft hunt required.
+
+(The competitive-collision review originally sketched here is repositioned as a lighter,
+post-freeze ecosystem activity; it is not a v1 technical-freeze prerequisite.)
 
 ### O6H — v1 compatibility / readiness contract ⏸️
 

@@ -1,0 +1,37 @@
+{
+  "oaaf_version": "1.0",
+  "status": "release-candidate",
+  "spec_version": "0.1",
+  "note": "The definitive artifact set for OAAF Core 1.0 and its profiles. status is release-candidate until the O6H freeze. Hashes are sha256 of the referenced files; check:manifest fails if any drifts. See compatibility.md for the versioning contract.",
+  "core": {
+    "requirements": {
+      "path": "spec/0.1/conformance/requirements.json",
+      "sha256": "b40da030e257ec7a9eda37462df17141411a7279af357b13499c1e84228ea69d"
+    },
+    "corpus": {
+      "path": "spec/0.1/conformance/vectors/corpus.json",
+      "sha256": "0eecc8751ad32087d87fd32cbf3a506b8293ca6a532f07ed708378b385fbe799"
+    },
+    "reason_codes": {
+      "path": "spec/0.1/conformance/reason-codes.json",
+      "sha256": "1ea3d0ac51925c8a979eadcd9e67eddcfdc75173147247b5966e9e461f799b51"
+    },
+    "aat_profile": {
+      "path": "spec/0.1/conformance/aat-profile.md",
+      "sha256": "3f120d92966fca9c0df0e24c9877dcab0077aaf3bf55bac38ab9b4d0ea859b0e",
+      "revision": "01"
+    }
+  },
+  "profiles": {
+    "status": "1.0",
+    "identity": "1.0",
+    "mcp": "1.0",
+    "a2a": "1.0",
+    "pdp": "1.0"
+  },
+  "standards": {
+    "aat": "draft-niyikiza-oauth-attenuating-agent-tokens-01",
+    "authzen": "Authorization API 1.0 (Final)",
+    "a2a": "1.0.1"
+  }
+}

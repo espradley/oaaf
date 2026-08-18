@@ -94,11 +94,12 @@ Status List all vanished from their archives?_
 self-standing — but Core is **not yet fully self-contained** either, because the AAT `-01` wire
 format lives by reference. That is the strong-but-honest position:
 
-> **Recommendation for O6G/O6H:** add an explicit _profiled AAT-`-01` claim-shape appendix_ to the
-> spec, so a pinned AAT-`-01`-compatible token format is permanently implementable **from OAAF's
-> own archived artifacts alone**, independent of whether the individual draft is ever republished.
-> This converts "Core depends on a draft that might expire" into "Core profiles a frozen,
-> self-archived revision" — a materially stronger footing to call v1.
+> **Resolved in O6G.** The [AAT-`-01` compatibility profile](aat-profile.md) now freezes the
+> claim shape as an OAAF profile of the pinned revision, so a pinned AAT-`-01`-compatible token
+> format is permanently implementable **from OAAF's own archived artifacts alone**, independent of
+> whether the individual draft is ever republished. This converts "Core depends on a draft that
+> might expire" into "Core profiles a frozen, self-archived revision" — a materially stronger
+> footing to call v1.
 
 ## Summary for v1
 
@@ -107,7 +108,7 @@ format lives by reference. That is the strong-but-honest position:
 - **Freeze with a pin:** AAT `-01` and COAZ, as explicitly profiled draft revisions.
 - **Keep out of Core v1 guarantees:** WIMSE and Token Status List remain EXPERIMENTAL, isolated
   to optional profiles.
-- **One pre-freeze action recommended (not a blocker):** the profiled AAT claim-shape appendix,
+- **Pre-freeze action — done in O6G:** the [profiled AAT claim-shape appendix](aat-profile.md),
   so Core is implementable from OAAF's archive alone.
 
 Sources for the audit are cited in the commit; primary sources are the IETF Datatracker document
