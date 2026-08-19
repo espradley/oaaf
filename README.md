@@ -1,42 +1,18 @@
 # OAAF — Open Agent Authority Framework
 
-OAAF is an open interoperability framework for carrying, enforcing, and verifying
-delegated authority across AI agents and tools.
+**Give AI agents only the authority they need. Prove it when they act.**
 
-It makes existing identity, authorization, delegation, and evidence standards practical
-across MCP, A2A, and agent runtimes without introducing another competing authorization
-protocol.
-
-> **Status: Core 1.0 interoperability contract frozen; reference implementations published.**
-> A frozen, implementation-independent conformance contract, TypeScript ([`@oaaf/sdk`](https://www.npmjs.com/package/@oaaf/sdk))
-> and Python ([`oaaf`](https://pypi.org/project/oaaf/)) implementations, a portable
-> [conformance corpus](spec/0.1/conformance/vectors/README.md) and a [cross-language runner](spec/0.1/conformance/runner.md).
-> It is **not** independently security-audited and has no production adopters yet — see
-> [Project maturity](#project-maturity) before you plan around it.
-
-<!-- prettier-ignore -->
-> **For standards maintainers (AuthZEN · A2A · MCP · IETF):** OAAF _profiles_ your work rather
-> than competing with it. Frozen [Core 1.0 contract](spec/0.1/conformance/oaaf-1.0.md) ·
-> [AAT→AuthZEN profile](rfcs/0001-aat-authzen-enforcement-profile.md) ·
-> [MCP/COAZ](rfcs/0002-mcp-coaz-binding.md) · [A2A extension](rfcs/0003-a2a-binding.md) ·
-> [standards & how to engage](docs/standards.md).
-
-## The problem
-
-**Your AI agent has credentials. But is it actually authorized to make this request,
-delegate this work, or call this tool?**
-
-Agent frameworks are getting good at planning, tool use, and coordination. Permissions
-have not kept up. Most systems still express what an agent may do as application
-config, an API key, or a tool allow-list. That works until the agent has broader
-credentials than the task requires — which is nearly always, because credentials are
-issued to the process, not to the intent.
+OAAF is an open interoperability framework for carrying, enforcing, and verifying delegated
+authority across AI agents and tools.
 
 ```text
 Agent requests:
   github.merge_pull_request
 
-Presented authority permits:
+Credentials:
+  valid GitHub access ✓
+
+Delegated authority:
   github.read
   github.write
   github.create_pull_request
@@ -45,41 +21,104 @@ Decision:
   DENY
 
 Reason:
-  capability_not_granted
+  tool_not_authorized
 ```
 
-The agent held a valid GitHub token the whole time. The token could merge. The
-_authority_ could not, and something had to be positioned to notice the difference.
+**The credential could merge. The authority could not.** That is the simple problem OAAF
+solves — and OAAF does not introduce another competing authorization protocol to do it.
 
-**See it work in one command** — an MCP `tools/call` allowed, and a structurally valid
-one denied before the authorization PDP is ever consulted:
+## Try OAAF in 30 seconds
+
+No account. No hosted service. No API key.
 
 ```bash
+git clone https://github.com/espradley/oaaf.git
+cd oaaf
 npm install
-npm run demo:mcp
+npm run demo:cross
+```
+
+`demo:cross` enforces the **same delegated authority** across both an MCP tool call and an A2A
+agent handoff — allowing what was delegated and denying what was not:
+
+```text
+              SAME AUTHORITY
+          Alice → Bob
+      narrowed to repo.read
+               │
+        ┌──────┴──────┐
+        ▼             ▼
+       MCP           A2A
+  Agent → Tool   Agent → Agent
+  read   ALLOW   read   ALLOW
+  merge  DENY    merge  DENY
+```
+
+The authority does not belong to MCP. It does not belong to A2A. It does not belong to a
+particular agent framework. It travels with the agent's authority, and OAAF verifies it the same
+way regardless of the transport it arrives on.
+
+## Add it to your project
+
+The clone above is for **trying** OAAF. To **use** it, install the published package:
+
+```bash
+# TypeScript / JavaScript
+npm install @oaaf/sdk
+
+# Python
+pip install oaaf
 ```
 
 If you maintain an MCP server or gateway, start with
-[examples/mcp-tool-guard](examples/mcp-tool-guard/) — it answers "where does OAAF sit
-in my request path?" in about five minutes.
+[examples/mcp-tool-guard](examples/mcp-tool-guard/) — it answers "where does OAAF sit in my
+request path?" in about five minutes.
 
-**The core idea in one demo** — the _same_ delegated authority enforced identically across
-both an MCP tool call and an A2A agent handoff:
+## Why this exists
+
+Agent systems today express what an agent may do with an **API key**, an **OAuth token**, a
+**service account**, a **tool allow-list**, or **application config**. Those describe what the
+credential or process _can access_. They do not answer the question that matters for an
+autonomous agent:
+
+> **What is this agent authorized to do for this delegated task?**
+
+Credentials are issued to the process, not to the intent — so an agent almost always holds
+broader access than the task in front of it requires. Delegation makes it concrete:
 
 ```text
-        SAME AUTHORITY CHAIN  (Alice → Bob, narrowed to repo.read)
-                     │
-          ┌──────────┴──────────┐
-          ▼                     ▼
-         MCP                   A2A
-     Agent → Tool          Agent → Agent
-     read ALLOW · merge DENY   read ALLOW · merge DENY
+Agent Alice
+authority:
+  repo.read
+  repo.write
+  repo.merge
+        │ delegates review
+        ▼
+Agent Bob
+authority:
+  repo.read
+  repo.comment
+
+repo.read     → ALLOW
+repo.comment  → ALLOW
+repo.merge    → DENY   (Bob was never delegated it)
 ```
 
-`npm run demo:cross` runs it. The authority is not owned by the transport — that is what
-OAAF is for.
+OAAF verifies that Bob's presented authority genuinely narrows from Alice's, cryptographically,
+before anything consequential happens. It says nothing about _why_ Bob was chosen, what happens
+next, or how the work is coordinated — those are not authority questions.
 
-## The model
+## The core principle
+
+> **The model may decide what it wants to do. The authority layer decides what it is permitted
+> to do.**
+
+OAAF assumes the agent may be prompt-injected, compromised, buggy, confused, or simply operating
+with credentials broader than its delegated authority. The enforcement point never relies on the
+agent restraining itself, and it **fails closed**: authority that is unverifiable, expired,
+revoked, or malformed denies the action.
+
+## The enforcement model
 
 ```text
 Agent requests action
@@ -87,135 +126,78 @@ Agent requests action
         ▼
 OAAF Enforcement Point
         │
-        ├── verify authority
-        ├── evaluate capability
-        ├── evaluate resource/constraints
-        └── produce evidence
+        ├── verify delegated authority
+        ├── verify proof of possession
+        ├── verify identity binding
+        ├── enforce narrowing / attenuation
+        ├── evaluate constraints
+        ├── check status / revocation
+        └── produce verified authority facts
         │
-   ALLOW / DENY
+    VALID / DENY
         │
         ▼
-       Tool
+Existing authorization / PDP
+        │
+    ALLOW / DENY
+        │
+        ▼
+Consequential action
 ```
 
-An **enforcement point** is whatever sits immediately before a consequential action:
-MCP middleware, a tool gateway, a shell wrapper, a Git proxy, an API gateway, an agent
-runtime. It is an architectural role, not a product you have to buy or host.
+An **enforcement point** is whatever sits immediately before a consequential action — MCP
+middleware, a tool gateway, an A2A agent, an agent runtime, an API gateway, a Git proxy. It is an
+architectural role, not a hosted OAAF service you have to buy or run.
 
-## The core principle
+## OAAF does not replace your existing authorization system
 
-> **The model may decide what it wants to do. The authority layer decides what it is
-> permitted to do.**
-
-OAAF assumes the agent may be prompt-injected, compromised, or simply wrong. The
-enforcement point never relies on the agent restraining itself, and it fails closed:
-authority that is unverifiable, expired, revoked, or malformed denies the action.
-
-## Who this is for
-
-OAAF is aimed at the infrastructure layer — the people who end up owning this problem
-whether or not they wanted to:
-
-- **MCP server maintainers** who expose consequential tools and need scoped authority
-  around them — there is a runnable [MCP tool-guard example](examples/mcp-tool-guard/)
-- **A2A agent authors** who delegate work across an agent boundary and need the
-  narrowing to be verifiable
-- **Tool gateway and proxy operators** enforcing what reaches a downstream system
-- **Security and IAM teams** evaluating what autonomous agents may do
-
-If you are building any of these, the alternative to OAAF is wiring several
-specifications together yourself. That is the comparison OAAF has to win.
-
-## What OAAF is not
-
-- **Not another authorization protocol.** OAAF implements and profiles existing
-  standards rather than competing with them.
-- Not an agent framework
-- Not a model
-- Not an orchestration engine
-- Not an IAM replacement — OAAF sits above workload identity and integrates with it
-- Not a workflow product
-- Not DigitalStack360, and not an open-source edition of it
-
-OAAF deliberately says nothing about which agent should do a task, in what order work
-should happen, or how an organization should run its AI workforce. Those are real
-problems; they belong to products built on top of OAAF. The boundary is written down in
-[CHARTER.md](CHARTER.md) and is enforced in CI.
-
-## Repository layout
+OAAF sits **in front of** your policy engine, not instead of it. Two questions, two owners:
 
 ```text
-spec/0.1/              how OAAF profiles existing standards
-packages/typescript/   @oaaf/sdk — TypeScript SDK
-rfcs/                  proposals for what OAAF adopts, profiles, extends, or invents
-docs/adr/              architecture decision records
-scripts/               repository checks, including the dependency boundary guard
+OAAF asks:                          Your organization asks:
+"Is the delegated authority         "Does our policy permit
+ valid?"                             this action?"
+
+        OAAF
+   authorityVerified = true
+        │
+        ▼
+   Organization PDP
+        │
+        ▼
+       DENY          ← legitimate
 ```
 
-Directories from the planned structure — `reference/`, `examples/`, `tests/` — are
-absent until there is something real to put in them. Empty scaffolding is not progress.
+A valid authority chain can still be denied on policy — that is intentional. OAAF conveys
+**verified authority facts** into the request context; the organization's PDP still owns the
+policy decision. OAAF profiles [AuthZEN](https://openid.net/wg/authzen/) as the decision model
+here rather than competing with it, and works alongside OPA, Cedar, and other engines
+([RFC-0006](rfcs/0006-pdp-interoperability.md)).
 
-## Getting started
+## MCP and A2A
 
-Requires Node.js 20 or newer. Nothing else — no account, no hosted service, no
-credentials.
+OAAF covers the two boundaries agents actually cross:
 
-```bash
-npm install
-npm run check
+```text
+Agent → Tool     MCP    (RFC-0002, COAZ / AuthZEN)
+Agent → Agent    A2A    (RFC-0003, A2A extension)
 ```
 
-`npm run check` runs the dependency boundary guard, the format check, the typecheck,
-and the test suite.
+The underlying **authority semantics are transport-independent** — the same chain verifies the
+same way — while each **binding is standards-specific**. OAAF does not assume MCP and A2A share
+an authorization model; it maps each into its own binding and preserves the authority decision
+across both (certified as [transport equivalence](spec/0.1/conformance/security.md)).
 
-To see authority actually enforced — a delegated agent refused a path it gave up:
+## Standards-first
 
-```bash
-npm run demo
-```
-
-The SDK verifies an AAT `-01` delegation chain, maps the request into an AuthZEN 1.0
-decision, and explains any denial. See [`@oaaf/sdk`](packages/typescript/README.md) and
-the [quickstart](examples/quickstart/index.js).
-
-**Inspect a decision locally** — see an ALLOW and two DENYs, and why, with no integration
-code:
-
-```bash
-npm run inspect -- --example allow
-npm run inspect -- --example deny-argument
-```
-
-The [authority inspector](examples/inspector/) is local, offline, and privacy-safe by
-default (names, never values).
-
-### Adding OAAF to your own project
-
-The steps above use this monorepo to _try_ OAAF. **Adopting** it does not — you install the
-published SDK into your own project:
-
-```bash
-npm install @oaaf/sdk
-```
-
-`@oaaf/sdk` is published on npm (and `oaaf` on PyPI). The whole path from discovering OAAF to
-depending on it is mapped, step by step, in the
-[outsider adoption journey](docs/adoption-journey.md).
-
-## The standards underneath
-
-The primitives for this mostly exist already. Identity, attenuating delegation,
-authorization decisions, and portable evidence are each being standardized by people
-who have been doing this longer than we have.
-
-What does not exist is running code that makes them work together across an agent
-boundary. That is OAAF.
+OAAF introduces no wire format of its own. Most of the primitives already exist; OAAF makes them
+work together across an agent boundary.
 
 ```text
 EXISTING STANDARDS
-────────────────────────────────
-Identity        SPIFFE / WIMSE
-Delegation      Attenuating authorization tokens
+──────────────────────────────────────────
+Identity        SPIFFE / WIMSE / OIDC
+Delegation      Attenuating Authorization Tokens (AAT)
 Decisions       AuthZEN
 MCP auth        COAZ
 Evidence        Signed receipts
@@ -223,69 +205,182 @@ A2A transport   A2A extensions
                   │
                   ▼
 OAAF
-────────────────────────────────
-Profiles
-Bindings
-Enforcement
-Verification
-Explainability
-Conformance
-Developer tooling
-             ┌────┴────┐
-             ▼         ▼
-            MCP       A2A
-             │         │
-             ▼         ▼
-           Tools     Agents
+──────────────────────────────────────────
+Profiles · Bindings · Enforcement · Verification
+Explainability · Conformance · Developer tooling
 ```
 
-OAAF defines no wire format of its own. Where a standard already solves something, OAAF
-adopts or profiles it; the reasoning is in
-[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md).
+Where a standard already solves something, OAAF adopts or profiles it — the reasoning is in
+[ADR-0003](docs/adr/0003-implement-existing-authority-standards.md), and how OAAF engages with
+each standard (and how to raise an interoperability discrepancy) is in
+[docs/standards.md](docs/standards.md).
+
+## OAAF Core 1.0 — a frozen interoperability contract
+
+The **OAAF Core 1.0 interoperability contract is frozen**, and defined **independently of** the
+TypeScript and Python reference implementations — so a Go, Rust, or Java implementation can
+target it without importing any OAAF code. The frozen artifact set
+([What is OAAF 1.0?](spec/0.1/conformance/oaaf-1.0.md), hash-pinned by a
+[freeze manifest](spec/0.1/conformance/manifest.json)):
+
+- normative [Core requirements](spec/0.1/conformance/requirements.json);
+- [AAT compatibility profile](spec/0.1/conformance/aat-profile.md);
+- normative [reason codes](spec/0.1/conformance/reason-codes.json);
+- [portable conformance corpus](spec/0.1/conformance/vectors/README.md);
+- implementation-independent [runner protocol](spec/0.1/conformance/runner.md);
+- optional [profile definitions](spec/0.1/conformance/classification.md);
+- adversarial [security evidence](spec/0.1/conformance/security.md);
+- [compatibility policy](spec/0.1/conformance/compatibility.md);
+- the [freeze manifest](spec/0.1/conformance/manifest.json).
+
+> The **contract** is Core 1.0 (frozen). The reference **packages** are versioned separately
+> (`@oaaf/sdk` and `oaaf` are `0.x`) — see the [compatibility policy](spec/0.1/conformance/compatibility.md).
+
+## Conformance — implementation-independent
+
+Any implementation — in any language — proves conformance without importing OAAF code, by
+answering a small adapter protocol over the portable corpus:
+
+```bash
+node scripts/oaaf-conform.mjs --adapter "<your adapter>" --profile Core
+```
+
+Representative output:
+
+```text
+OAAF Core + Status + Identity + A2A + MCP + PDP 0.1
+Corpus 0.1 (sha256:…)
+Manifest 1.0 frozen (sha256:…)
+51 applicable vectors
+51 passed
+0 failed
+CONFORMANT
+(self-declared, self-verified against the corpus above)
+```
+
+Conformance is **self-declared and self-verifiable**. OAAF does not certify implementations and
+operates no certification authority — the machine-readable output (`--json`) is clean evidence a
+reader can reproduce. Both the TypeScript and Python reference implementations pass the corpus.
+
+## Security posture
+
+- **OAAF has adversarial security certification derived from its normative security invariants**
+  — 41 attacks tied back to the 44 security invariants, in every attack family: authority
+  widening, chain manipulation, cryptographic attacks, proof-of-possession failures,
+  identity/recipient substitution, validity/revocation behavior, transport-equivalence attacks,
+  privacy leakage, and malformed inputs
+  ([security certification](spec/0.1/conformance/security.md)).
+- **OAAF has not yet undergone an independent professional third-party security audit.**
+
+Those are two different claims, and both are stated plainly. To report a vulnerability, see
+[SECURITY.md](SECURITY.md) (private reporting).
+
+## Identity, kept separate
+
+OAAF does not conflate four things that agent systems usually merge into one:
+
+```text
+WHO IS THE ACTOR?              subject                (SPIFFE / WIMSE / OIDC)
+HOW WAS IT AUTHENTICATED?      external credential    (an SVID / OIDC token — never in OAAF)
+WHO POSSESSES THIS AUTHORITY?  proof-of-possession key
+WHAT MAY IT DO?                authority              (the delegated grant)
+```
+
+Identity providers establish _who_ the actor is; OAAF verifies _what authority_ the actor
+presents and that it is bound to the right key. Workload-identity systems are complementary, not
+replaced ([RFC-0005](rfcs/0005-external-subject-identity-binding.md)).
+
+## Who this is for
+
+- **MCP server maintainers** — scope authority around consequential tools; a request that exceeds
+  its delegated authority is denied before the tool runs.
+- **A2A implementers** — make the narrowing across an agent handoff cryptographically verifiable.
+- **Agent framework / runtime authors** — a transport-neutral place to enforce what an agent may do.
+- **Tool gateway / proxy maintainers** — enforce delegated authority at the boundary you already own.
+- **Security / IAM teams** — evaluate what autonomous agents may actually do, with fail-closed defaults.
+
+## What OAAF is not
+
+- Not another authorization wire protocol
+- Not an agent framework
+- Not a model
+- Not an IAM replacement (it sits above workload identity and integrates with it)
+- Not an orchestration engine, a workflow engine, or a scheduler
+- Not an AI-workforce product
+- Not DigitalStack360, and not an open-source edition of it
+
+OAAF deliberately does **not** decide which agent should do the work, what happens next, how work
+is prioritized, how much capacity exists, when execution should recover, who should take over, or
+what organizational context to supply. Those are real problems that belong to products built on
+top of OAAF. The boundary is written down in [CHARTER.md](CHARTER.md) and enforced in CI.
+
+## Runnable demos
+
+All run from a fresh clone, offline, with no credentials:
+
+```bash
+npm run demo         # a delegated agent refused a path it gave up
+npm run demo:mcp     # OAAF as a precondition on an MCP tools/call
+npm run demo:a2a     # OAAF enforcement over an A2A message
+npm run demo:cross   # the same authority, same result, across transports
+npm run demo:pdp     # OAAF in front of an existing PDP (valid authority, org still denies)
+
+npm run inspect -- --example allow             # exit 0 (ALLOW)
+npm run inspect -- --example deny-argument      # prints the denial; exit 1 (DENY), by design
+```
+
+The inspector exits `0` for ALLOW and `1` for DENY — a non-zero exit on a `deny-*` example is the
+decision, not an error.
 
 ## Project maturity
 
-Honest accounting of where this stands:
-
-|                       |                                                                                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Core contract         | **OAAF Core 1.0 — frozen.** [What is OAAF 1.0?](spec/0.1/conformance/oaaf-1.0.md), hash-pinned by a [freeze manifest](spec/0.1/conformance/manifest.json).   |
-| Standards profile     | AAT `-01` (pinned, self-contained via the [AAT profile](spec/0.1/conformance/aat-profile.md)) and AuthZEN 1.0 **Final**. See [standards](docs/standards.md). |
-| TypeScript SDK        | Published on npm as [`@oaaf/sdk`](https://www.npmjs.com/package/@oaaf/sdk).                                                                                  |
-| Python implementation | Independent; published on PyPI as [`oaaf`](https://pypi.org/project/oaaf/).                                                                                  |
-| MCP / COAZ binding    | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path.                                                                                |
-| A2A binding           | Shipped (O3B): OAAF authority as an A2A extension, verified before work.                                                                                     |
-| PDP interoperability  | Shipped (O5E): conveys verified authority to an existing PDP; the PDP still owns policy.                                                                     |
-| Identity / revocation | External subject identity binding (SPIFFE/OIDC/WIMSE) and a status/revocation resolver contract.                                                             |
-| Conformance suite     | Portable conformance corpus (51 vectors) + implementation-independent [runner](spec/0.1/conformance/runner.md); TypeScript and Python both certified.        |
-| Security testing      | Adversarial security certification against OAAF's normative invariants — 41 attacks ([security.md](spec/0.1/conformance/security.md)).                       |
-| Independent audit     | **Not performed.** No independent professional security audit has taken place.                                                                               |
-| External adopters     | None yet ([ADOPTERS.md](ADOPTERS.md) is empty by design — verified, voluntary entries only).                                                                 |
-| Governance            | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                                                                                                             |
-
-The interoperability contract is frozen and the implementations are published, but OAAF has not
-had an independent security audit and has no production adopters yet. If you are interested in
-shaping how these standards fit together — or in implementing the contract independently — this
-is the useful moment.
-
-## Governance and policies
-
-OAAF is maintained by Edwin Digital LLC, founder-led today and designed to evolve. How
-decisions are made, how normative changes go through RFCs, how versions and compatibility
-work, and how to report a vulnerability are written down:
-[GOVERNANCE](GOVERNANCE.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) ·
-[versioning & compatibility](docs/versioning-and-compatibility.md) ·
-[extensions](docs/extensions.md) · [adoption journey](docs/adoption-journey.md) ·
-[adopters](ADOPTERS.md).
+| Area                           | Current state                                                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| OAAF Core                      | **1.0 interoperability contract frozen** ([what that means](spec/0.1/conformance/oaaf-1.0.md))                       |
+| TypeScript SDK                 | Published as [`@oaaf/sdk`](https://www.npmjs.com/package/@oaaf/sdk) (`0.x`)                                          |
+| Python                         | Published as [`oaaf`](https://pypi.org/project/oaaf/) (`0.x`)                                                        |
+| MCP / COAZ                     | Implemented and conformance-tested ([RFC-0002](rfcs/0002-mcp-coaz-binding.md))                                       |
+| A2A                            | Implemented and conformance-tested ([RFC-0003](rfcs/0003-a2a-binding.md))                                            |
+| PDP interoperability           | AuthZEN-compatible authority context; existing-PDP coexistence ([RFC-0006](rfcs/0006-pdp-interoperability.md))       |
+| Identity                       | SPIFFE / WIMSE / OIDC-compatible identity-binding model ([RFC-0005](rfcs/0005-external-subject-identity-binding.md)) |
+| Revocation / status            | Implemented with profile-specific semantics ([RFC-0004](rfcs/0004-authority-status-revocation.md))                   |
+| Conformance                    | Portable corpus + implementation-independent [runner](spec/0.1/conformance/runner.md)                                |
+| Cross-language                 | TypeScript + Python reference implementations                                                                        |
+| Security                       | Normative security-invariant + [adversarial suite](spec/0.1/conformance/security.md)                                 |
+| Independent professional audit | Not yet performed                                                                                                    |
+| External adopters              | Early stage — independent evidence still being built ([ADOPTERS.md](ADOPTERS.md) is empty by design)                 |
+| Governance                     | Founder-led, public [RFC process](rfcs/README.md)                                                                    |
 
 ## Contributing
 
-Design critique is worth more than code right now, particularly from people who have
-operated agent systems or IAM infrastructure in anger — and especially from anyone
-working on the standards OAAF builds on. See [CONTRIBUTING.md](CONTRIBUTING.md) and
-[rfcs/README.md](rfcs/README.md).
+OAAF wants interoperability reports, standards-interpretation feedback, independent conformance
+adapters, real integration examples, security findings, documentation improvements, and
+implementations in additional languages.
 
-To report a security issue, see [SECURITY.md](SECURITY.md).
+- [CONTRIBUTING.md](CONTRIBUTING.md) · [RFC process](rfcs/README.md) ·
+  [docs/standards.md](docs/standards.md) ·
+  [Discussions](https://github.com/espradley/oaaf/discussions)
+- Open [`help wanted`](https://github.com/espradley/oaaf/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+  issues include an independent Go/Rust conformance adapter, AuthZEN interop testing, and a
+  real-world MCP integration.
+
+## Using OAAF?
+
+- ⭐ Star the project if it is useful.
+- 🧩 Tell us what you're integrating.
+- 🐛 Report interoperability problems.
+- 🤝 Contribute an implementation, adapter, test, or standards finding.
+- 📣 Using OAAF in a real project? Consider the voluntary [adopter process](ADOPTERS.md).
+
+No telemetry, no phone-home, no install-time promotional hooks — participation is voluntary, and
+a star is a visibility signal, not adoption certification.
+
+## Governance and policies
+
+Maintained by Edwin Digital LLC, founder-led today and designed to evolve:
+[GOVERNANCE](GOVERNANCE.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) ·
+[versioning & compatibility](docs/versioning-and-compatibility.md) ·
+[standards](docs/standards.md) · [adoption journey](docs/adoption-journey.md).
 
 ## License
 
