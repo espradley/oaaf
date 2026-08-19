@@ -88,7 +88,7 @@ How adoption is observed without any telemetry in the SDK is documented in
 
 - [CONTRIBUTING](../CONTRIBUTING.md) — how to propose changes and the bar for them.
 - An interoperability gap OAAF cannot express →
-  [integration template](https://github.com/espradley/oaaf/issues/new?template=integration.md).
+  [interoperability bug](https://github.com/espradley/oaaf/issues/new?template=interop_bug.md).
 - A normative change → the [RFC process](../rfcs/README.md) and
   [rfc-intent template](https://github.com/espradley/oaaf/issues/new?template=rfc_intent.md).
 - [GOVERNANCE](../GOVERNANCE.md) and [CODE_OF_CONDUCT](../CODE_OF_CONDUCT.md) apply throughout.

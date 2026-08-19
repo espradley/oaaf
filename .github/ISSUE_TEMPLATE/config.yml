@@ -5,6 +5,11 @@ contact_links:
     about: >-
       Do NOT open a public issue for a vulnerability. Report it privately here.
       See SECURITY.md for what to include and what is in scope.
+  - name: Discussions — questions, integrations, standards interpretation
+    url: https://github.com/espradley/oaaf/discussions
+    about: >-
+      Implementation questions, integration help, standards interpretation, and
+      "show what you are integrating" belong here rather than as bugs.
   - name: The outsider adoption journey
     url: https://github.com/espradley/oaaf/blob/main/docs/adoption-journey.md
     about: >-

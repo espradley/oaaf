@@ -11,6 +11,11 @@
 /packages/typescript/src/mcp/       @espradley
 /packages/typescript/src/a2a/       @espradley
 
+# The frozen conformance contract and the independent Python implementation.
+/spec/                              @espradley
+/python/                            @espradley
+/.github/                           @espradley
+
 # Governance and normative contracts.
 /rfcs/                              @espradley
 /docs/adr/                          @espradley

@@ -1,0 +1,44 @@
+name: DCO
+
+# OAAF uses the Developer Certificate of Origin (git commit -s), documented in
+# CONTRIBUTING.md. This checks it on pull requests with a small inline script — no
+# third-party GitHub App, no CLA. It gates PRs only; it does not affect maintainer
+# direct pushes.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    name: Signed-off-by present
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check every commit has a Signed-off-by trailer
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          missing=0
+          for sha in $(git rev-list "$BASE_SHA".."$HEAD_SHA"); do
+            # Merge commits (more than one parent) are exempt.
+            if [ "$(git rev-list --parents -n 1 "$sha" | wc -w)" -gt 2 ]; then
+              continue
+            fi
+            author="$(git show -s --format='%an <%ae>' "$sha")"
+            if ! git show -s --format='%B' "$sha" | grep -qiE "^Signed-off-by: .+ <.+@.+>"; then
+              echo "::error::commit $sha by $author is missing a Signed-off-by trailer (use git commit -s; see CONTRIBUTING.md)"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "One or more commits lack a DCO sign-off. See https://developercertificate.org/ and CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "All commits carry a Signed-off-by trailer."

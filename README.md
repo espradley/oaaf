@@ -7,9 +7,19 @@ It makes existing identity, authorization, delegation, and evidence standards pr
 across MCP, A2A, and agent runtimes without introducing another competing authorization
 protocol.
 
-> **Status: early, but runnable.** A verified authority kernel and an MCP tool-guard
-> integration work today, across MCP (`npm run demo:mcp`) and A2A (`npm run demo:a2a`). Not production-ready and not
-> security-audited — see [Project maturity](#project-maturity) before you plan around it.
+> **Status: Core 1.0 interoperability contract frozen; reference implementations published.**
+> A frozen, implementation-independent conformance contract, TypeScript ([`@oaaf/sdk`](https://www.npmjs.com/package/@oaaf/sdk))
+> and Python ([`oaaf`](https://pypi.org/project/oaaf/)) implementations, a portable
+> [conformance corpus](spec/0.1/conformance/vectors/README.md) and a [cross-language runner](spec/0.1/conformance/runner.md).
+> It is **not** independently security-audited and has no production adopters yet — see
+> [Project maturity](#project-maturity) before you plan around it.
+
+<!-- prettier-ignore -->
+> **For standards maintainers (AuthZEN · A2A · MCP · IETF):** OAAF _profiles_ your work rather
+> than competing with it. Frozen [Core 1.0 contract](spec/0.1/conformance/oaaf-1.0.md) ·
+> [AAT→AuthZEN profile](rfcs/0001-aat-authzen-enforcement-profile.md) ·
+> [MCP/COAZ](rfcs/0002-mcp-coaz-binding.md) · [A2A extension](rfcs/0003-a2a-binding.md) ·
+> [standards & how to engage](docs/standards.md).
 
 ## The problem
 
@@ -237,20 +247,26 @@ adopts or profiles it; the reasoning is in
 
 Honest accounting of where this stands:
 
-|                    |                                                                               |
-| ------------------ | ----------------------------------------------------------------------------- |
-| Standards profile  | AAT `-01` and AuthZEN 1.0, pinned. Mapping frozen by RFC-0001.                |
-| TypeScript SDK     | Verify, decide, explain, MCP + A2A bindings. Published on npm as `@oaaf/sdk`. |
-| MCP / COAZ binding | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path. |
-| A2A binding        | Shipped (O3B): OAAF authority as an A2A extension, verified before work.      |
-| Conformance suite  | Not started.                                                                  |
-| Security review    | None. No formal audit, no certification, no threat model published yet.       |
-| External adopters  | None yet.                                                                     |
-| Governance         | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                              |
+|                       |                                                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Core contract         | **OAAF Core 1.0 — frozen.** [What is OAAF 1.0?](spec/0.1/conformance/oaaf-1.0.md), hash-pinned by a [freeze manifest](spec/0.1/conformance/manifest.json).   |
+| Standards profile     | AAT `-01` (pinned, self-contained via the [AAT profile](spec/0.1/conformance/aat-profile.md)) and AuthZEN 1.0 **Final**. See [standards](docs/standards.md). |
+| TypeScript SDK        | Published on npm as [`@oaaf/sdk`](https://www.npmjs.com/package/@oaaf/sdk).                                                                                  |
+| Python implementation | Independent; published on PyPI as [`oaaf`](https://pypi.org/project/oaaf/).                                                                                  |
+| MCP / COAZ binding    | Shipped (O3A): an enforcement precondition in front of the COAZ/AuthZEN path.                                                                                |
+| A2A binding           | Shipped (O3B): OAAF authority as an A2A extension, verified before work.                                                                                     |
+| PDP interoperability  | Shipped (O5E): conveys verified authority to an existing PDP; the PDP still owns policy.                                                                     |
+| Identity / revocation | External subject identity binding (SPIFFE/OIDC/WIMSE) and a status/revocation resolver contract.                                                             |
+| Conformance suite     | Portable conformance corpus (51 vectors) + implementation-independent [runner](spec/0.1/conformance/runner.md); TypeScript and Python both certified.        |
+| Security testing      | Adversarial security certification against OAAF's normative invariants — 41 attacks ([security.md](spec/0.1/conformance/security.md)).                       |
+| Independent audit     | **Not performed.** No independent professional security audit has taken place.                                                                               |
+| External adopters     | None yet ([ADOPTERS.md](ADOPTERS.md) is empty by design — verified, voluntary entries only).                                                                 |
+| Governance            | Founder-led. See [GOVERNANCE.md](GOVERNANCE.md).                                                                                                             |
 
-If you are evaluating OAAF for production use: it is too early. If you are interested
-in shaping how these standards fit together before that calcifies, this is the useful
-moment.
+The interoperability contract is frozen and the implementations are published, but OAAF has not
+had an independent security audit and has no production adopters yet. If you are interested in
+shaping how these standards fit together — or in implementing the contract independently — this
+is the useful moment.
 
 ## Governance and policies
 

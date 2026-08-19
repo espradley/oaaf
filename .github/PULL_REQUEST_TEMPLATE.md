@@ -11,6 +11,13 @@ behavior needs all of it. Delete what does not apply. -->
 - [ ] Tests added for behavior changes (adversarial ones for security-sensitive code)
 - [ ] Commits signed off (`git commit -s`, DCO)
 
+## Classification
+
+<!-- Skip for a typo/docs-only PR. -->
+
+- [ ] ADOPT / PROFILE / EXTEND / INVENT (a normative change — needs an [RFC](../rfcs/README.md))
+- [ ] Implementation / docs only
+
 ## Impact
 
 - **Compatibility:** none / additive / breaking — if not "none", see
