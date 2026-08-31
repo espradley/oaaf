@@ -24,6 +24,7 @@
     "clean": "tsc --build --clean",
     "demo": "npm run build && node examples/quickstart/index.js",
     "demo:mcp": "npm run build && node examples/mcp-tool-guard/index.js",
+    "demo:mcp-filesystem": "npm run build && node examples/mcp-filesystem-guard/index.js",
     "demo:a2a": "npm run build && node examples/a2a-delegation/index.js",
     "demo:cross": "npm run build && node examples/cross-transport/index.js",
     "inspect": "npm run build && node examples/inspector/inspect.js",

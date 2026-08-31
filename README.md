@@ -72,7 +72,9 @@ pip install oaaf
 
 If you maintain an MCP server or gateway, start with
 [examples/mcp-tool-guard](examples/mcp-tool-guard/) — it answers "where does OAAF sit in my
-request path?" in about five minutes.
+request path?" in about five minutes. For a real MCP server process, run
+[`examples/mcp-filesystem-guard`](examples/mcp-filesystem-guard/) against the open-source
+filesystem server.
 
 ## Why this exists
 
@@ -321,6 +323,7 @@ All run from a fresh clone, offline, with no credentials:
 ```bash
 npm run demo         # a delegated agent refused a path it gave up
 npm run demo:mcp     # OAAF as a precondition on an MCP tools/call
+npm run demo:mcp-filesystem  # OAAF guarding a real MCP filesystem server
 npm run demo:a2a     # OAAF enforcement over an A2A message
 npm run demo:cross   # the same authority, same result, across transports
 npm run demo:pdp     # OAAF in front of an existing PDP (valid authority, org still denies)

@@ -37,6 +37,7 @@ credentials:
 npm install
 npm run demo          # a delegated agent refused a path it gave up
 npm run demo:mcp      # OAAF as a precondition on an MCP tools/call (RFC-0002)
+npm run demo:mcp-filesystem  # OAAF guarding a real MCP filesystem server
 npm run demo:a2a      # OAAF enforcement over an A2A message (RFC-0003)
 npm run demo:cross    # the same authority, same result, across transports (RFC-0003C)
 npm run demo:pdp      # OAAF in front of an existing PDP (RFC-0006)
