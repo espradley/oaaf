@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "canonicalize": "^4.0.0",
-    "jose": "^6.2.9"
+    "jose": "^6.2.10"
   },
   "keywords": [
     "oaaf",
