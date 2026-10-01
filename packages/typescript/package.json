@@ -51,8 +51,8 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "canonicalize": "^4.0.0",
-    "jose": "^6.2.9"
+    "canonicalize": "^5.1.0",
+    "jose": "^6.2.12"
   },
   "keywords": [
     "oaaf",
